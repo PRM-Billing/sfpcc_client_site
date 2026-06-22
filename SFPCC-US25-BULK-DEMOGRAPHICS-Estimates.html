@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="doc-last-updated" content="2026-06-21" />
+    <title>SFPCC ERP — US-25 Bulk Patient Demographics Upload: BRD &amp; Estimate</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #3182ce;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --danger: #e53e3e;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --purple: #6b46c1;
+            --purple-light: #f3e8ff;
+            --teal: #319795;
+            --teal-light: #e6fffa;
+            --orange: #c05621;
+            --orange-light: #fffaf0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 36px 44px;
+            border-radius: 14px 14px 0 0;
+        }
+        .header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 14px; line-height: 1.3; }
+        .header-meta { font-size: 0.88rem; opacity: 0.92; line-height: 1.8; }
+        .header-meta strong { font-weight: 600; }
+
+        .content {
+            background: var(--card-bg);
+            padding: 44px;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin: 38px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        h2:first-child { margin-top: 0; }
+        h3 { font-size: 1.05rem; color: var(--primary-light); margin: 24px 0 10px 0; }
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 8px 0 16px 24px; }
+        li { margin-bottom: 5px; }
+
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid var(--accent);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0 20px 0;
+            font-size: 0.92rem;
+        }
+        .warn-box {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0 20px 0;
+            font-size: 0.92rem;
+        }
+        .success-box {
+            background: #f0fff4;
+            border-left: 4px solid var(--success);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0 20px 0;
+            font-size: 0.92rem;
+        }
+
+        .context-block {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--purple);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0 18px 0;
+            font-size: 0.9rem;
+            line-height: 1.75;
+        }
+        .context-label {
+            display: inline-block;
+            background: var(--purple-light);
+            color: var(--purple);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .open-q-block {
+            background: var(--orange-light);
+            border: 1px solid #f6ad55;
+            border-left: 4px solid var(--orange);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0 16px 0;
+            font-size: 0.88rem;
+        }
+        .open-q-label {
+            display: inline-block;
+            background: #feebc8;
+            color: var(--orange);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .open-q-label.blocking {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .story-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 24px 28px;
+            margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .story-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.08rem;
+        }
+        .story-meta {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .story-desc {
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .module-tag {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .mod-appointments { background: #dbeafe; color: #1e40af; }
+        .mod-scheduler { background: #e0e7ff; color: #3730a3; }
+        .mod-patients { background: #fce7f3; color: #9d174d; }
+        .mod-ai { background: #f3e8ff; color: #6b21a8; }
+        .mod-platform { background: #ccfbf1; color: #065f46; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 0.82rem;
+        }
+        thead th {
+            background: var(--primary);
+            color: white;
+            padding: 9px 11px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.76rem;
+            white-space: nowrap;
+        }
+        tbody td {
+            padding: 9px 11px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        tbody tr:nth-child(even) { background: #f7fafc; }
+        tbody tr:hover { background: #edf2f7; }
+        .hours-table { max-width: 360px; }
+        .hours-table th { font-size: 0.78rem; }
+        .hours-table td { font-size: 0.85rem; }
+        .totals-row td, .totals-row th {
+            font-weight: 700;
+            background: #edf2f7 !important;
+        }
+
+        .grand-total {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px 28px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .grand-total .gt-label { font-size: 0.75rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; }
+        .grand-total .gt-value { font-size: 1.6rem; font-weight: 700; margin-top: 4px; }
+
+        .field-table { margin: 12px 0; }
+        .field-table th { background: #4a5568; }
+
+        .status-flow {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 10px 0 14px 0;
+            flex-wrap: wrap;
+            font-size: 0.82rem;
+        }
+        .status-pill {
+            background: #edf2f7;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-weight: 600;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+        .status-arrow { color: var(--text-light); font-size: 1rem; }
+
+        .bucket-pill {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-right: 6px;
+        }
+        .bucket-new { background: #c6f6d5; color: #22543d; }
+        .bucket-update { background: #bee3f8; color: #2c5282; }
+        .bucket-review { background: #feebc8; color: #c05621; }
+
+        hr.divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+        @media print {
+            body { padding: 0; background: white; font-size: 11px; }
+            .container { max-width: 100%; }
+            .header { border-radius: 0; }
+            .content { box-shadow: none; border-radius: 0; padding: 24px; }
+            .story-card { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>SFPCC ERP — US-25: Bulk Patient Demographics Upload with Auto-Match &amp; Calendar Assignment</h1>
+        <div class="header-meta">
+            <strong>Purpose:</strong> Business requirements and effort estimate for bulk demographics import with auto-match and medical-center calendar assignment — ClinicSync ERP.<br>
+            <strong>Version:</strong> 1.4 · May 2026 &nbsp;|&nbsp; <strong>Story:</strong> US-25 &nbsp;|&nbsp; <strong>Estimate:</strong> 76 hours combined (63 engineering + 13 QA) — <em>QA ≈ 20% of engineering time</em><br>
+            <strong>UX review:</strong> Interactive prototype available for stakeholder walkthrough (May 2026) — <a href="SFPCC-US25-Bulk-Demographics-Prototype.html"><strong>Open interactive prototype →</strong></a><br>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- USER STORY & CONTEXT -->
+        <h2>User Story: Bulk Patient Demographics Upload with Auto-Match &amp; Calendar Assignment</h2>
+        <div class="info-box">
+            <p>As an <strong>SFP operations user</strong> (scheduler / front-desk), I want to upload a <strong>CSV, Excel, or PDF</strong> of patient demographics received from a medical center, <strong>So that</strong> patient records are automatically created or updated and routed to the correct medical-center calendar for that day's NP visit — eliminating manual data entry.</p>
+        </div>
+
+        <h2>Context</h2>
+        <ul>
+            <li>NPs visit external medical centers on a rotating schedule. Each medical center has its own calendar in the dashboard.</li>
+            <li>The medical center sends a patient list ahead of the visit. Ops needs the demographics in the calendar in time to verify insurance and referrals.</li>
+            <li>A meaningful share of these patients already exist in our system — for them the upload is effectively an <strong>insurance/referral refresh</strong>, not a net-new chart.</li>
+        </ul>
+
+        <hr class="divider">
+
+        <!-- ACCEPTANCE CRITERIA -->
+        <h2>Acceptance Criteria</h2>
+        <ol>
+            <li>User selects the <strong>target calendar</strong> (medical center + visit date) and uploads a <strong>CSV, XLSX, or PDF</strong>.</li>
+            <li>System extracts demographics: first/last name, DOB, gender, address, phone, email, insurance (carrier, member ID, group), referral source, PCP.</li>
+            <li>Patient matching runs against the existing database:
+                <ul>
+                    <li><span class="bucket-pill bucket-update">Update</span> Strong match (name + DOB exact) → flagged as Update.</li>
+                    <li><span class="bucket-pill bucket-review">Needs Review</span> Weak/ambiguous match → review queue for manual confirmation.</li>
+                    <li><span class="bucket-pill bucket-new">New</span> No match → flagged as New.</li>
+                </ul>
+            </li>
+            <li>Pre-commit review screen shows three buckets: <strong>New</strong> / <strong>Update</strong> (with field-level diff) / <strong>Needs Review</strong>. User confirms before any writes occur.</li>
+        </ol>
+
+        <h3 style="margin-top:24px;">On commit &amp; operations (included in this scope)</h3>
+        <ol start="5">
+            <li>After confirmation, patient records are created or updated and placed on the correct medical-center calendar for the visit day, with a full audit trail.</li>
+            <li><strong>Master NP calendar</strong> — Month, week, and day views with upload status and demographics summaries per visit; day-details modal from month view.</li>
+            <li><strong>Upload log</strong> — Searchable history of bulk uploads with per-batch activity (parse, review, commit).</li>
+            <li><strong>Patient master</strong> — Searchable registry to view, add, edit, and deactivate patients.</li>
+        </ol>
+
+        <div class="success-box">
+            <strong>UX review (May 2026):</strong> An interactive prototype demonstrates the master calendar (month / week / day), day-details modal, seven-step upload wizard, upload log, and patient master — available for SFPCC walkthrough and sign-off. <a href="SFPCC-US25-Bulk-Demographics-Prototype.html"><strong>Open prototype →</strong></a>
+        </div>
+
+        <hr class="divider">
+
+        <!-- GRAND TOTALS -->
+        <h2>Grand Totals — US-25</h2>
+        <div class="grand-total">
+            <div class="gt-item">
+                <div class="gt-label">Engineering</div>
+                <div class="gt-value">63 h</div>
+            </div>
+            <div class="gt-item">
+                <div class="gt-label">QA</div>
+                <div class="gt-value">13 h</div>
+            </div>
+            <div class="gt-item">
+                <div class="gt-label">Combined</div>
+                <div class="gt-value">76 h</div>
+            </div>
+            <div class="gt-item">
+                <div class="gt-label">Stories</div>
+                <div class="gt-value">1</div>
+            </div>
+        </div>
+        <p class="info-box" style="margin-top:12px;"><strong>QA sizing rule:</strong> QA is modeled at approximately <strong>20% of engineering</strong> hours (<strong>13 h</strong> on <strong>63 h</strong> engineering).</p>
+        <hr class="divider">
+
+        <!-- ROLLUP TABLE -->
+        <h2>Rollup — US-25 Hours</h2>
+        <table>
+            <thead>
+                <tr><th>US</th><th>Module</th><th>Title</th><th>BE (h)</th><th>FE (h)</th><th>AI (h)</th><th>Eng (h)</th><th>QA (h)</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>US-25</td>
+                    <td>
+                        <span class="module-tag mod-patients">Patients</span>
+                        <span class="module-tag mod-scheduler">Scheduler</span>
+                        <span class="module-tag mod-ai">AI Extraction</span>
+                    </td>
+                    <td>Bulk patient demographics upload — auto-match &amp; calendar assignment</td>
+                    <td>29</td><td>27</td><td>7</td><td>63</td><td>13</td>
+                </tr>
+                <tr class="totals-row">
+                    <td colspan="3"><strong>Total (US-25)</strong></td>
+                    <td><strong>29</strong></td><td><strong>27</strong></td><td><strong>7</strong></td><td><strong>63</strong></td><td><strong>13</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Hours by Area</h3>
+        <table>
+            <thead><tr><th>Area</th><th>Description</th><th>Eng (h)</th><th>QA (h)</th></tr></thead>
+            <tbody>
+                <tr><td>Backend</td><td>Patient master, upload, matching, commit, audit</td><td>29</td><td>—</td></tr>
+                <tr><td>Frontend</td><td>Upload wizard, 3-bucket review, master calendar, patient master, upload log, navigation</td><td>27</td><td>—</td></tr>
+                <tr><td>AI / Automation</td><td>PDF text extraction + document vision for scanned patient lists</td><td>7</td><td>—</td></tr>
+                <tr><td>QA</td><td>Smoke + match edge cases on sample center lists (~20% of engineering)</td><td>—</td><td>13</td></tr>
+                <tr class="totals-row"><td colspan="2"><strong>Total</strong></td><td><strong>63</strong></td><td><strong>13</strong></td></tr>
+            </tbody>
+        </table>
+
+        <hr class="divider">
+
+        <!-- PER-STORY DETAIL -->
+        <h2>Per-Story Detail</h2>
+
+        <div class="story-card">
+            <h3>US-25: Bulk Patient Demographics Upload <span class="module-tag mod-patients">Patients</span> <span class="module-tag mod-scheduler">Scheduler</span> <span class="module-tag mod-ai">AI Extraction</span></h3>
+            <div class="story-meta">As an SFP operations user (scheduler / front-desk), I want to upload a CSV, Excel, or PDF of patient demographics from a medical center, So that records are auto-matched and routed to the correct NP visit calendar without manual data entry.</div>
+            <div class="story-desc">User selects medical center + visit date, uploads a list, reviews New / Update / Needs Review buckets (with diffs on updates), then confirms. Committed patients appear on the master calendar; upload log and patient master support day-to-day operations.</div>
+
+            <div class="status-flow">
+                <span class="status-pill">Select calendar + upload</span>
+                <span class="status-arrow">→</span>
+                <span class="status-pill">Parse / AI extract</span>
+                <span class="status-arrow">→</span>
+                <span class="status-pill">Auto-match</span>
+                <span class="status-arrow">→</span>
+                <span class="status-pill">Pre-commit review</span>
+                <span class="status-arrow">→</span>
+                <span class="status-pill">Commit</span>
+                <span class="status-arrow">→</span>
+                <span class="status-pill">Patients + appointments updated</span>
+            </div>
+
+            <div class="context-block">
+                <div class="context-label">Context</div>
+                <p>NPs visit external medical centers on a rotating schedule; each center has its own calendar in the dashboard. Centers send patient lists ahead of the visit so ops can verify insurance and referrals before the NP arrives.</p>
+                <p>Many list patients already exist in the system — the upload is often an insurance/referral refresh, not a new chart. Strong matches (name + DOB) surface as <strong>Update</strong> with field-level diffs; ambiguous matches go to <strong>Needs Review</strong>; no match is <strong>New</strong>.</p>
+            </div>
+
+            <h3 style="margin-top:16px;">Decisions Needed from SFPCC</h3>
+            <div class="open-q-block">
+                <p><strong>1. Source of patient master data</strong> — What should be the <strong>source of truth</strong> for demographics in the patient master (name, DOB, contact, insurance, PCP)? For example: <strong>medical-center bulk upload</strong>, <strong>CureMD</strong>, <strong>manual entry in Patient Master</strong>, or a defined priority when more than one source disagrees?</p>
+            </div>
+            <div class="open-q-block">
+                <p><strong>2. Close matches on the list</strong> — When names are similar or dates of birth do not match exactly, should staff <strong>always review</strong> those rows, or may the system <strong>auto-link</strong> when MRN / account number on the list matches an existing patient?</p>
+            </div>
+            <div class="open-q-block">
+                <p><strong>3. Retention of uploaded center lists</strong> — After a list is committed, how long should SFPCC keep the original CSV or PDF on file for compliance (e.g. 30 days, one year, or not retained after commit)?</p>
+            </div>
+            <div class="open-q-block">
+                <p><strong>4. Scanned PDF rosters</strong> — What is the largest roster SFPCC expects per upload (patient count or pages)? If a scan cannot be read reliably, should staff <strong>re-upload a spreadsheet</strong> or <strong>correct rows in the review screen</strong>?</p>
+            </div>
+
+            <h3 style="margin-top:16px;">Demographics Captured from Center Lists</h3>
+            <table class="field-table">
+                <thead><tr><th>Category</th><th>Fields</th></tr></thead>
+                <tbody>
+                    <tr><td>Identity</td><td>First name, last name, date of birth, gender, MRN / account number</td></tr>
+                    <tr><td>Contact</td><td>Address, phone, email</td></tr>
+                    <tr><td>Insurance</td><td>Carrier, member ID, group number (primary; secondary if on list)</td></tr>
+                    <tr><td>Referral</td><td>Referral source, PCP name</td></tr>
+                    <tr><td>Calendar</td><td>Medical center and NP visit date (selected at upload)</td></tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top:16px;">How Patients Are Matched</h3>
+            <table class="field-table">
+                <thead><tr><th>Result</th><th>When it applies</th><th>What staff does</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><span class="bucket-pill bucket-update">Update</span></td>
+                        <td>Exact name + date of birth match to an existing patient</td>
+                        <td>Review what changed (e.g. insurance, PCP); confirm update</td>
+                    </tr>
+                    <tr>
+                        <td><span class="bucket-pill bucket-review">Needs Review</span></td>
+                        <td>Similar name, partial date of birth, phone-only overlap, or more than one possible patient</td>
+                        <td>Choose the correct patient, confirm as new, or skip the row</td>
+                    </tr>
+                    <tr>
+                        <td><span class="bucket-pill bucket-new">New</span></td>
+                        <td>No confident match to an existing patient</td>
+                        <td>Confirm new patient on the NP visit calendar</td>
+                    </tr>
+                </tbody>
+            </table>
+
+                        <h3 style="margin-top:16px;">Engineering Breakdown</h3>
+            <table class="hours-table">
+                <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                <tbody>
+                    <tr><td>Backend — patient master and upload staging</td><td>6</td></tr>
+                    <tr><td>Backend — file upload and spreadsheet parsing</td><td>7</td></tr>
+                    <tr><td>Backend — patient matching and commit</td><td>10</td></tr>
+                    <tr><td>Backend — audit trail and patient master source rules</td><td>6</td></tr>
+                    <tr><td>Frontend — 7-step upload wizard (calendar pick, file, parse, column mapping)</td><td>7</td></tr>
+                    <tr><td>Frontend — 3-bucket review + manual match resolution</td><td>8</td></tr>
+                    <tr><td>Frontend — master NP calendar (month / week / day, filters, day modal, patient modal)</td><td>6</td></tr>
+                    <tr><td>Frontend — patient master registry (search, CRUD, deactivate)</td><td>2</td></tr>
+                    <tr><td>Frontend — upload log + per-batch activity audit UI</td><td>2</td></tr>
+                    <tr><td>Frontend — navigation and integration</td><td>2</td></tr>
+                    <tr><td>AI — PDF text extraction + document vision for scanned lists</td><td>7</td></tr>
+                    <tr><td>QA — 3 formats, match edge cases, 500+ rows, PHI, sync conflict (~20% of eng.)</td><td>13</td></tr>
+                    <tr class="totals-row"><td><strong>Total</strong></td><td><strong>76</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <hr class="divider">
+
+        <h2>UX Specification — Master Calendar &amp; Navigation</h2>
+        <div class="info-box">
+            <p>Requirements below reflect the agreed UX from stakeholder prototype review (May 2026). Production build should match this behavior unless SFPCC directs a change — <a href="SFPCC-US25-Bulk-Demographics-Prototype.html"><strong>interactive prototype →</strong></a></p>
+        </div>
+
+        <h3>Sidebar navigation</h3>
+        <ul>
+            <li><strong>Calendar</strong> (expandable submenu): Master calendar (default month), Month view, Week view, Day view, New upload (wizard), Upload log.</li>
+            <li><strong>Patient Master</strong> — top-level registry (not under Calendar).</li>
+        </ul>
+
+        <h3>Month view</h3>
+        <ul>
+            <li>Month summary banner: NP visit count, lists uploaded, total patients on calendar, aggregate New/Upd/Rev counts, upload-due and not-started counts.</li>
+            <li>Sun–Sat grid; each day cell shows visit cards (center short name, patient count, New/Upd/Rev tags, status color: green = uploaded, yellow = upload due, grey = not started).</li>
+            <li>Click day or visit card → <strong>day details modal</strong>: date, Day view shortcut, per-visit upload status, Re-upload / Upload list, patients &amp; demographics table (6 rows default, Show more), row click → patient detail modal.</li>
+            <li>Full-width calendar (no persistent right panel).</li>
+        </ul>
+
+        <h3>Week view</h3>
+        <ul>
+            <li>Seven columns; up to 5 inline patient rows per committed visit (name, DOB, phone, insurance, action chip).</li>
+            <li>Patient row click → patient detail modal; column header Day view → switches to day view for that date.</li>
+        </ul>
+
+        <h3>Day view</h3>
+        <ul>
+            <li>One card per patient for selected NP visit day(s); prev/next day navigation.</li>
+            <li>Card click → patient detail modal.</li>
+        </ul>
+
+        <h3>Filters (all calendar views)</h3>
+        <ul>
+            <li>Medical center, upload status, NP provider, visit date range, free-text search.</li>
+            <li>Active filter chips with one-click remove; Clear all filters; result count bar.</li>
+        </ul>
+
+        <h3>Upload wizard (7 steps)</h3>
+        <ol>
+            <li>Welcome / guided demo entry</li>
+            <li>Select medical center + NP visit date (or from master calendar)</li>
+            <li>Upload CSV, XLSX, or PDF (sample file + template download)</li>
+            <li>Parse / AI extraction animation</li>
+            <li>Column mapping (spreadsheet) or AI-mapped fields (PDF)</li>
+            <li>Pre-commit review: New / Update (diffs) / Needs Review</li>
+            <li>Commit summary + success (calendar preview, link to upload log)</li>
+        </ol>
+        <p>Session activity log visible from step 1; stored on upload record after commit.</p>
+
+        <hr class="divider">
+
+        <!-- DEPENDENCIES MAP -->
+        <h2>Dependencies Map</h2>
+        <table>
+            <thead><tr><th>Story</th><th>Depends On</th><th>Enables / Notes</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>US-25</strong></td>
+                    <td>
+                        <ul style="margin:0; padding-left:18px;">
+                            <li>Medical-center calendar and NP visit schedule in ClinicSync</li>
+                            <li>SFPCC decision on patient master data source and match rules (above)</li>
+                            <li>Sample center lists (CSV, XLSX, PDF) for UAT</li>
+                        </ul>
+                    </td>
+                    <td>
+                        Faster NP-day prep; reusable patient master for portal, eligibility, and repeat matching. Reduces manual scheduler data entry.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr class="divider">
+
+        <!-- RECOMMENDED SEQUENCING -->
+        <h2>Recommended Delivery Sequence</h2>
+        <div class="success-box">
+            <p><strong>Milestone 1 (~32 h):</strong> CSV/Excel upload, patient matching, three-bucket review, commit to calendar, master calendar (month view and day details), patient master, and upload log.</p>
+            <p><strong>Milestone 2 (~20 h):</strong> Scanned PDF roster support, column-mapping fallback, and full Needs Review workflow.</p>
+            <p><strong>Milestone 3 (~14 h):</strong> Patient master source-of-truth rules per SFPCC decision, large-list performance, QA, and UAT on live center list samples.</p>
+            <p style="margin-bottom:0;"><strong>Planning note:</strong> SFPCC decisions in <strong>Decisions Needed from SFPCC</strong> should be confirmed before build starts. Calendar, wizard, and patient master UX are available for final sign-off via interactive prototype (<a href="SFPCC-US25-Bulk-Demographics-Prototype.html">open →</a>).</p>
+        </div>
+
+        <hr class="divider">
+
+        <!-- US-25 ESTIMATE SUMMARY -->
+        <h2>US-25 Estimate Summary</h2>
+        <table>
+            <thead><tr><th>Scope</th><th>Engineering (h)</th><th>QA (h)</th><th>Total (h)</th></tr></thead>
+            <tbody>
+                <tr><td>US-25: Bulk demographics upload</td><td>63</td><td>13</td><td>76</td></tr>
+                <tr class="totals-row"><td><strong>Total (US-25)</strong></td><td><strong>63</strong></td><td><strong>13</strong></td><td><strong>76</strong></td></tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<script src="prm-date-format.js?v=20260622m"></script>
+<script src="prm-doc-meta.js?v=20260622m"></script>
+</body>
+</html>

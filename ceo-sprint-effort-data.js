@@ -1,0 +1,351 @@
+/**
+ * CEO Sprint Effort — Estimated vs Actual (multi-sprint)
+ *
+ * Source of truth for Sprint 1–2 line items: Google Sheet **SFPCARE CLIENT - BILLING HOURS TRACKER**
+ * (billable vs actual tables per sprint window). QA rule on Sprint 2 sheet: QA ≈ 20% of (BE+FE+Auto);
+ * PRD + QA criteria added manually from timesheets / Harshit work reports.
+ *
+ * HOW TO MAINTAIN:
+ * 1. Pick sprint with URL `ceo-sprint-effort.html?sprint=1` or `?sprint=2` (`defaultSprintId` when omitted).
+ * 2. Edit rows under each `sprints[]` entry; use `summaryOverride` only when spreadsheet totals intentionally differ from visible rows.
+ *
+ * MARGIN in sprint summaries (tracker-style): billable plan − actual spent (positive = profit vs plan; negative = loss vs plan).
+ */
+window.PRM_CEO_SPRINT_EFFORT = {
+  billingExport: {
+    clientLabel: "SFPCC",
+    invoiceReference: "",
+    internalNote:
+      "Mirrors SFPCARE CLIENT billing tracker (Sprint 1 Apr 6–Apr 20 · Sprint 2 Apr 20–May 4). Attach BRD links + Harshit work reports from the sheet header when sending to AP.",
+  },
+
+  qaRuleNote:
+    "Sprint 2 tracker note: QA hours modeled at ~20% of (Backend + Frontend + Automation); PRD + QA criteria hours entered manually from Harshit's work exports.",
+
+  defaultSprintId: 1,
+
+  sprints: [
+    {
+      id: 1,
+      sprint: {
+        shortLabel: "Sprint 1",
+        label: "Apr 6 – Apr 20",
+        lastUpdated: "2026-05-19",
+        notes:
+          "Single-story sprint — US-7 Sleep Study (AI pre-fill from scored PDF). Tracker: billable plan 52 h vs actual spent 72 h → margin vs plan −20 h.",
+      },
+      estimated: {
+        rows: [
+          {
+            story: "US-7",
+            description: "AI pre-fill from scored PDF",
+            module: "Sleep Study",
+            backend: 32,
+            frontend: 8,
+            automation: 0,
+            prdQa: 0,
+            qa: 12,
+            total: 52,
+            status: "Completed",
+          },
+        ],
+      },
+      actual: {
+        rows: [
+          {
+            story: "US-7",
+            description: "AI pre-fill from scored PDF",
+            module: "Sleep Study",
+            backend: 47,
+            frontend: 12,
+            automation: 0,
+            prdQa: 5,
+            qa: 8,
+            total: 72,
+            status: "Completed",
+          },
+        ],
+      },
+    },
+
+    {
+      id: 2,
+      sprint: {
+        shortLabel: "Sprint 2",
+        label: "Apr 20 – May 4",
+        lastUpdated: "2026-05-19",
+        notes:
+          "US-13–US-16 bundle (platform, integration, X-ray). Tracker: billable plan 70.5 h vs actual spent 65 h → margin vs plan +5.5 h.",
+      },
+      estimated: {
+        rows: [
+          {
+            story: "US-13",
+            description: "Doctor-approved admin login (Firebase / FCM)",
+            module: "Platform",
+            backend: 24,
+            frontend: 8,
+            automation: 0,
+            prdQa: 0,
+            qa: 3,
+            total: 35,
+            status: "Completed",
+          },
+          {
+            story: "US-14",
+            description: "Same-day patient & appointment sync",
+            module: "Integration",
+            backend: 15,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 4,
+            total: 19,
+            status: "Completed",
+          },
+          {
+            story: "US-15",
+            description: "Instant X-ray interpretation upload",
+            module: "X-Ray",
+            backend: 12,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 3,
+            total: 15,
+            status: "Completed",
+          },
+          {
+            story: "US-16",
+            description: "Consistent sync status messaging",
+            module: "Platform",
+            backend: 1,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 0.5,
+            total: 1.5,
+            status: "Completed",
+          },
+        ],
+      },
+      actual: {
+        rows: [
+          {
+            story: "US-13",
+            description: "Doctor-approved admin login (Firebase / FCM)",
+            module: "Platform",
+            backend: 24,
+            frontend: 8,
+            automation: 0,
+            prdQa: 2,
+            qa: 3,
+            total: 37,
+            status: "Completed",
+          },
+          {
+            story: "US-14",
+            description: "Same-day patient & appointment sync",
+            module: "Integration",
+            backend: 8,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0.5,
+            qa: 4,
+            total: 12.5,
+            status: "Completed",
+          },
+          {
+            story: "US-15",
+            description: "Instant X-ray interpretation upload",
+            module: "X-Ray",
+            backend: 8,
+            frontend: 0,
+            automation: 0,
+            prdQa: 2,
+            qa: 4,
+            total: 14,
+            status: "Completed",
+          },
+          {
+            story: "US-16",
+            description: "Consistent sync status messaging",
+            module: "Platform",
+            backend: 1,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 0.5,
+            total: 1.5,
+            status: "Completed",
+          },
+        ],
+      },
+    },
+
+    {
+      id: 4,
+      sprint: {
+        shortLabel: "Sprint 4",
+        label: "May 19 – Jun 1",
+        lastUpdated: "2026-06-02",
+        notes:
+          "ClinicSync-PST tracker tab · billable plan 42.5 h (US-21, US-26, US-5.1) · US-36 non-billable bug-fix enhancement · actual spent 38.8 h → margin vs plan +3.9 h. QA ≈ 20% of (BE+FE+Auto); PRD + QA criteria from timesheets.",
+      },
+      estimated: {
+        rows: [
+          {
+            story: "US-21",
+            description: "Send PST reports to referring physicians",
+            module: "ClinicSync — PST",
+            backend: 14,
+            frontend: 12,
+            automation: 0,
+            prdQa: 0,
+            qa: 5.2,
+            total: 31.2,
+            status: "Completed",
+          },
+          {
+            story: "US-26",
+            description: "Electronic signature",
+            module: "ClinicSync",
+            backend: 5,
+            frontend: 2,
+            automation: 0,
+            prdQa: 0,
+            qa: 0.5,
+            total: 7.5,
+            status: "Completed",
+          },
+          {
+            story: "US-5.1",
+            description: "Single merged PDF — new enhancement",
+            module: "ClinicSync — Sleep Study",
+            backend: 4,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 0,
+            total: 4,
+            status: "Completed",
+          },
+          {
+            story: "US-36",
+            description:
+              "CureMD configurable appointment range sync — enhancement implemented to resolve the bug (non-billable)",
+            module: "ClinicSync",
+            backend: 2,
+            frontend: 1,
+            automation: 0,
+            prdQa: 0,
+            qa: 0,
+            total: 0,
+            status: "Completed · non-billable",
+          },
+        ],
+      },
+      actual: {
+        rows: [
+          {
+            story: "US-21",
+            description: "Send PST reports to referring physicians",
+            module: "ClinicSync — PST",
+            backend: 7.3,
+            frontend: 5,
+            automation: 0,
+            prdQa: 2,
+            qa: 2,
+            total: 16.3,
+            status: "Completed",
+          },
+          {
+            story: "US-26",
+            description: "Electronic signature",
+            module: "ClinicSync",
+            backend: 4,
+            frontend: 2,
+            automation: 0,
+            prdQa: 1,
+            qa: 0.5,
+            total: 7.5,
+            status: "Completed",
+          },
+          {
+            story: "US-5.1",
+            description: "Single merged PDF — new enhancement",
+            module: "ClinicSync — Sleep Study",
+            backend: 4,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 0,
+            total: 4,
+            status: "Completed",
+          },
+          {
+            story: "US-13",
+            description: "Entity admin login approval via FCM",
+            module: "ClinicSync",
+            backend: 4,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 0,
+            total: 4,
+            status: "Completed",
+          },
+          {
+            story: "US-20",
+            description: "Send PFT reports to referring physicians",
+            module: "ClinicSync — PFT",
+            backend: 2,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 0,
+            total: 2,
+            status: "Completed",
+          },
+          {
+            story: "US-22",
+            description: "Send sleep study reports to referring physicians",
+            module: "ClinicSync — Sleep Study",
+            backend: 1,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 0,
+            total: 1,
+            status: "Completed",
+          },
+          {
+            story: "US-19",
+            description: "Send X-ray reports to referring physicians",
+            module: "ClinicSync — X-Ray",
+            backend: 1,
+            frontend: 0,
+            automation: 0,
+            prdQa: 0,
+            qa: 0,
+            total: 1,
+            status: "Completed",
+          },
+          {
+            story: "US-36",
+            description:
+              "CureMD configurable appointment range sync — enhancement implemented to resolve the bug (non-billable)",
+            module: "ClinicSync",
+            backend: 1,
+            frontend: 0,
+            automation: 0,
+            prdQa: 2,
+            qa: 0,
+            total: 3,
+            status: "Completed · non-billable",
+          },
+        ],
+      },
+    },
+  ],
+};

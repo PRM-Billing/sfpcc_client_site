@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="doc-last-updated" content="2026-06-21" />
+    <title>SFPCC ERP User Stories — US-18 through US-22: Estimates</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #3182ce;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --danger: #e53e3e;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --purple: #6b46c1;
+            --purple-light: #f3e8ff;
+            --teal: #319795;
+            --teal-light: #e6fffa;
+            --orange: #c05621;
+            --orange-light: #fffaf0;
+            --success-light: #f0fff4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 36px 44px;
+            border-radius: 14px 14px 0 0;
+        }
+        .header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 14px; line-height: 1.3; }
+        .header-meta { font-size: 0.88rem; opacity: 0.92; line-height: 1.8; }
+        .header-meta strong { font-weight: 600; }
+
+        .content {
+            background: var(--card-bg);
+            padding: 44px;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin: 38px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        h2:first-child { margin-top: 0; }
+        h3 { font-size: 1.05rem; color: var(--primary-light); margin: 24px 0 10px 0; }
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 8px 0 16px 24px; }
+        li { margin-bottom: 5px; }
+
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid var(--accent);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0 20px 0;
+            font-size: 0.92rem;
+        }
+        .warn-box {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0 20px 0;
+            font-size: 0.92rem;
+        }
+        .success-box {
+            background: #f0fff4;
+            border-left: 4px solid var(--success);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0 20px 0;
+            font-size: 0.92rem;
+        }
+
+        .context-block {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--purple);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0 18px 0;
+            font-size: 0.9rem;
+            line-height: 1.75;
+        }
+        .context-label {
+            display: inline-block;
+            background: var(--purple-light);
+            color: var(--purple);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .open-q-block {
+            background: var(--orange-light);
+            border: 1px solid #f6ad55;
+            border-left: 4px solid var(--orange);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0 16px 0;
+            font-size: 0.88rem;
+        }
+        .open-q-label {
+            display: inline-block;
+            background: #feebc8;
+            color: var(--orange);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .story-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 24px 28px;
+            margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .story-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.08rem;
+        }
+        .story-meta {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .story-desc {
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .status-flow {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 12px 0 18px 0;
+            flex-wrap: wrap;
+        }
+        .status-pill {
+            background: linear-gradient(135deg, var(--teal) 0%, #2c7a7b 100%);
+            color: white;
+            padding: 5px 14px;
+            border-radius: 18px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .status-arrow {
+            color: var(--teal);
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .module-tag {
+            display: inline-block;
+            background: var(--purple-light);
+            color: var(--purple);
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+        }
+        .mod-integration { background: #e6fffa; color: var(--teal); }
+        .mod-portal { background: #feebc8; color: var(--orange); }
+        .mod-pst { background: var(--purple-light); color: var(--purple); }
+        .mod-pft { background: #fed7e2; color: #c53030; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--muted-bg);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.84rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        tbody tr:hover { background: #fafbfc; }
+        .totals-row td {
+            font-weight: 700;
+            background: #f7fafc;
+            border-top: 2px solid var(--primary);
+        }
+
+        .hours-table { margin-top: 14px; }
+        .field-table { font-size: 0.86rem; }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 32px 0;
+        }
+
+        code {
+            background: #f1f5f9;
+            color: #c7254e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.88em;
+        }
+
+        .note-box {
+            background: var(--success-light);
+            border-left: 4px solid var(--success);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-size: 0.92rem;
+        }
+
+        .footer-note {
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.84rem;
+            color: var(--text-light);
+            text-align: center;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>SFPCC ERP User Stories — US-18 through US-22: Estimates</h1>
+        <div class="header-meta">
+            <strong>Version:</strong> 1.0 · April 27, 2026<br>
+            <strong>Stories:</strong> US-18 through US-22 (5 stories)
+        </div>
+    </div>
+
+    <div class="content">
+
+        <h2>Document Purpose</h2>
+        <p>This document provides detailed time estimates for user stories US-18 through US-22, which represent the next phase of ClinicSync MD ERP development for SFPCC. These estimates cover five user stories totaling <strong>130.8 hours</strong> of development, QA, and integration work.</p>
+
+        <h2>Context & Problem Statement</h2>
+        <div class="context-block">
+            <div class="context-label">What We're Solving</div>
+            <p><strong>Current State:</strong> SFPCC has built a robust diagnostic workflow in ClinicSync MD for sleep studies and x-rays — doctors can review, interpret, and sign diagnostic reports within the ERP. However, two critical gaps remain:</p>
+            <ol>
+                <li><strong>Manual data entry into CureMD:</strong> After signing an x-ray interpretation in ClinicSync MD, staff must manually re-enter the interpretation into the patient's CureMD chart as a provider note. This creates duplicate work and delays referring physician access to results.</li>
+                <li><strong>Limited portal access:</strong> The medical records portal currently shows only sleep studies. Referring physicians cannot access x-ray interpretations, and newer diagnostic types (PST, PFT) have no portal distribution at all.</li>
+            </ol>
+            <p><strong>What US-18 through US-22 Delivers:</strong></p>
+            <ul>
+                <li><strong>US-18:</strong> Automates x-ray interpretation insertion into CureMD provider notes — eliminates manual re-entry</li>
+                <li><strong>US-19:</strong> Extends the medical records portal to support multiple document types (x-rays, sleep studies, PST, PFT) with filtering and categorization</li>
+                <li><strong>US-20:</strong> Adds sleep study reports to the portal (leverages US-19 infrastructure)</li>
+                <li><strong>US-21:</strong> Builds the full PST (Pulmonary Stress Test) module — order creation, report upload, doctor interpretation, automated distribution to CureMD and portal</li>
+                <li><strong>US-22:</strong> Builds the full PFT (Pulmonary Function Test) module — same workflow as PST, more complex interpretation form</li>
+            </ul>
+            <p><strong>Business Impact:</strong> Referring physicians get faster access to diagnostic results, SFPCC staff eliminate duplicate data entry, and the ERP becomes a complete diagnostic hub for all pulmonary and imaging workflows.</p>
+        </div>
+
+        <hr class="divider">
+
+        <!-- US-18 -->
+        <h2>X-Ray Integration Module</h2>
+        <div class="story-card">
+            <h3>US-18: X-Ray Interpretation → CureMD Provider Note <span class="module-tag mod-integration">Integration</span></h3>
+            <div class="story-meta">As a medical records user I want the signed x-ray interpretation to automatically populate a provider note in CureMD so that referring physicians can view the result in the patient's chart without manual data entry.</div>
+            <div class="story-desc"><strong>What it is:</strong> Integration to push signed x-ray interpretations from ClinicSync ERP into the patient's CureMD chart as a provider note. Two possible implementation paths: (1) direct CureMD API for note creation, or (2) Playwright bot to replicate the doctor's manual workflow. Requires discovery session with SFPCC to inspect CureMD note UI and identify field selectors.</div>
+
+            <div class="context-block">
+                <div class="context-label">Client Context</div>
+                <p>SFPCC confirmed they want x-ray interpretations visible inside CureMD charts for referring physicians, mirroring how sleep study notes already work today. The client is open to either API-based insertion or bot-based automation — whichever is more reliable. Dependency: CureMD UI discovery session (scheduled) must happen before implementation path can be finalized and bot selectors can be confirmed (if bot approach is chosen).</p>
+            </div>
+
+            <div class="open-q-block">
+                <div class="open-q-label">Open Question (Blocks Start)</div>
+                <p><strong>OQ-1:</strong> CureMD UI discovery session with SFPCC is required to determine: (a) whether CureMD API supports note creation for this account type, or (b) which UI selectors the Playwright bot must target. Discovery session scheduled for next sprint. Bot development cannot start until selectors are confirmed.</p>
+            </div>
+
+            <table class="hours-table">
+                <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                <tbody>
+                    <tr><td>Backend (queue + worker + API/bot + error handling + logging)</td><td>28</td></tr>
+                    <tr><td>Frontend (status UI + retry controls + CureMD sync indicator)</td><td>10</td></tr>
+                    <tr><td>Automation (Playwright bot — if API route not available)</td><td>0</td></tr>
+                    <tr><td>QA (20% of dev work)</td><td>7.6</td></tr>
+                    <tr><td><strong>Total</strong></td><td><strong>45.6</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- US-19 -->
+        <div class="story-card">
+            <h3>US-19: X-Ray Reports → Medical Records Portal <span class="module-tag mod-portal">Portal</span></h3>
+            <div class="story-meta">As a referring physician I want signed x-ray interpretations available in the medical records portal so that I can retrieve patient diagnostic results without calling the clinic.</div>
+            <div class="story-desc"><strong>What it is:</strong> Extension of the existing medical records portal (built for sleep studies in US-3) to support x-ray documents. Adds <code>document_type</code> infrastructure to differentiate sleep studies, x-rays, PST, PFT, etc. in the portal UI. Establishes the multi-document portal pattern that enables US-20, US-21, US-22 at near-zero incremental frontend cost.</div>
+
+            <div class="context-block">
+                <div class="context-label">Client Context</div>
+                <p>SFPCC confirmed that referring physicians need access to x-ray interpretations the same way they access sleep study reports today — via the existing medical records portal. The portal currently shows only sleep studies. US-19 extends it to support multiple document types with filtering and categorization. This is foundational work: once US-19 ships, adding sleep study, PST, and PFT documents to the portal (US-20, 21, 22) becomes trivial backend-only work.</p>
+            </div>
+
+            <table class="hours-table">
+                <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                <tbody>
+                    <tr><td>Backend (migration + <code>document_type</code> enum + API updates)</td><td>6</td></tr>
+                    <tr><td>Frontend (document type filter + UI for x-ray entries + icons)</td><td>8</td></tr>
+                    <tr><td>Automation</td><td>0</td></tr>
+                    <tr><td>QA (20% of dev work)</td><td>2.8</td></tr>
+                    <tr><td><strong>Total</strong></td><td><strong>16.8</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- US-20 -->
+        <div class="story-card">
+            <h3>US-20: Sleep Study Reports → Medical Records Portal <span class="module-tag mod-portal">Portal</span></h3>
+            <div class="story-meta">As a referring physician I want signed sleep study reports available in the medical records portal so that I can retrieve patient diagnostic results alongside x-ray and other documents.</div>
+            <div class="story-desc"><strong>What it is:</strong> Add sleep study documents to the medical records portal (relies on US-19 multi-document infrastructure). Minimal incremental work — frontend already supports multiple document types after US-19 ships. Backend adds sleep study to the <code>document_type</code> enum and populates portal entries when studies are signed. Can coordinate with US-5 (merged PDF) to ensure correct column name is used.</div>
+
+            <div class="context-block">
+                <div class="context-label">Client Context</div>
+                <p>Sleep studies are already digitized and signed in ClinicSync ERP. The portal extension is purely a delivery mechanism — no new data capture. SFPCC confirmed the workflow mirrors x-rays: when the doctor signs a sleep study, it should automatically appear in the portal for referring physicians to download.</p>
+            </div>
+
+            <table class="hours-table">
+                <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                <tbody>
+                    <tr><td>Backend (enum update + portal insert on sign event)</td><td>3</td></tr>
+                    <tr><td>Frontend (already built in US-19 — zero incremental)</td><td>2</td></tr>
+                    <tr><td>Automation</td><td>0</td></tr>
+                    <tr><td>QA (20% of dev work)</td><td>1</td></tr>
+                    <tr><td><strong>Total</strong></td><td><strong>6</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr class="divider">
+
+        <!-- PST MODULE -->
+        <h2>PST Module (Pulmonary Stress Test)</h2>
+        <div class="story-card">
+            <h3>US-21: PST Module — Pulmonary Stress Test Workflow <span class="module-tag mod-pst">PST</span></h3>
+            <div class="story-meta">As a medical records user I want PST reports managed in ClinicSync MD and available to referring physicians so that pulmonary stress test results are documented and distributed automatically.</div>
+            <div class="story-desc"><strong>What it is:</strong> Full new PST module with 4-step workflow: (1) technician creates a PST order and uploads the raw PST report PDF, (2) doctor opens the PST review screen to see the uploaded report on the left, (3) doctor completes the interpretation form (structured checkboxes — 4 clinical fields for desaturation severity levels + free text notes) and signs, (4) signed PST document is automatically sent to CureMD and to the medical records portal. Phase 1 scope is checkbox-based interpretation only. Phase 2 (future) can add AI voice/PDF analysis at ~20–25% of original effort, following the sleep study pattern.</div>
+
+            <div class="context-block">
+                <div class="context-label">Client Context</div>
+                <p>SFPCC performs Pulmonary Stress Tests with no ERP module today. The client confirmed the workflow mirrors sleep study and x-ray: technician uploads the raw PST report, doctor reviews it and clicks interpretation checkboxes, document goes to CureMD and to the medical records portal. The PST interpretation form (sourced from the client's handwritten form) has four desaturation severity categories (None / Mild / Moderate / Severe) as boolean checkboxes plus a free text field for additional notes. This is the simplest new module in terms of clinical fields, but since the architecture is fully established from sleep study and x-ray, the scaffolding effort is identical.</p>
+            </div>
+
+            <h3 style="margin-top:16px;">Interpretation Form — PST</h3>
+            <table class="field-table">
+                <thead><tr><th>Section</th><th>Fields</th><th>Type</th></tr></thead>
+                <tbody>
+                    <tr><td>—</td><td>No evidence of desaturation</td><td>boolean</td></tr>
+                    <tr><td>—</td><td>Mild desaturation</td><td>boolean</td></tr>
+                    <tr><td>—</td><td>Moderate desaturation</td><td>boolean</td></tr>
+                    <tr><td>—</td><td>Severe desaturation</td><td>boolean</td></tr>
+                    <tr><td>—</td><td>Additional Notes</td><td>text (free)</td></tr>
+                </tbody>
+            </table>
+
+            <table class="hours-table">
+                <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                <tbody>
+                    <tr><td>Backend (2 migrations + controller + service + routes + PDF gen)</td><td>14</td></tr>
+                    <tr><td>Frontend (types + API + store + 5 pages + form + filters)</td><td>12</td></tr>
+                    <tr><td>Automation</td><td>0</td></tr>
+                    <tr><td>QA (20% of dev work)</td><td>5.2</td></tr>
+                    <tr><td><strong>Total</strong></td><td><strong>31.2</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PFT MODULE -->
+        <div class="story-card">
+            <h3>US-22: PFT Module — Pulmonary Function Test Workflow <span class="module-tag mod-pft">PFT</span></h3>
+            <div class="story-meta">As a medical records user I want PFT reports managed in ClinicSync MD and available to referring physicians so that pulmonary diagnostic results are documented and distributed automatically.</div>
+            <div class="story-desc"><strong>What it is:</strong> Full new PFT module — identical 4-step workflow to PST (US-21), same codebase pattern, different interpretation form. <strong>Interpretation form:</strong> 5 sections (Normal + 4 disease categories with Mild/Moderate/Severe + Reversibility + Diffusion Impairment) = 21 clinical fields + free text.</div>
+
+            <div class="status-flow">
+                <span class="status-pill">Create Order</span>
+                <span class="status-arrow">→</span>
+                <span class="status-pill">Upload PFT Report</span>
+                <span class="status-arrow">→</span>
+                <span class="status-pill">Interpret & Sign</span>
+                <span class="status-arrow">→</span>
+                <span class="status-pill">CureMD + Portal</span>
+            </div>
+
+            <div class="context-block">
+                <div class="context-label">Client Context</div>
+                <p>SFPCC performs Pulmonary Function Tests with no ERP module today. The client confirmed the workflow mirrors PST and sleep study: technician creates an order and uploads the PFT report; the doctor reviews it on the left and checks interpretation boxes on the right; the document goes to CureMD and to the medical records portal. Phase 1 scope is checkboxes only. The PFT form (sourced from the client's handwritten form) has five distinct clinical sections — Normal, Small Airway, Obstructive Lung Disease, Restrictive Lung Disease, Restrictive Lung Disease of Chest Bellows Type, and Diffusion Impairment — with Mild/Moderate/Severe severity options and Yes/No Reversibility for the airway and lung disease sections. This is the most clinically detailed new module, but since the architecture is fully established from sleep study, x-ray, and PST, the incremental effort matches PST. <strong>Key open question:</strong> Does the Chest Bellows section also include a Reversibility field? Must be confirmed with SFPCC before DB migrations are written.</p>
+            </div>
+
+            <div class="open-q-block">
+                <div class="open-q-label">Blocking Open Question</div>
+                <p><strong>OQ-1 (blocks migrations):</strong> Does the "Restrictive Lung Disease of Chest Bellows Type" section include a Reversibility (Yes/No) field? The handwritten form was cut off at that section. Must be confirmed with SFPCC before <code>pft_interpretations</code> migration is written.</p>
+            </div>
+
+            <h3 style="margin-top:16px;">Interpretation Form — PFT</h3>
+            <table class="field-table">
+                <thead><tr><th>Section</th><th>Fields</th><th>Type</th></tr></thead>
+                <tbody>
+                    <tr><td>Top level</td><td>Normal</td><td>boolean</td></tr>
+                    <tr><td>Small Airway</td><td>Mild / Moderate / Severe</td><td>boolean ×3</td></tr>
+                    <tr><td>Small Airway</td><td>Reversibility</td><td>yes/no/null</td></tr>
+                    <tr><td>Obstructive Lung Disease</td><td>Mild / Moderate / Severe</td><td>boolean ×3</td></tr>
+                    <tr><td>Obstructive Lung Disease</td><td>Reversibility</td><td>yes/no/null</td></tr>
+                    <tr><td>Restrictive Lung Disease</td><td>Mild / Moderate / Severe</td><td>boolean ×3</td></tr>
+                    <tr><td>Restrictive Lung Disease</td><td>Reversibility</td><td>yes/no/null</td></tr>
+                    <tr><td>Chest Bellows Type</td><td>Mild / Moderate / Severe</td><td>boolean ×3</td></tr>
+                    <tr><td>Diffusion Impairment</td><td>Mild / Moderate / Severe</td><td>boolean ×3</td></tr>
+                    <tr><td>Free text</td><td>Additional Notes</td><td>text</td></tr>
+                </tbody>
+            </table>
+
+            <table class="hours-table">
+                <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                <tbody>
+                    <tr><td>Backend (2 migrations + controller + service + routes + PDF gen)</td><td>14</td></tr>
+                    <tr><td>Frontend (types + API + store + 5 pages + form + filters)</td><td>12</td></tr>
+                    <tr><td>Automation</td><td>0</td></tr>
+                    <tr><td>QA (20% of dev work)</td><td>5.2</td></tr>
+                    <tr><td><strong>Total</strong></td><td><strong>31.2</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr class="divider">
+
+        <!-- SUMMARY TABLE -->
+        <h2>Estimated Time for US-18 to US-22</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:12%">Story</th>
+                    <th style="width:42%">What we are building</th>
+                    <th>Module</th>
+                    <th>BE (h)</th>
+                    <th>FE (h)</th>
+                    <th>Automation (h)</th>
+                    <th>QA (h)</th>
+                    <th>Total (h)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>US-18</strong></td>
+                    <td>X-ray Interpretation → CureMD Provider Note</td>
+                    <td>Integration</td>
+                    <td>28</td>
+                    <td>10</td>
+                    <td>0</td>
+                    <td>7.6</td>
+                    <td><strong>45.6</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>US-19</strong></td>
+                    <td>X-ray Reports → Medical Records Portal</td>
+                    <td>Portal</td>
+                    <td>6</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>2.8</td>
+                    <td><strong>16.8</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>US-20</strong></td>
+                    <td>Sleep Study Reports → Medical Records Portal</td>
+                    <td>Portal</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>1.0</td>
+                    <td><strong>6.0</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>US-21</strong></td>
+                    <td>PST Module — Pulmonary Stress Test Workflow</td>
+                    <td>PST</td>
+                    <td>14</td>
+                    <td>12</td>
+                    <td>0</td>
+                    <td>5.2</td>
+                    <td><strong>31.2</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>US-22</strong></td>
+                    <td>PFT Module — Pulmonary Function Test Workflow</td>
+                    <td>PFT</td>
+                    <td>14</td>
+                    <td>12</td>
+                    <td>0</td>
+                    <td>5.2</td>
+                    <td><strong>31.2</strong></td>
+                </tr>
+                <tr class="totals-row">
+                    <td colspan="3"><strong>Grand Total — US-18 through US-22</strong></td>
+                    <td><strong>65</strong></td>
+                    <td><strong>44</strong></td>
+                    <td><strong>0</strong></td>
+                    <td><strong>21.8</strong></td>
+                    <td><strong>130.8</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <strong>QA Hours Calculation:</strong> QA is 20% of development work (Backend + Frontend + Automation). For example, US-18: (28 + 10 + 0) × 0.20 = 7.6 hours QA.
+        </div>
+
+        <hr class="divider">
+
+        <!-- DEPENDENCIES MAP -->
+        <h2>Dependencies Map</h2>
+        <table>
+            <thead><tr><th>Story</th><th>Depends On</th><th>Enables / Notes</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>US-18</strong></td>
+                    <td>US-4 pattern (queue + Playwright bot); CureMD UI discovery session with SFPCC (OQ-1)</td>
+                    <td>Blocks automation sprint start until note selector discovery is complete</td>
+                </tr>
+                <tr>
+                    <td><strong>US-19</strong></td>
+                    <td>US-3 (multi-document portal architecture). Signs x-ray must be working.</td>
+                    <td>Establishes <code>document_type</code> infrastructure and multi-doc FE — enables US-20, US-21, US-22 portal entries at zero additional FE cost</td>
+                </tr>
+                <tr>
+                    <td><strong>US-20</strong></td>
+                    <td>US-19 (FE infrastructure). US-5 (merged PDF — compatible but not required).</td>
+                    <td>6 h total if US-19 ships first. Coordinate US-5 merged PDF column name before US-5 ships.</td>
+                </tr>
+                <tr>
+                    <td><strong>US-21</strong></td>
+                    <td>US-19 (portal document type infrastructure). Can build in parallel with US-22.</td>
+                    <td>Establishes PST module pattern. Phase 2: AI voice/PDF analysis at ~20–25% original effort.</td>
+                </tr>
+                <tr>
+                    <td><strong>US-22</strong></td>
+                    <td>US-19 (portal). OQ-1 (Chest Bellows Reversibility field) must be resolved before migrations. Can build in parallel with US-21.</td>
+                    <td>Phase 2: same AI capabilities as sleep study.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr class="divider">
+
+        <!-- RECOMMENDED SEQUENCING -->
+        <h2>Recommended Delivery Sequencing</h2>
+        <div class="success-box">
+            <p><strong>Sprint 1:</strong> US-19 (X-ray → portal) — establishes all FE infrastructure for multi-document portal. US-18 CureMD note discovery session with SFPCC.</p>
+            <p><strong>Sprint 2:</strong> US-20 (Sleep study → portal, ~6h, minimal work). US-18 bot development (after selectors confirmed). US-21 and US-22 in parallel (same pattern).</p>
+            <p><strong>Sprint 3:</strong> US-18 QA and production. US-21 / US-22 QA and production. End-to-end referring physician UAT for portal documents.</p>
+            <p style="margin-bottom:0;"><strong>Efficiency note:</strong> US-21 (PST) and US-22 (PFT) can be built in parallel by the same dev — module scaffolding is identical, saving 5–8h across both stories in combined development.</p>
+        </div>
+
+        <hr class="divider">
+
+        <!-- APPROVAL FLOW -->
+        <h2>Approval Flow</h2>
+        <div class="info-box" style="background: var(--success-light); border-left-color: var(--success);">
+            <strong>Next Steps:</strong>
+            <ol style="margin-left: 20px;">
+                <li><strong>Kindly provide approval</strong> on the estimated hours for US-18 through US-22 — 130.8 hours total</li>
+                <li><strong>Confirm open questions:</strong> US-18 CureMD UI discovery session timing, US-22 PFT Chest Bellows Reversibility field confirmation</li>
+                <li><strong>We begin immediately</strong> after approval — work can start same day</li>
+            </ol>
+        </div>
+
+        <div class="note-box" style="text-align: center; font-weight: 600;">
+            Kindly provide confirmation on the estimated hours before we proceed working on these user stories.
+        </div>
+
+        <hr class="divider">
+
+        <!-- STRUCTURAL ACTION ITEMS -->
+        <h2>Structural Action Items</h2>
+        <div class="info-box">
+            <p><strong>Process Optimization in Progress:</strong> We are currently planning process improvements for dual-track development (enhancements vs. new modules) and delivery management structure. We will get back to you with the solution by <strong>Tuesday, April 29, 2026</strong>.</p>
+        </div>
+
+        <hr class="divider">
+
+        <!-- BACKLOG MODULES -->
+        <h2>Modules in Backlog — Awaiting Go-Ahead</h2>
+        <div class="warn-box">
+            <p>The following modules are in the backlog and ready for analysis once we receive your approval to proceed:</p>
+            <ul style="margin-top: 8px;">
+                <li><strong>US-23 — Ambient Listening for Clinical Notes</strong> (New Module): AI-powered clinical note generation using ambient listening technology</li>
+                <li><strong>US-24 — Order Management Module:</strong> Comprehensive order management system for diagnostic workflows</li>
+            </ul>
+            <p style="margin-top: 12px; margin-bottom: 0;"><strong>Next Step:</strong> Kindly confirm when you would like us to begin discovery and analysis for these modules.</p>
+        </div>
+
+        <div class="footer-note">
+            Questions? Contact Himani Juneja, Chief of Staff — PRM Billing.<br>
+            This document is confidential and intended solely for SFPCC review.<br>
+            Prepared: April 27, 2026
+        </div>
+    </div>
+</div>
+<script src="prm-date-format.js?v=20260622m"></script>
+<script src="prm-doc-meta.js?v=20260622m"></script>
+</body>
+</html>

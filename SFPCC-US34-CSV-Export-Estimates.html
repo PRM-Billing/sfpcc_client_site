@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="doc-last-updated" content="2026-06-21" />
+    <title>SFPCC ERP — US-34 CSV Report Export: BRD &amp; Estimate</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #3182ce;
+            --success: #38a169;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 36px 44px;
+            border-radius: 14px 14px 0 0;
+        }
+        .header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+        .header-meta { font-size: 0.88rem; opacity: 0.92; line-height: 1.75; }
+        .content {
+            background: var(--card-bg);
+            padding: 40px 44px;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .nav-back { margin-bottom: 20px; font-size: 0.9rem; }
+        .nav-back a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        .nav-back a:hover { text-decoration: underline; }
+        h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin: 32px 0 14px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        h2:first-of-type { margin-top: 0; }
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 24px;
+            font-size: 0.92rem;
+        }
+        .info-box ul { margin: 10px 0 0 20px; }
+        .proposal-box {
+            background: #f0fff4;
+            border-left: 4px solid var(--success);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 24px 0;
+            font-size: 0.92rem;
+        }
+        table.findings {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        table.findings thead th {
+            background: var(--primary);
+            color: white;
+            text-align: left;
+            padding: 12px 14px;
+            font-weight: 600;
+        }
+        table.findings tbody td {
+            vertical-align: top;
+            padding: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        table.findings tbody tr:nth-child(even) td { background: #f8fafc; }
+        .total-row td { font-weight: 700; background: #edf2f7 !important; }
+        code {
+            font-family: ui-monospace, monospace;
+            font-size: 0.85em;
+            background: #edf2f7;
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+        @media print {
+            body { padding: 0; background: white; }
+            .content { box-shadow: none; }
+            .nav-back { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>US-34 — CSV Report Export across All Modules</h1>
+        <div class="header-meta">
+            <strong>Client:</strong> SFPCC / ClinicSync ERP<br>
+            <strong>Document type:</strong> BRD &amp; incremental estimate<br>
+            <strong>Modules:</strong> X-Ray · Sleep Study · PFT · PST<br>
+            <strong>Version:</strong> 1.0 · Mar&nbsp;27,&nbsp;2026<br>
+            <strong>Companion:</strong> <a href="SFPCC-USER-STORIES-FE-BE-ESTIMATES-2026-03-27.md" style="color:#bee3f8;">SFPCC-USER-STORIES-FE-BE-ESTIMATES-2026-03-27.md</a> (incremental floor methodology · US-1–11 + US-13)
+        </div>
+    </div>
+    <div class="content">
+        <p class="nav-back"><a href="sfpcc-consolidated-user-stories.html#us-34-csv-report-export">← Back to consolidated backlog (US-34)</a></p>
+
+        <div class="info-box">
+            <strong>User story</strong>
+            <p style="margin-top:8px;"><strong>As</strong> operations or clinical leadership,<br>
+            <strong>I want</strong> to export a CSV report from each modality module,<br>
+            <strong>So that</strong> I can review all orders and all statuses without manual copy-paste from the UI.</p>
+        </div>
+
+        <h2>Requirement</h2>
+        <p>Add an <strong>Export CSV</strong> control on each module’s orders/report surface:</p>
+        <ul>
+            <li><strong>X-Ray</strong></li>
+            <li><strong>Sleep Study</strong></li>
+            <li><strong>PFT</strong></li>
+            <li><strong>PST</strong></li>
+        </ul>
+        <p>Each export must include <strong>all orders</strong> and <strong>all statuses</strong> for that module (full module dataset — not limited to the current on-screen filter unless product explicitly chooses filter-scoped export later).</p>
+
+        <h2>Solution outline</h2>
+        <table class="findings">
+            <thead><tr><th>Layer</th><th>Deliverable</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>Backend</strong></td>
+                    <td>Shared CSV serialization helper · one authenticated export route per module (four routes) · reuse existing list/query patterns · consistent column naming where possible across modalities</td>
+                </tr>
+                <tr>
+                    <td><strong>Frontend</strong></td>
+                    <td>Shared <strong>Export CSV</strong> button component on four module pages · loading/disabled state · browser file download · same label and placement pattern on each page</td>
+                </tr>
+                <tr>
+                    <td><strong>QA</strong></td>
+                    <td>Full regression on one module (row count, status coverage, permissions) · smoke on the other three modules</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Acceptance criteria</h2>
+        <div class="info-box" style="margin-bottom:0;">
+            <ul>
+                <li>Each of the four modules exposes a working <strong>Export CSV</strong> action visible to authorized users.</li>
+                <li>Downloaded file includes all orders for that module and all workflow statuses represented in the ERP.</li>
+                <li>Export respects tenant and user access rules (same as list views).</li>
+                <li>Button UX is consistent across modules (label, placement, loading feedback).</li>
+                <li>No regression to existing list/filter behaviour when export is not used.</li>
+            </ul>
+        </div>
+
+        <h2>Estimate — incremental floor (8 h total)</h2>
+        <p style="font-size:0.92rem;color:var(--text-light);margin-bottom:12px;">Sized as an incremental delta on the existing ClinicSync codebase (same methodology as <a href="SFPCC-USER-STORIES-FE-BE-ESTIMATES-2026-03-27.md">SFPCC ERP FE/BE estimates · Mar&nbsp;2026</a>). QA ≈ lean functional pass.</p>
+        <table class="findings">
+            <thead><tr><th>Area</th><th>Hours</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td>Backend Development</td><td>4</td><td>Shared CSV helper + export route per module</td></tr>
+                <tr><td>Frontend Development</td><td>3</td><td>Shared button on four pages</td></tr>
+                <tr><td>QA Testing</td><td>1</td><td>One module full test + quick check on other three</td></tr>
+                <tr class="total-row"><td><strong>Total</strong></td><td><strong>8</strong></td><td>Planning floor · PRM actuals supersede</td></tr>
+            </tbody>
+        </table>
+
+        <div class="proposal-box">
+            <strong>Status:</strong> Backlog · estimated · BRD published<br>
+            <strong>Consolidated backlog:</strong> <a href="sfpcc-consolidated-user-stories.html#us-34-csv-report-export">US-34 on sfpcc-consolidated-user-stories.html</a>
+        </div>
+    </div>
+</div>
+<script src="prm-date-format.js?v=20260622m"></script>
+<script src="prm-doc-meta.js?v=20260622m"></script>
+</body>
+</html>

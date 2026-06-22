@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="doc-last-updated" content="2026-06-21" />
+    <title>US-35 — Dashboard Status Overview PFT &amp; PST (Plain English)</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #3182ce;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 36px 44px;
+            border-radius: 14px 14px 0 0;
+        }
+        .header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+        .header-meta { font-size: 0.88rem; opacity: 0.92; line-height: 1.75; }
+        .content {
+            background: var(--card-bg);
+            padding: 40px 44px;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 24px;
+            font-size: 0.92rem;
+        }
+        .info-box ul { margin: 10px 0 0 20px; }
+        .info-box li { margin-bottom: 6px; }
+        .proposal-box {
+            background: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 24px 0;
+            font-size: 0.92rem;
+        }
+        .warn-box {
+            background: #fffaf0;
+            border-left: 4px solid #dd6b20;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 24px 0;
+            font-size: 0.92rem;
+        }
+        .sev-pill {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .sev-pending { background: #feebc8; color: #c05621; }
+        .sev-done { background: #c6f6d5; color: #22543d; }
+        h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin: 32px 0 14px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        h2:first-of-type { margin-top: 0; }
+        table.findings {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        table.findings thead th {
+            background: var(--primary);
+            color: white;
+            text-align: left;
+            padding: 12px 14px;
+            font-weight: 600;
+        }
+        table.findings tbody td {
+            vertical-align: top;
+            padding: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        table.findings tbody tr:nth-child(even) td { background: #f8fafc; }
+        .tech-meta { font-size: 0.82rem; color: var(--text-light); margin-top: 8px; }
+        .tech-meta code {
+            font-family: ui-monospace, monospace;
+            font-size: 0.8rem;
+            background: #edf2f7;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+        .signoff { margin-top: 32px; font-size: 0.9rem; }
+        .signoff table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .signoff th, .signoff td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; }
+        .signoff th { background: #edf2f7; }
+        @media print {
+            body { padding: 0; background: white; }
+            .content { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>US-35 — Dashboard Status Overview for PFT and PST</h1>
+        <div class="header-meta">
+            <strong>Client:</strong> [SFPCC Client – JUNE] US-35<br>
+            <strong>Reference UI:</strong> Existing X-Ray and Sleep Study status panels on ClinicSync dashboard<br>
+            <strong>Audience:</strong> SFPCC operations, Product, Engineering, QA · June 2026<br>
+            <strong>Companion:</strong> US-35-DASHBOARD-PFT-PST-STATUS-OVERVIEW-USER-STORY.md
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="info-box">
+            <strong>User story</strong>
+            <p style="margin-top:8px;"><strong>As a</strong> ClinicSync user on the home dashboard,<br>
+            <strong>I want</strong> <strong>PFT</strong> and <strong>PST</strong> status overview sections like X-Ray and Sleep Study,<br>
+            <strong>So that</strong> I can see order counts by stage at a glance and open the filtered orders list with one click.</p>
+            <p style="margin-top:12px;"><strong>Placement:</strong> New row <strong>below</strong> the existing X-Ray and Sleep Study status overview row.</p>
+        </div>
+
+        <div class="warn-box">
+            <strong>Note:</strong> <strong>Activity Overview</strong> and <strong>Document Status</strong> charts on the dashboard stay unchanged (appointments / documents only). This story adds only the PFT and PST <strong>five-count panels</strong>.
+        </div>
+
+        <h2>Five metric cards (each module)</h2>
+        <table class="findings">
+            <thead>
+                <tr>
+                    <th>Card label (UI)</th>
+                    <th>What it counts</th>
+                    <th>When user clicks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Total Orders</strong></td>
+                    <td>All active (non-archived) orders in the module</td>
+                    <td>Opens full PFT or PST orders list</td>
+                </tr>
+                <tr>
+                    <td><strong>Pending</strong></td>
+                    <td>Orders waiting for report upload</td>
+                    <td>Filters list to <code>pending_for_upload</code></td>
+                </tr>
+                <tr>
+                    <td><strong>In Progress</strong></td>
+                    <td>Orders <strong>ready for review</strong> only (not “queued for CureMD”)</td>
+                    <td>Filters list to <code>ready_for_review</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Signed</strong></td>
+                    <td>Signed orders not yet fully uploaded</td>
+                    <td>Filters list to <code>signed</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Uploaded to CureMD</strong></td>
+                    <td>Orders completed in CureMD</td>
+                    <td>Filters list to <code>uploaded_to_curemd</code></td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="tech-meta">Counts come from existing APIs: <code>GET /api/pft/orders/stats</code> and <code>GET /api/pst/orders/stats</code>. Doctors acting on behalf of another physician see counts scoped to that physician (same as X-Ray / Sleep).</p>
+
+        <h2>Engineering notes (for dev)</h2>
+        <table class="findings">
+            <thead>
+                <tr><th>Item</th><th>Detail</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Pattern to copy</td>
+                    <td>Existing X-Ray / Sleep blocks in <code>frontend/src/features/dashboard/pages/DashboardPage.tsx</code></td>
+                </tr>
+                <tr>
+                    <td>APIs</td>
+                    <td><code>getOrderStats</code> from <code>pftApi.ts</code> and <code>getPstOrderStats</code> from <code>pstApi.ts</code></td>
+                </tr>
+                <tr>
+                    <td>PST deep links</td>
+                    <td>Support <code>?status=</code> on <code>PstOrdersPage</code> (PFT already does)</td>
+                </tr>
+                <tr>
+                    <td>Access</td>
+                    <td>Hide panel when user lacks PFT/PST clinical read (see <code>pftAccess</code> / <code>pstAccess</code>)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Assumptions — confirm with SFPCC</h2>
+        <table class="findings">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Assumption</th>
+                    <th>Default</th>
+                    <th>Y / N / Change</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>C1</td>
+                    <td>Add PFT and PST blocks on the <strong>main dashboard</strong></td>
+                    <td>Yes</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>C2</td>
+                    <td>Fifth card label is <strong>Uploaded to CureMD</strong> (not “Completed in 3 days”)</td>
+                    <td>Yes</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>C3</td>
+                    <td><strong>In Progress</strong> = Ready for Review only</td>
+                    <td>Yes</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>C4</td>
+                    <td>Card labels: Total Orders, Pending, In Progress, Signed, Uploaded to CureMD</td>
+                    <td>Yes</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>C5</td>
+                    <td>Clicking a card opens the <strong>filtered orders list</strong></td>
+                    <td>Yes</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>C6</td>
+                    <td>Users <strong>without</strong> PFT or PST access do <strong>not</strong> see that panel</td>
+                    <td>Yes</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Acceptance criteria</h2>
+        <div class="info-box" style="margin-bottom:0;">
+            <ul>
+                <li>Dashboard shows <strong>PFT – Status Overview</strong> and <strong>PST – Status Overview</strong> when data loads.</li>
+                <li>Each panel shows five clickable counts matching the table above.</li>
+                <li>Counts match the stats APIs for the tenant (and rendering physician when applicable).</li>
+                <li>Layout matches X-Ray / Sleep row (two columns on desktop, stacked on mobile).</li>
+                <li>No empty or broken panel for users who lack module access — panel is hidden.</li>
+            </ul>
+        </div>
+
+        <div class="proposal-box">
+            <strong>Implementation status:</strong> <span class="sev-pill sev-pending">To be built by Engineering</span> — not deployed to staging/production yet. X-Ray and Sleep overview panels already exist; this story adds the same pattern for PFT and PST.<br><br>
+            <strong>Effort estimate: 7 hours total</strong>
+            <ul style="margin:10px 0 0 20px;">
+                <li>Frontend: 5 h (panels + permissions + navigation)</li>
+                <li>Backend: 0 h (stats APIs already exist)</li>
+                <li>QA: 2 h after deploy</li>
+            </ul>
+        </div>
+
+        <div class="signoff">
+            <h2>Sign-off</h2>
+            <table>
+                <thead>
+                    <tr><th>Role</th><th>Name</th><th>Date</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>SFPCC / client operations</td><td></td><td></td><td>C1–C6:</td></tr>
+                    <tr><td>Product / PM</td><td></td><td></td><td></td></tr>
+                    <tr><td>Engineering</td><td></td><td></td><td></td></tr>
+                    <tr><td>QA</td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+<script src="prm-date-format.js?v=20260622m"></script>
+<script src="prm-doc-meta.js?v=20260622m"></script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="doc-last-updated" content="2026-06-21" />
+  <title>SFPCARE — Sprint hours reconciliation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #eef2f7;
+      --card: #fff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #1e40af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    .page { max-width: 1080px; margin: 0 auto; padding: 28px 20px 64px; }
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      align-items: center;
+    }
+    .breadcrumb a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .nav-mini { margin-left: auto; display: flex; flex-wrap: wrap; gap: 12px; }
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+    }
+    .pill.closed { background: #d1fae5; color: #065f46; }
+    .pill.active { background: #dbeafe; color: #1e40af; }
+    .pill.planned { background: #f1f5f9; color: #475569; }
+
+    .recon-hero {
+      border-radius: 16px;
+      padding: 28px 28px 24px;
+      margin-bottom: 22px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+    }
+    .recon-hero.hero-profit { background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 42%, #f0fdf4 100%); border-color: #6ee7b7; }
+    .recon-hero.hero-loss { background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 42%, #fff7ed 100%); border-color: #fcd34d; }
+    .recon-hero-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .recon-hero-eyebrow {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .recon-hero-title {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .recon-hero-dates { font-size: 15px; color: var(--muted); margin-top: 6px; }
+    .recon-hero-badge-wrap { text-align: right; }
+    .recon-hero-badge {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 10px 18px;
+      border-radius: 999px;
+      color: #fff;
+    }
+    .hero-profit .recon-hero-badge { background: #059669; }
+    .hero-loss .recon-hero-badge { background: #d97706; }
+    .recon-hero-badge-sub {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .recon-hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .recon-hero-metric {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      padding: 16px 18px;
+      min-height: 96px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .recon-hero-metric.primary { background: #fff; border-color: #cbd5e1; }
+    .recon-hero-metric.pos { background: #fff; border-color: #6ee7b7; }
+    .recon-hero-metric.neg { background: #fff; border-color: #fcd34d; }
+    .recon-hero-metric .k {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .recon-hero-metric .v {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .recon-hero-metric .u { font-size: 1rem; font-weight: 700; color: var(--muted); margin-left: 2px; }
+    .recon-hero-metric.pos .v { color: #047857; }
+    .recon-hero-metric.neg .v { color: #b45309; }
+    .recon-hero-note {
+      font-size: 14px;
+      color: #334155;
+      line-height: 1.6;
+      max-width: 52rem;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn {
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn.secondary { background: #1e293b; }
+    .btn.ghost { background: #fff; color: var(--accent); border: 1px solid #bfdbfe; }
+    .btn:hover { filter: brightness(1.06); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+    .card h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .recon-intro {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.6;
+      max-width: 52rem;
+    }
+
+    table.tb { width: 100%; border-collapse: collapse; font-size: 14px; }
+    table.tb th {
+      text-align: left;
+      padding: 12px 14px;
+      background: #1e3a5f;
+      color: #fff;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    table.tb td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    table.tb tbody tr:nth-child(even) td { background: #f8fafc; }
+    table.tb td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+    table.tb td.delta-over { color: #b45309; font-weight: 700; background: #fffbeb !important; }
+    table.tb td.delta-under { color: #047857; font-weight: 700; background: #ecfdf5 !important; }
+    table.tb td.delta-zero { color: var(--muted); }
+    table.tb td.story-id { font-family: "JetBrains Mono", monospace; font-weight: 700; white-space: nowrap; }
+    table.tb td.story-title a.task-link {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    table.tb td.story-title a.task-link:hover { text-decoration: underline; }
+
+    table.tb tfoot td {
+      font-weight: 700;
+      background: #e2e8f0 !important;
+      border-top: 2px solid #94a3b8;
+    }
+    table.tb tfoot td.num.pos { color: #047857; }
+    table.tb tfoot td.num.neg { color: #b45309; }
+
+    #missing { padding: 48px 20px; text-align: center; color: var(--muted); }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; }
+      .page { max-width: none; padding: 12px; }
+      .recon-hero, .card { box-shadow: none; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="breadcrumb no-print">
+      <a href="index.html">PRM hub</a> ·
+      <a href="sfpcare-weekly-hours-reports.html">SFPCARE weekly reports</a>
+      <span class="nav-mini" id="nav-links"></span>
+    </p>
+
+    <div id="missing" style="display: none;"></div>
+
+    <div id="content" style="display: none;">
+      <div class="pill" id="pill">—</div>
+      <div id="hero-mount"></div>
+
+      <div class="toolbar no-print">
+        <p class="recon-intro" style="margin:0;max-width:36rem;">
+          <strong>Quoted ≥ spent</strong> = profit or break-even. Per-story detail below.
+        </p>
+        <div class="toolbar-actions">
+          <button type="button" class="btn" id="btn-recon-csv">Download CSV</button>
+          <button type="button" class="btn secondary" id="btn-recon-print">Print / PDF</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>By user story — quoted vs spent</h2>
+        <p class="recon-intro">
+          <strong>Harshit quoted hours</strong> vs <strong>Harshit spent</strong> ·
+          <strong>client approved</strong> vs <strong>team / dev spent</strong>.
+          <strong>Δ approved − spent</strong> = client approved − (team spent + Harshit spent). Negative = loss.
+        </p>
+        <table class="tb">
+          <thead>
+            <tr>
+              <th>Story</th>
+              <th>Deliverable</th>
+              <th class="num">Harshit quoted</th>
+              <th class="num">Client approved</th>
+              <th class="num">Harshit spent</th>
+              <th class="num">Team spent</th>
+              <th class="num">Δ approved − spent</th>
+            </tr>
+          </thead>
+          <tbody id="story-recon-rows"></tbody>
+          <tfoot id="story-recon-foot"></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="ceo-program-progress-data.js?v=20260528"></script>
+  <script src="ceo-billing-export.js?v=20260530"></script>
+  <script>
+    (function () {
+      function escapeHtml(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      function fmtHours(n) {
+        if (typeof n !== "number" || isNaN(n)) return "—";
+        return (Math.round(n * 10) / 10).toFixed(1);
+      }
+
+      function fmtDeltaSigned(h) {
+        if (typeof h !== "number" || isNaN(h)) return "—";
+        var rounded = Math.round(h * 10) / 10;
+        return (rounded > 0 ? "+" : "") + rounded.toFixed(1) + " h";
+      }
+
+      function deltaCellClass(d) {
+        if (typeof d !== "number" || isNaN(d)) return "delta-zero";
+        if (d > 0.05) return "delta-under";
+        if (d < -0.05) return "delta-over";
+        return "delta-zero";
+      }
+
+      function showMissing(msg) {
+        var m = document.getElementById("missing");
+        m.style.display = "block";
+        m.innerHTML =
+          msg ||
+          '<p>No sprint found for <code>sprint</code> in the URL.</p><p><a href="sfpcare-weekly-hours-reports.html">Back to weekly reports</a></p>';
+      }
+
+      function storyReconRowDelta(r) {
+        if (!r) return NaN;
+        if (BX && typeof BX.computeStoryReconRowDelta === "function") {
+          return BX.computeStoryReconRowDelta(r);
+        }
+        if (typeof r.clientQuotedH !== "number" || typeof r.teamSpentH !== "number") return NaN;
+        var hs = typeof r.harshitSpentH === "number" ? r.harshitSpentH : 0;
+        return Math.round((r.clientQuotedH - r.teamSpentH - hs) * 10) / 10;
+      }
+
+      var D = window.PRM_CEO_PROGRAM_PROGRESS;
+      var BX = window.PRM_BILLING_EXPORT;
+      if (!D || !Array.isArray(D.sprints) || !BX) {
+        showMissing("<p>Program data failed to load.</p>");
+        return;
+      }
+
+      var id = NaN;
+      try {
+        id = parseInt(new URLSearchParams(window.location.search).get("sprint") || "", 10);
+      } catch (e) {}
+      var s = D.sprints.find(function (x) {
+        return Number(x.id) === id;
+      });
+      if (!s) {
+        showMissing();
+        return;
+      }
+
+      var reconRows = s.storyHoursReconciliation || [];
+      if (!reconRows.length) {
+        showMissing(
+          "<p>No per-story hours reconciliation for <strong>" +
+            escapeHtml(s.name || "this sprint") +
+            "</strong>.</p><p><a href=\"ceo-program-sprint-detail.html?sprint=" +
+            encodeURIComponent(String(id)) +
+            '">Open sprint results</a></p>'
+        );
+        return;
+      }
+
+      document.getElementById("missing").style.display = "none";
+      document.getElementById("content").style.display = "block";
+
+      var st = String(s.status || "").toLowerCase();
+      var pillEl = document.getElementById("pill");
+      pillEl.textContent = s.status || "";
+      pillEl.className =
+        "pill " +
+        (st === "closed" ? "closed" : st === "active" || st === "in progress" ? "active" : "planned");
+
+      document.title = (s.name || "Sprint") + " — hours reconciliation | SFPCARE";
+
+      var totals = BX.computeStoryReconTotals(reconRows);
+      var heroMount = document.getElementById("hero-mount");
+      if (heroMount && BX.renderStoryReconFullPageHeroHtml) {
+        heroMount.innerHTML = BX.renderStoryReconFullPageHeroHtml(totals, {
+          name: s.name,
+          dates: s.dates,
+          status: s.status,
+        });
+      }
+
+      document.getElementById("nav-links").innerHTML =
+        '<a href="ceo-program-sprint-detail.html?sprint=' +
+        encodeURIComponent(String(id)) +
+        '">Sprint results</a>' +
+        '<a href="sfpcare-sprint-billing.html?sprint=' +
+        encodeURIComponent(String(id)) +
+        '">Client billing</a>';
+
+      document.getElementById("story-recon-rows").innerHTML = reconRows
+        .map(function (r) {
+          var dq = storyReconRowDelta(r);
+          return (
+            "<tr><td class='story-id'><strong>" +
+            escapeHtml(r.story || "") +
+            "</strong></td><td class='story-title'>" +
+            escapeHtml(r.title || "") +
+              (r.note
+                ? "<br><span style='font-size:12px;color:var(--muted)'>" + escapeHtml(r.note) + "</span>"
+                : "") +
+              (r.taskUrl
+              ? "<br><a class='task-link' href='" +
+                escapeHtml(r.taskUrl) +
+                "' target='_blank' rel='noopener'>Bitrix task →</a>"
+              : "") +
+            "</td><td class='num'>" +
+            escapeHtml(fmtHours(r.harshitEstimatedH)) +
+            "</td><td class='num'>" +
+            escapeHtml(fmtHours(r.clientQuotedH)) +
+            "</td><td class='num'>" +
+            escapeHtml(fmtHours(r.harshitSpentH)) +
+            "</td><td class='num'>" +
+            escapeHtml(fmtHours(r.teamSpentH)) +
+            "</td><td class='num " +
+            deltaCellClass(dq) +
+            "'>" +
+            escapeHtml(fmtDeltaSigned(dq)) +
+            "</td></tr>"
+          );
+        })
+        .join("");
+
+      var marginClass = totals.isProfit ? "pos" : "neg";
+      document.getElementById("story-recon-foot").innerHTML =
+        "<tr><td colspan='2'><strong>Sprint total</strong> · " +
+        totals.storyCount +
+        " tracked " +
+        (totals.storyCount === 1 ? "story" : "stories") +
+        "</td><td class='num'>" +
+        escapeHtml(BX.formatHoursDisplay(totals.harshitEstimatedH)) +
+        "</td><td class='num'>" +
+        escapeHtml(BX.formatHoursDisplay(totals.clientQuotedH)) +
+        "</td><td class='num'>" +
+        escapeHtml(BX.formatHoursDisplay(totals.harshitSpentH)) +
+        "</td><td class='num'>" +
+        escapeHtml(BX.formatHoursDisplay(totals.teamSpentH)) +
+        "</td><td class='num " +
+        marginClass +
+        "'>" +
+        escapeHtml(BX.formatMarginSigned(totals.marginH)) +
+        "</td></tr>";
+
+      var clientSeg = BX.sanitizeFilenameSegment(
+        ((D.meta && D.meta.billingExport) || {}).clientLabel || "SFPCC"
+      );
+      var dateSeg = BX.sanitizeFilenameSegment(D.meta.lastUpdated || "");
+      var baseName =
+        clientSeg + "_SFPCARE_Sprint-" + Number(s.id) + "_hours_reconciliation_" + dateSeg + ".csv";
+
+      document.getElementById("btn-recon-csv").onclick = function () {
+        BX.downloadCsv(baseName, BX.buildRowsForStoryHoursReconciliation(D, s));
+      };
+      document.getElementById("btn-recon-print").onclick = function () {
+        BX.printPage();
+      };
+    })();
+  </script>
+<script src="prm-date-format.js?v=20260622m"></script>
+<script src="prm-doc-meta.js?v=20260622m"></script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="doc-last-updated" content="2026-06-21" />
+    <title>US-5.2 — PFT &amp; PST: Combined PDF for CureMD (Plain English)</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #3182ce;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 36px 44px;
+            border-radius: 14px 14px 0 0;
+        }
+        .header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+        .header-meta { font-size: 0.88rem; opacity: 0.92; line-height: 1.75; }
+        .content {
+            background: var(--card-bg);
+            padding: 40px 44px;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 24px;
+            font-size: 0.92rem;
+        }
+        .info-box ul { margin: 10px 0 0 20px; }
+        .info-box li { margin-bottom: 6px; }
+        .proposal-box {
+            background: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 24px 0;
+            font-size: 0.92rem;
+        }
+        .warn-box {
+            background: #fffaf0;
+            border-left: 4px solid #dd6b20;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 24px 0;
+            font-size: 0.92rem;
+        }
+        .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; align-items: center; }
+        .legend-label { font-size: 0.85rem; font-weight: 600; color: var(--text-light); margin-right: 4px; }
+        .sev-pill {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .sev-done { background: #c6f6d5; color: #22543d; }
+        .sev-pending { background: #feebc8; color: #c05621; }
+        .sev-high { background: #feebc8; color: #c05621; }
+        .sev-medium { background: #fefcbf; color: #975a16; }
+        .sev-low { background: #e2e8f0; color: #4a5568; }
+        .sev-decision { background: #e9d8fd; color: #553c9a; }
+        h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin: 32px 0 14px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        h2:first-of-type { margin-top: 0; }
+        table.findings {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        table.findings thead th {
+            background: var(--primary);
+            color: white;
+            text-align: left;
+            padding: 12px 14px;
+            font-weight: 600;
+        }
+        table.findings thead th.col-tech { width: 55%; }
+        table.findings thead th.col-plain { width: 45%; }
+        table.findings tbody td {
+            vertical-align: top;
+            padding: 16px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        table.findings tbody tr:nth-child(even) td { background: #f8fafc; }
+        .tech-id { font-weight: 700; color: var(--primary); font-size: 0.95rem; margin-bottom: 6px; }
+        .tech-finding { margin: 8px 0; }
+        .tech-meta { font-size: 0.82rem; color: var(--text-light); margin-top: 10px; }
+        .tech-meta strong { color: var(--text); }
+        .tech-meta code {
+            font-family: ui-monospace, monospace;
+            font-size: 0.8rem;
+            background: #edf2f7;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+        .plain-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--primary-light);
+            margin: 0 0 4px 0;
+        }
+        .plain-label + p { margin-bottom: 12px; }
+        .plain-label:not(:first-child) { margin-top: 14px; }
+        .plain-col p:last-child { margin-bottom: 0; }
+        @media print {
+            body { padding: 0; background: white; }
+            .content { box-shadow: none; }
+            table.findings tbody tr { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>US-5.2 — PFT &amp; PST: One combined PDF for CureMD (and Medical Records)</h1>
+        <div class="header-meta">
+            <strong>Reference story:</strong> [SFPCC Client – APRIL] US-5 — Combined into a single file when uploaded to CureMD<br>
+            <strong>Companion (Sleep):</strong> <code>US-5-GAPS-AND-SME-DECISIONS-PLAIN.html</code><br>
+            <strong>Modules:</strong> Pulmonary Function Test (PFT), Pre-Surgical Testing (PST)<br>
+            <strong>Audience:</strong> SFPCC SME (Oriana), Product, Engineering · June 2026<br>
+            <strong>How to read:</strong> Technical detail on the left; plain-language impact on the right.
+        </div>
+    </div>
+
+    <div class="content">
+
+        <p style="margin-bottom:20px;font-size:0.9rem;"><a href="sfpcc-consolidated-user-stories.html#us-5-2-pft-pst-merged-pdf" style="color:var(--accent);font-weight:600;text-decoration:none;">← Back to consolidated backlog (US-5.2 · enhancement of US-5)</a></p>
+
+        <div class="info-box">
+            <strong>Business goal (same as US-5 for Sleep Study):</strong> When a PFT or PST order is signed, CureMD should receive <strong>one PDF</strong> that contains the <strong>interpretation</strong> and the <strong>signed clinical report</strong> (interpretation pages first, then the report), not two separate uploads.
+            <p style="margin-top:12px;"><strong>PFT / PST workflow (simplified):</strong></p>
+            <ul>
+                <li>Upload PFT/PST report → technician uploads source PDF.</li>
+                <li>Review &amp; sign → physician completes interpretation and signs; system generates interpretation PDF and keeps signed report PDF.</li>
+                <li>Queue → <code>queue_curemd_uploads</code> row with two file paths.</li>
+                <li>CureMD bot → merges both PDFs and uploads <strong>one</strong> file to the patient chart folder.</li>
+            </ul>
+        </div>
+
+        <div class="warn-box">
+            <strong>Deployment baseline:</strong> <code>origin/main</code> at <code>b1cc1ff</code> (May 2026). <strong>Do not treat uncommitted local edits as shipped.</strong> Engineering implements, commits, and deploys R1–R4; QA proves in CureMD after deploy.
+        </div>
+
+        <div class="legend">
+            <span class="legend-label">Tags:</span>
+            <span class="sev-pill sev-pending">Dev to build</span>
+            <span class="sev-pill sev-done">On main today</span>
+            <span class="sev-pill sev-high">High</span>
+            <span class="sev-pill sev-medium">Medium</span>
+            <span class="sev-pill sev-decision">SFPCC decision</span>
+        </div>
+
+        <h2>Engineering scope — US-5 parity (dev to implement)</h2>
+        <table class="findings">
+            <thead>
+                <tr>
+                    <th class="col-tech">Area</th>
+                    <th class="col-plain">In plain English</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="tech-id">R1 <span class="sev-pill sev-pending">Dev to build</span></div>
+                        <p class="tech-finding"><strong>CureMD bot merge</strong> — Extend <code>main-upload-doc.py</code> so <code>upload_type</code> <code>PFT</code> / <code>PST</code> merge like Sleep Study when both files exist (interpretation first, then signed report). Add filename heuristic for legacy rows with swapped <code>file1</code>/<code>file2</code>.</p>
+                        <p class="tech-meta"><strong>On <code>origin/main</code> today:</strong> bot merges <strong>Sleep Study only</strong>, not PFT/PST.</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>The upload robot must combine interpretation + report into one PDF before CureMD for PFT and PST (same as Sleep).</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">R2 <span class="sev-pill sev-done">On main today</span></div>
+                        <p class="tech-finding"><strong>Sign requires both PDFs</strong> — <code>pft.service.signInterpretation</code> and <code>pst.service.signInterpretation</code> return errors if <code>interpretationPdfUrl</code> or <code>signedReportPdfUrl</code> is missing.</p>
+                        <p class="tech-meta">Already on <code>origin/main</code>; dev verifies in QA after any related changes.</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Physicians cannot complete sign on PFT/PST without both the uploaded report and the interpretation PDF.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">R3 <span class="sev-pill sev-pending">Dev to build</span></div>
+                        <p class="tech-finding"><strong>Queue column order</strong> — New queue rows: <code>file1</code> = interpretation, <code>file2</code> = signed report in <code>ensurePftCuremdQueueEntry</code> / <code>ensurePstCuremdQueueEntry</code> (and related SQL).</p>
+                        <p class="tech-meta"><strong>On <code>origin/main</code> today:</strong> new rows use <code>file1</code> = signed report, <code>file2</code> = interpretation (reversed vs bot merge order).</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>New sign events must queue files in the order the robot expects for merging.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">R4 <span class="sev-pill sev-done">On main today</span></div>
+                        <p class="tech-finding"><strong>Medical Records v1 ingest (merged)</strong> — On sign: <code>pft.controller</code> / <code>pst.controller</code> pass both PDF paths to <code>ingestToMedicalRecordPortal</code> (PFT <code>merged_pft</code> when both readable; PST merged).</p>
+                        <p class="tech-meta">Already on <code>origin/main</code>; dev verifies MR delivery matches SFPCC Q3.</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Referring-physician portal can receive one merged file when both PDFs are available at sign.</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Remaining gaps &amp; verification (backlog)</h2>
+        <table class="findings">
+            <thead>
+                <tr>
+                    <th class="col-tech">Technical detail</th>
+                    <th class="col-plain">In plain English</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="tech-id">G1 <span class="sev-pill sev-medium">Medium</span></div>
+                        <p class="tech-finding"><strong>No <code>merged_pdf_url</code> on order</strong> — Same as US-5 G2. PFT/PST store <code>interpretation_pdf_url</code> and <code>signed_report_pdf_url</code> separately; merge only at bot / MR ingest time.</p>
+                        <p class="tech-meta"><strong>Fix:</strong> Merge once at sign in Node (<code>mergePdfFilesOrdered</code>); save URL on <code>pft_orders</code> / <code>pst_orders</code>; bot uploads single <code>file1</code>.</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Staff can open each PDF in ClinicSync, but there is no single “complete package” link saved on the order for re-upload or audits.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">G2 <span class="sev-pill sev-medium">Medium</span></div>
+                        <p class="tech-finding"><strong><code>documents</code> table may show interpretation only</strong> — PFT/PST sign still insert one <code>documents</code> row pointing at interpretation path (not merged), while v1 ingest may send merged file.</p>
+                        <p class="tech-meta"><strong>Fix:</strong> Align with US-5 Q4 policy: one merged row or rely only on v1 ingest — same rules for PFT, PST, Sleep.</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Referring physicians might see one merged file in one place and only the interpretation in another, depending on which MR code path runs.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">G3 <span class="sev-pill sev-low">Low</span></div>
+                        <p class="tech-finding"><strong>Legacy queue rows</strong> — Orders queued before file-order fix may have file1/file2 swapped; bot uses heuristic, not ideal.</p>
+                        <p class="tech-meta"><strong>Fix:</strong> Re-queue on next sign, or one-time SQL/script for pending PFT/PST rows.</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Old pending uploads might merge in wrong page order until re-signed or re-queued.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">G4 <span class="sev-pill sev-medium">Medium</span></div>
+                        <p class="tech-finding"><strong>Two merge engines</strong> — Python <code>pypdf</code> (bot) and <code>pdf-lib</code> (MR ingest), same as US-5 G6.</p>
+                        <p class="tech-meta"><strong>Fix:</strong> Single merge at sign (G1); downstream uses one file.</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Same study could look slightly different in CureMD vs portal if two merge tools behave differently.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">G5 <span class="sev-pill sev-high">High</span></div>
+                        <p class="tech-finding"><strong>QA evidence for SFPCC</strong> — Need signed PFT + PST test orders proving CureMD chart shows <strong>one</strong> document with interpretation + report pages.</p>
+                        <p class="tech-meta"><strong>Fix:</strong> Test plan: sign → queue → bot run → verify CureMD + MR portal.</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Client asked for same behavior as Sleep; proof in CureMD UI is required even if code path exists.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">G6 <span class="sev-pill sev-medium">Medium</span></div>
+                        <p class="tech-finding"><strong>10 MB MR ingest cap</strong> — Large merged PFT/PST may fail portal while CureMD succeeds (shared with US-5 G7).</p>
+                        <p class="tech-meta"><strong>Fix:</strong> SME max size / compression policy.</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Very large studies might reach CureMD but not the referring-physician portal.</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Merge order (confirmed — match US-5 / Sleep)</h2>
+        <table class="findings">
+            <thead>
+                <tr><th class="col-tech">Order</th><th class="col-plain">In plain English</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><p class="tech-finding">Page order: <strong>interpretation</strong> then <strong>signed report</strong></p></td>
+                    <td class="plain-col"><p>Same as Sleep Study US-5. SFPCC should confirm this is correct for PFT and PST referring-physician packets.</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tech-finding">CureMD folder: <code>curemd_folder_id</code> on order (default folder constants in service)</p></td>
+                    <td class="plain-col"><p>Confirm PFT and PST documents land in the correct CureMD folders per site/practice.</p></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Decisions needed from Oriana (SFPCC)</h2>
+        <table class="findings">
+            <thead>
+                <tr>
+                    <th class="col-tech">Question</th>
+                    <th class="col-plain">In plain English</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="tech-id">Q1 <span class="sev-pill sev-decision">Decision</span></div>
+                        <p class="tech-finding">Is the complete PFT/PST package always <strong>interpretation + signed report</strong> together (same as US-5 Q1 for sleep)?</p>
+                        <p class="tech-meta">☐ Yes &nbsp; ☐ No (describe): _______________</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>PFT/PST already block sign without both PDFs. Confirm clinically so engineering and QA targets match SFPCC expectations.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">Q2 <span class="sev-pill sev-decision">Decision</span></div>
+                        <p class="tech-finding">Page order: interpretation first, then report — OK for PFT and PST?</p>
+                        <p class="tech-meta">☐ Yes (match Sleep) &nbsp; ☐ Reverse order &nbsp; ☐ Other: _______________</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Defines merge sequence in CureMD and Medical Records.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">Q3 <span class="sev-pill sev-decision">Decision</span></div>
+                        <p class="tech-finding">Medical Records: one merged file only, or separate docs visible until both exist? (US-5 Q4)</p>
+                        <p class="tech-meta">☐ 4a One merged only &nbsp; ☐ 4b Partial with label &nbsp; ☐ Match CureMD &nbsp; ☐ Other: _______________</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Drives G2 fix — align <code>documents</code> table with v1 ingest.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="tech-id">Q4 <span class="sev-pill sev-decision">Decision</span></div>
+                        <p class="tech-finding">Accept engineering default: merge once at sign, save <code>merged_pdf_url</code>, bot uploads that single file?</p>
+                        <p class="tech-meta">☐ Approve &nbsp; ☐ Defer (keep bot-only merge) &nbsp; ☐ Change: _______________</p>
+                    </td>
+                    <td class="plain-col">
+                        <p>Simplest long-term alignment with US-5; removes duplicate merge logic.</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="proposal-box">
+            <strong>Engineering default (recommended)</strong>
+            <ul style="margin:10px 0 0 20px;">
+                <li><strong>Q1 = Yes</strong> — always both documents.</li>
+                <li><strong>Q2 = Yes</strong> — interpretation then report (current bot behavior).</li>
+                <li><strong>Q3 = 4a</strong> — one merged file for referring physicians when both exist.</li>
+                <li><strong>Q4 = Approve</strong> — persist <code>merged_pdf_url</code> at sign for PFT and PST.</li>
+            </ul>
+            <p style="margin-top:12px;"><strong>Oriana:</strong> ☐ Approve default &nbsp; ☐ Change (describe): _______________</p>
+        </div>
+
+        <h2>Acceptance criteria</h2>
+        <div class="info-box" style="margin-bottom:0;">
+            <ul>
+                <li>After PFT sign, CureMD receives <strong>one</strong> PDF containing interpretation + signed report (verified in CureMD UI or bot logs: “Uploading merged PFT file”).</li>
+                <li>After PST sign, same for PST (“Uploading merged PST file”).</li>
+                <li>Sign is rejected if either PDF is missing (already true — regression test).</li>
+                <li>Medical Records delivery follows Q3 policy (merged vs partial).</li>
+                <li>SFPCC sign-off on Q1–Q4 recorded below.</li>
+            </ul>
+        </div>
+
+        <div class="proposal-box">
+            <strong>Effort estimate: 14 hours total</strong>
+            <table class="findings" style="margin-top:12px;">
+                <thead><tr><th>Area</th><th>Hours</th><th>Scope</th></tr></thead>
+                <tbody>
+                    <tr><td>Frontend</td><td>0</td><td>No UI changes</td></tr>
+                    <tr><td>Backend</td><td>12</td><td>R1 bot PFT/PST merge; R3 queue file order; MR <code>documents</code> alignment; optional <code>merged_pdf_url</code>; legacy queue cleanup (two modules)</td></tr>
+                    <tr><td>QA</td><td>2</td><td>CureMD proof (PFT + PST); verify R2/R4 after deploy</td></tr>
+                    <tr><td><strong>Total</strong></td><td><strong>14</strong></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+<script src="prm-date-format.js?v=20260622m"></script>
+<script src="prm-doc-meta.js?v=20260622m"></script>
+</body>
+</html>

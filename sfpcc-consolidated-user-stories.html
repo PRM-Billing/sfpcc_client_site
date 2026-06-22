@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="doc-last-updated" content="2026-06-21" />
+    <title>SFPCC — ERP Backlog &amp; Delivery Status</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #3182ce;
+            --success: #2f855a;
+            --success-light: #f0fff4;
+            --warning: #d69e2e;
+            --warning-light: #fffbeb;
+            --danger: #e53e3e;
+            --danger-light: #fff5f5;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --muted-bg: #f8fafc;
+            --purple: #6b46c1;
+            --purple-light: #f3e8ff;
+            --teal: #319795;
+            --teal-light: #e6fffa;
+            --orange: #c05621;
+            --orange-light: #fffaf0;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 999;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(49,130,206,0.24);
+        }
+        .print-btn:hover { background: var(--primary-light); }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #fff;
+            padding: 36px 44px;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.16);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 999px;
+            margin-bottom: 14px;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            line-height: 1.25;
+        }
+
+        .header-meta {
+            font-size: 0.92rem;
+            opacity: 0.95;
+            line-height: 1.9;
+        }
+
+        .header-meta strong { font-weight: 700; }
+
+        .header-meta .last-updated-date {
+            color: #c53030;
+            font-weight: 700;
+        }
+
+        .content {
+            background: var(--card-bg);
+            padding: 44px;
+            border-radius: 0 0 14px 14px;
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin: 38px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        h2:first-child { margin-top: 0; }
+
+        h3 {
+            font-size: 1.05rem;
+            color: var(--primary-light);
+            margin: 20px 0 10px;
+        }
+
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 8px 0 16px 24px; }
+        li { margin-bottom: 5px; }
+
+        .info-box,
+        .warn-box,
+        .note-box {
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0 20px 0;
+            font-size: 0.92rem;
+        }
+
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid var(--accent);
+        }
+
+        .warn-box {
+            background: var(--warning-light);
+            border-left: 4px solid var(--warning);
+        }
+
+        .note-box {
+            background: var(--success-light);
+            border-left: 4px solid var(--success);
+        }
+
+        .totals {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px 28px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            text-align: center;
+        }
+
+        .totals .label {
+            font-size: 0.74rem;
+            opacity: 0.85;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+        }
+
+        .totals .value {
+            font-size: 1.7rem;
+            font-weight: 700;
+        }
+
+        .story-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 24px 28px;
+            margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .story-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.08rem;
+        }
+
+        .story-meta {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .story-desc {
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .context-block {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--purple);
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0 18px 0;
+            font-size: 0.9rem;
+            line-height: 1.75;
+        }
+
+        .context-label {
+            display: inline-block;
+            background: var(--purple-light);
+            color: var(--purple);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .module-tag {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .mod-appointments { background: #fef3c7; color: #92400e; }
+        .mod-sleep { background: #dbeafe; color: #1e3a8a; }
+        .mod-xray { background: #e0e7ff; color: #3730a3; }
+        .mod-platform { background: #d1fae5; color: #065f46; }
+        .mod-resource { background: #fce7f3; color: #831843; }
+        .mod-medical { background: #e0f2fe; color: #075985; }
+        .mod-referral { background: #fed7aa; color: #7c2d12; }
+        .mod-integration { background: #fce7f3; color: #831843; }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .badge-bug { background: var(--danger-light); color: var(--danger); }
+        .badge-enhancement { background: var(--warning-light); color: var(--warning); }
+        .badge-backlog { background: var(--teal-light); color: var(--teal); }
+        .badge-optional { background: var(--purple-light); color: var(--purple); }
+
+        .hours-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 0 0;
+            font-size: 0.85rem;
+        }
+
+        .hours-table th,
+        .hours-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hours-table thead {
+            background: var(--muted-bg);
+        }
+
+        .hours-table th {
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+        }
+
+        .hours-table tbody tr:hover {
+            background: #fafbfc;
+        }
+
+        .hours-pill {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-top: 8px;
+        }
+
+        .hours-pill.success { background: var(--success); }
+        .hours-pill.warning { background: var(--warning); }
+
+        .divider {
+            border: none;
+            border-top: 2px solid var(--border);
+            margin: 32px 0;
+        }
+        .divider[id] {
+            scroll-margin-top: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.85rem;
+        }
+
+        table th,
+        table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table thead {
+            background: var(--muted-bg);
+        }
+
+        table th {
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+        }
+
+        table tbody tr:hover {
+            background: #fafbfc;
+        }
+
+        .totals-row {
+            background: var(--muted-bg);
+            font-weight: 700;
+        }
+
+        .totals-row td {
+            color: var(--primary);
+            border-top: 2px solid var(--accent);
+        }
+
+        .footer-note {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .hub-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-bottom: 12px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+        .hub-link:hover { text-decoration: underline; color: var(--accent); }
+
+        .toc {
+            background: var(--muted-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 14px 0 24px 0;
+            font-size: 0.88rem;
+        }
+        .toc strong { display: block; margin-bottom: 8px; color: var(--primary); }
+        .toc ol { margin: 0 0 0 1.25rem; padding: 0; line-height: 1.85; }
+
+        .mod-note { background: #ede9fe; color: #5b21b6; }
+        .mod-order { background: #cffafe; color: #155e75; }
+        .mod-patients { background: #fce7f3; color: #9d174d; }
+        .mod-scheduler { background: #e0e7ff; color: #4338ca; }
+        .mod-ai-tag { background: #f3e8ff; color: #6b21a8; }
+
+        .source-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #edf2f7;
+            color: var(--text-light);
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .status-strip {
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 8px 12px;
+            margin: -24px -28px 16px -28px;
+            border-radius: 10px 10px 0 0;
+        }
+        .status-strip.completed { background: var(--success-light); color: #166534; border-bottom: 1px solid #86efac; }
+        .status-strip.in-progress { background: #dbeafe; color: #1e40af; border-bottom: 1px solid #93c5fd; }
+        .status-strip.backlog { background: #f1f5f9; color: #475569; border-bottom: 1px solid #e2e8f0; }
+
+        .new-pill {
+            display: inline-block;
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: var(--purple-light);
+            color: var(--purple);
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .delivered-pill {
+            display: inline-block;
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: var(--success-light);
+            color: #166534;
+            border: 1px solid #86efac;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .delivered-label { color: var(--success); font-weight: 700; }
+        .sprint-pill {
+            display: inline-block;
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #ebf8ff;
+            color: #2b6cb0;
+            border: 1px solid #90cdf4;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .signature-asset {
+            margin-top: 14px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--muted-bg);
+        }
+        .signature-asset img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: #fff;
+        }
+        .signature-asset .cap {
+            font-size: 0.78rem;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        .dash-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 16px 0 8px;
+        }
+        .dash-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,.04);
+        }
+        .dash-card .lbl { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-light); }
+        .dash-card .val { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-top: 4px; }
+        .dash-card.done .val { color: var(--success); }
+        .dash-card.prog .val { color: #1d4ed8; }
+        .dash-card.back .val { color: var(--text-light); }
+        .dash-card.pending .val { color: #b45309; }
+        .dash-card.total .val { color: var(--primary); }
+
+        .estimate-summary-table { margin-top: 16px; }
+        .estimate-summary-table td:first-child { width: 38%; font-weight: 600; }
+        .estimate-summary-table .story-ids { font-size: 0.82rem; color: var(--text-light); line-height: 1.55; }
+
+        .legend {
+            font-size: 0.82rem;
+            color: var(--text-light);
+            margin: 8px 0 0;
+            line-height: 1.6;
+        }
+
+        .status-table .cell-done { color: var(--success); font-weight: 700; }
+        .status-table .cell-prog { color: #1d4ed8; font-weight: 700; }
+        .status-table .cell-back { color: var(--text-light); font-weight: 600; }
+        .status-table .cell-est { color: #1d4ed8; font-weight: 700; }
+        .status-table a.story-id-link { color: var(--accent); font-weight: 700; text-decoration: none; }
+        .status-table a.story-id-link:hover { text-decoration: underline; }
+
+        .status-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+            border-bottom: 2px solid var(--border);
+        }
+        .status-tab {
+            padding: 10px 22px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: -2px;
+        }
+        .status-tab:hover { color: var(--accent); }
+        .status-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .status-table tr.tab-hidden { display: none; }
+        .consolidated-hours a.story-id-link { color: var(--accent); font-weight: 700; text-decoration: none; }
+        .consolidated-hours a.story-id-link:hover { text-decoration: underline; }
+
+        .consolidated-hours {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            table-layout: fixed;
+        }
+        .consolidated-hours th:nth-child(1),
+        .consolidated-hours td:nth-child(1) { width: 6%; }
+        .consolidated-hours th:nth-child(2),
+        .consolidated-hours td:nth-child(2) { width: 28%; }
+        .consolidated-hours th:nth-child(3),
+        .consolidated-hours td:nth-child(3) { width: 14%; }
+        .consolidated-hours th:nth-child(4),
+        .consolidated-hours td:nth-child(4) {
+            width: 28%;
+            min-width: 12rem;
+            word-break: break-word;
+        }
+        .consolidated-hours th:nth-child(5),
+        .consolidated-hours td:nth-child(5) { width: 24%; }
+        .consolidated-hours th,
+        .consolidated-hours td {
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            vertical-align: top;
+        }
+        .consolidated-hours thead {
+            background: var(--muted-bg);
+        }
+        .consolidated-hours .num {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            white-space: normal;
+        }
+        .consolidated-hours .hours-prm {
+            font-size: 0.76rem;
+            font-weight: 500;
+            color: var(--text-light);
+            display: block;
+            margin-top: 4px;
+            line-height: 1.35;
+        }
+
+        .hours-sort-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.65rem 1rem;
+            margin: 0 0 14px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--card-bg);
+        }
+        .hours-sort-bar label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+        }
+        .hours-sort-bar select {
+            font: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--primary);
+            padding: 0.45rem 2rem 0.45rem 0.65rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        @media print {
+            body { padding: 0; background: white; }
+            .print-btn { display: none; }
+            .hours-sort-bar { display: none; }
+            .container { max-width: 100%; }
+            .story-card { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+
+    <div class="container">
+        <div class="header">
+            <div class="eyebrow">Client view · living backlog</div>
+            <h1>SFPCC — ERP Backlog &amp; Delivery Status</h1>
+            <div class="header-meta">
+                <strong>For:</strong> Jorge &amp; SFPCC leadership — completed vs backlog user stories in one place (no items marked in flight at this snapshot).<br>
+                <strong>Last updated:</strong> <span class="last-updated-date" id="doc-last-updated">…</span><br>
+                <strong>Maintained by:</strong> PRM Billing · Himani Juneja, Chief of Staff
+            </div>
+        </div>
+
+        <div class="content">
+            <a class="hub-link" href="index.html">← SFPCC shared documents</a>
+            <p class="legend" style="margin-bottom: 18px;">Proposing a <strong>new initiative</strong> not yet on this backlog? Complete the <a href="sfpcc-client-site/SFPCC-Business-Case-Intake.html"><strong>business case intake form</strong></a> so PRM can scope and estimate it.</p>
+
+            <div class="info-box">
+                <strong>How to use this page:</strong> Start with <a href="#sec-estimate-summary">Estimate summary</a> for hours by bucket, then <a href="#sec-status">Delivery status at a glance</a> for the full story list. <strong>Click any story ID</strong> (e.g. US-25) to jump to its detail narrative and hour breakdown — stories with a published BRD open the BRD page directly. Status labels are maintained for the client; if something looks wrong, flag PRM and we will correct the same day.
+            </div>
+
+            <ul class="legend" style="margin:8px 0 0 1.1rem;line-height:1.65;">
+                <li><strong>Completed</strong> — live in production for SFPCC as agreed.</li>
+                <li><strong>Backlog</strong> — scoped or proposed, not yet delivered.</li>
+                <li><strong>Backlog · estimated</strong> — BRD or estimate pack published; click story ID for detail &amp; hours.</li>
+                <li><strong>Enhancement stories</strong> use parent.child IDs (e.g. <strong>US-5.1</strong>, <strong>US-5.2</strong>) nested under the parent story card — not standalone top-level numbers.</li>
+                <li><strong>Enhancement · US-26</strong> — <strong>US-38</strong> delivered Sprint&nbsp;5 (remaining physicians).</li>
+                <li><strong>Enhancement · US-5</strong> — <strong>US-5.1</strong> delivered (interpretation-first merge); <strong>US-5.2</strong> extends merged PDF to PFT &amp; PST.</li>
+                <li><strong>Sprint 5 (Jun&nbsp;2–15,&nbsp;2026)</strong> — <strong>closed</strong> · all seven stories delivered: US-13.1 · US-5.2 · US-11 · US-13.2 · US-34 · US-35 · US-38.</li>
+                <li><strong>Sprint 6 (Jun&nbsp;15–29)</strong> &amp; <strong>Sprint 7 (Jun&nbsp;30 – Jul&nbsp;13)</strong> — <strong>US-33</strong> SyncMD AI Ambient Notes Module (~140&nbsp;h · same story across both sprints).</li>
+            </ul>
+
+            <hr class="divider" id="sec-estimate-summary">
+
+            <h2>Estimate summary</h2>
+            <div class="dash-grid" aria-label="Estimate summary by delivery status">
+                <div class="dash-card done">
+                    <div class="lbl">Completed</div>
+                    <div class="val">18 stories</div>
+                    <div class="legend" style="margin-top:8px;"><strong>337.7 h</strong> planning total</div>
+                </div>
+                <div class="dash-card back">
+                    <div class="lbl">Backlog · estimated</div>
+                    <div class="val">14 stories</div>
+                    <div class="legend" style="margin-top:8px;"><strong>599 h</strong> incl. optional US-17 + US-33 + US-27 + US-29 · <strong>588 h</strong> excl. US-17</div>
+                </div>
+                <div class="dash-card pending">
+                    <div class="lbl">Backlog · pending BRD / estimate</div>
+                    <div class="val">7 stories</div>
+                    <div class="legend" style="margin-top:8px;">Hours not published yet</div>
+                </div>
+                <div class="dash-card total">
+                    <div class="lbl">Total stories</div>
+                    <div class="val">39</div>
+                    <div class="legend" style="margin-top:8px;">18 completed · 22 backlog</div>
+                </div>
+            </div>
+            <table class="status-table estimate-summary-table">
+                <thead>
+                    <tr>
+                        <th>Bucket</th>
+                        <th style="width:12%">Count</th>
+                        <th style="width:14%">Hours</th>
+                        <th>Stories</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Completed</strong></td>
+                        <td class="num">18</td>
+                        <td class="num"><strong>337.7</strong></td>
+                        <td class="story-ids"><strong>US-5</strong> · <strong>US-5.1</strong> · <strong>US-5.2</strong> · <strong>US-7</strong> · <strong>US-11</strong> · <strong>US-13</strong> · <strong>US-13.1</strong> · <strong>US-13.2</strong> · <strong>US-14</strong> · <strong>US-15</strong> · <strong>US-16</strong> · <strong>US-19</strong> · <strong>US-20</strong> · <strong>US-21</strong> · <strong>US-22</strong> · <strong>US-26</strong> · <strong>US-38</strong> · <strong>US-34</strong> · <strong>US-35</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backlog · estimated</strong></td>
+                        <td class="num">14</td>
+                        <td class="num"><strong>599</strong></td>
+                        <td class="story-ids"><strong>US-1</strong> · <strong>US-2</strong> · <strong>US-3</strong> · <strong>US-4</strong> · <strong>US-6</strong> · <strong>US-8</strong> · <strong>US-9</strong> · <strong>US-10</strong> · <strong>US-17</strong> <em>(optional, 11 h)</em> · <strong>US-18</strong> · <strong>US-25</strong> · <strong>US-27</strong> · <strong>US-29</strong> · <strong>US-33</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backlog · pending BRD / estimate</strong></td>
+                        <td class="num">7</td>
+                        <td>—</td>
+                        <td class="story-ids"><strong>US-12</strong> · <strong>US-23</strong> · <strong>US-24</strong> · <strong>US-28</strong> · <strong>US-30</strong> · <strong>US-41</strong> · <strong>US-42</strong></td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <p class="legend" style="margin-top:14px;">Hours come from story-card workbooks and published BRD / APR estimate packs. <strong>588 h</strong> backlog estimated total excludes optional US-17; includes US-33 (~140 h) + US-27 (~30 h) + US-29 (4 h). PRM invoiced actuals supersede planning figures for delivered work. Line-by-line detail is in <a href="#sec-consolidated-hours">Consolidated Hour Estimate Breakdown</a> below.</p>
+
+            <hr class="divider" id="sec-status">
+
+            <h2>Delivery status at a glance</h2>
+
+            <div class="status-tabs" id="status-tabs">
+                <button class="status-tab active" data-tab="completed">Completed</button>
+                <button class="status-tab" data-tab="estimated">Backlog · Estimated</button>
+                <button class="status-tab" data-tab="backlog">Backlog</button>
+            </div>
+
+            <table class="status-table">
+                <thead>
+                    <tr>
+                        <th>Story</th>
+                        <th>Feature (short name)</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="delivery-status-body">
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-5-merged-pdf"><strong>US-5</strong></a> · <a class="story-id-link" href="#us-5-1-interpretation-first"><strong>US-5.1</strong></a></td><td>Single merged PDF (sleep) · interpretation-first order</td><td class="cell-done">Completed</td><td><span class="sprint-pill" style="margin-left:0">US-5 · Sprint 3</span> · <span class="sprint-pill">US-5.1 · Sprint 4</span> · <span class="delivered-pill">delivered</span></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-7-ai-prefill"><strong>US-7</strong></a></td><td>AI pre-fill from scored sleep PDF</td><td class="cell-done">Completed</td><td>—</td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-13-admin-login"><strong>US-13</strong></a></td><td>Doctor-approved admin login (Firebase / FCM)</td><td class="cell-done">Completed</td><td>—</td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-14-same-day-sync"><strong>US-14</strong></a></td><td>Same-day patient &amp; appointment sync</td><td class="cell-done">Completed</td><td>—</td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-15-instant-xray"><strong>US-15</strong></a></td><td>Instant X-ray interpretation upload to CureMD</td><td class="cell-done">Completed</td><td>—</td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-16-sync-messaging"><strong>US-16</strong></a></td><td>Consistent sync / upload status messaging</td><td class="cell-done">Completed</td><td>—</td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-19-apr17"><strong>US-19</strong></a></td><td>Send X-ray reports to referring physicians (portal)</td><td class="cell-done">Completed</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <span class="delivered-pill">delivered</span></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-20-apr17"><strong>US-20</strong></a></td><td>Send PFT reports to referring physicians (portal)</td><td class="cell-done">Completed</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <span class="delivered-pill">delivered</span></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-21-apr17"><strong>US-21</strong></a></td><td>Send PST reports to referring physicians (portal)</td><td class="cell-done">Completed</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <span class="delivered-pill">delivered</span></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-22-apr17"><strong>US-22</strong></a></td><td>Send sleep study reports to referring physicians (portal)</td><td class="cell-done">Completed</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <span class="delivered-pill">delivered</span></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-26-electronic-signature"><strong>US-26</strong></a> · <a class="story-id-link" href="#us-38-remaining-doctor-signatures"><strong>US-38</strong></a></td><td>Electronic signature · remaining doctors (US-38)</td><td class="cell-done">Completed</td><td><span class="sprint-pill" style="margin-left:0">US-26 · Sprint 4</span> · <span class="sprint-pill">US-38 · Sprint 5</span> · <span class="delivered-pill">delivered</span></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-5-2-pft-pst-merged-pdf"><strong>US-5.2</strong></a></td><td>Combined report PDF for PFT &amp; PST (enhancement · US-5)</td><td class="cell-done">Completed</td><td><span class="sprint-pill" style="margin-left:0">Sprint 5</span> · <span class="delivered-pill">delivered</span> · <a href="SFPCC-US5-2-PFT-PST-Merged-PDF-Plain.html">spec</a></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-11-resource-suggestions"><strong>US-11</strong></a></td><td>Resource suggestions (scheduling hints)</td><td class="cell-done">Completed</td><td><span class="sprint-pill" style="margin-left:0">Sprint 5</span> · <span class="delivered-pill">delivered</span></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="SFPCC-US34-CSV-Export-Estimates.html"><strong>US-34</strong></a></td><td>CSV report export — all orders &amp; statuses (X-Ray, Sleep, PFT, PST)</td><td class="cell-done">Completed</td><td><span class="sprint-pill" style="margin-left:0">Sprint 5</span> · <span class="delivered-pill">delivered</span> · <a href="SFPCC-US34-CSV-Export-Estimates.html">BRD</a></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-35-dashboard-pft-pst-status"><strong>US-35</strong></a></td><td>Dashboard status overview — PFT &amp; PST (five-count panels)</td><td class="cell-done">Completed</td><td><span class="sprint-pill" style="margin-left:0">Sprint 5</span> · <span class="delivered-pill">delivered</span> · <a href="SFPCC-US35-Dashboard-PFT-PST-Status-Overview.html">spec</a></td></tr>
+                    <tr data-category="completed"><td><a class="story-id-link" href="#us-13-1-pop-up-approval-notification"><strong>US-13.1</strong></a> · <a class="story-id-link" href="#us-13-2-concurrent-ma-approval-queue"><strong>US-13.2</strong></a></td><td>Pop-up approval notifications · concurrent MA queue (enhancement · US-13)</td><td class="cell-done">Completed</td><td><span class="sprint-pill" style="margin-left:0">Sprint 5</span> · <span class="delivered-pill">delivered</span></td></tr>
+
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-1-check-in-curemd"><strong>US-1</strong></a></td><td>Check-in ERP → CureMD + blank note</td><td class="cell-est">Backlog · estimated</td><td>Core integration</td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-2-inbound-checkin"><strong>US-2</strong></a></td><td>Inbound CureMD check-in → ERP (poll / live)</td><td class="cell-est">Backlog · estimated</td><td>Core integration</td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-3-sleep-studies-portal"><strong>US-3</strong></a></td><td>Signed sleep studies in medical records portal + patient docs</td><td class="cell-est">Backlog · estimated</td><td>—</td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-4-diagnosis-cpt"><strong>US-4</strong></a></td><td>Diagnosis &amp; CPT at upload → CureMD</td><td class="cell-est">Backlog · estimated</td><td>—</td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-6-status-cards"><strong>US-6</strong></a></td><td>Clickable sleep study status cards</td><td class="cell-est">Backlog · estimated</td><td>—</td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-8-mobile-signing"><strong>US-8</strong></a></td><td>Mobile-friendly sleep study signing</td><td class="cell-est">Backlog · estimated</td><td>—</td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-9-xray-legacy"><strong>US-9</strong></a></td><td>X-ray + legacy viewer (browser workflow)</td><td class="cell-est">Backlog · estimated</td><td>—</td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-10-compliance-prompt"><strong>US-10</strong></a></td><td>Weekly compliance prompt (new referring physicians)</td><td class="cell-est">Backlog · estimated</td><td>—</td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-17-order-validation"><strong>US-17</strong></a></td><td>CureMD order validation gate (optional)</td><td class="cell-est">Backlog · estimated</td><td>Optional — needs approval</td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-18-apr17"><strong>US-18</strong></a></td><td>X-ray interpretation → CureMD provider note</td><td class="cell-est">Backlog · estimated</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <a href="SFPCC-US18-22-ERP-Estimates-APR27.html">APR&nbsp;27 estimate</a></td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="SFPCC-US25-BULK-DEMOGRAPHICS-Estimates.html"><strong>US-25</strong></a></td><td>Bulk patient demographics upload (CSV/XLSX/PDF) + auto-match + NP calendar</td><td class="cell-est">Backlog · estimated</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <a href="SFPCC-US25-Bulk-Demographics-Prototype.html">prototype</a></td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-27-pcp-medical-records-appointments"><strong>US-27</strong></a></td><td>Medical Records — Future Appointments + CureMD Prescriptions</td><td class="cell-est">Backlog · estimated</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <strong>30–37 h</strong> (API 30 h / automation 37 h) · <a href="SFPCC-US27-MEDICAL-RECORDS-FUTURE-APPTS-PRESCRIPTIONS-BRD.html">BRD</a> · <a href="US-27-MEDICAL-RECORDS-FUTURE-APPTS-PRESCRIPTIONS-USER-STORY.md">user story</a> · <a href="us27-medical-records-prototype.html">prototype</a></td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-29-facility-dropdown"><strong>US-29</strong></a></td><td>Facility / location dropdown on sleep orders (operational tracking)</td><td class="cell-est">Backlog · estimated</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <strong>4 h</strong></td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-33-syncmd-ambient-notes"><strong>US-33</strong></a></td><td>SyncMD AI Ambient Notes Module (dashboard-embedded ambient scribe)</td><td class="cell-est">In progress · Sprint&nbsp;6–7</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <span class="sprint-pill">Sprint 6</span> · <span class="sprint-pill">Sprint 7</span> · <strong>~140 h</strong> (45 BE · 49 FE · 23 AI · 23 QA) · BC intake May&nbsp;2026 · <a href="SyncMD_AI_Ambient_Notes_Interview_Summary.pdf">interview summary</a> · <a href="SFPCC-US33-Ambient-Notes-Prototype.html">prototype</a> · <a href="US-33-PRD-SYNCMD-AMBIENT-NOTES.md">PRD</a></td></tr>
+
+                    <tr data-category="backlog"><td><a class="story-id-link" href="#us-12-referral"><strong>US-12</strong></a></td><td>Referral module</td><td class="cell-back">Backlog</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · discovery</td></tr>
+                    <tr data-category="backlog"><td><a class="story-id-link" href="#us-23-apr17"><strong>US-23</strong></a></td><td>Ambient listening for clinical notes</td><td class="cell-back">Backlog</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · discovery</td></tr>
+                    <tr data-category="backlog"><td><a class="story-id-link" href="#us-24-apr17"><strong>US-24</strong></a></td><td>Order management module (CT/MRI, etc.)</td><td class="cell-back">Backlog</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · discovery</td></tr>
+                    <tr data-category="backlog"><td><a class="story-id-link" href="#us-28-manual-patient-creation"><strong>US-28</strong></a></td><td>Manual patient creation + CureMD lookup (non-appointment patients)</td><td class="cell-back">Backlog</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · unblocks platform-only technician workflow</td></tr>
+                    <tr data-category="backlog"><td><a class="story-id-link" href="#us-30-login-session-time"><strong>US-30</strong></a></td><td>Extend login session time (orders lost after auto-logout)</td><td class="cell-back">Backlog</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · platform stabilization</td></tr>
+                    <tr data-category="backlog"><td><a class="story-id-link" href="#us-41-pcp-orders-appointments"><strong>US-41</strong></a></td><td>PCP portal — Medical Records, Orders · request template</td><td class="cell-back">Backlog</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · feasibility + client proposal pending</td></tr>
+                    <tr data-category="backlog"><td><a class="story-id-link" href="#us-42-three-sleep-labs-tech-package"><strong>US-42</strong></a></td><td>Three sleep labs — electronic technician package (tablet · paperless · CureMD)</td><td class="cell-back">Backlog</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · discovery · SME walkthrough with Oriana</td></tr></tbody>
+            </table>
+
+            <div class="totals" style="margin-top:20px;">
+                <div>
+                    <div class="label">Original estimate pack</div>
+                    <div class="value" style="font-size:1.2rem;">APR16</div>
+                </div>
+                <div>
+                    <div class="label">Eng. + stabilization (Engineering)</div>
+                    <div class="value">367 h</div>
+                </div>
+                <div>
+                    <div class="label">QA hours (ERP + stabilization test)</div>
+                    <div class="value">52.5 h</div>
+                </div>
+                <div>
+                    <div class="label">Rollup · excl. optional US-17</div>
+                    <div class="value">419.5 h</div>
+                </div>
+            </div>
+
+            <div class="toc">
+                <strong>Jump</strong>
+                <ol style="columns: 2;">
+                    <li><a href="#sec-estimate-summary">Estimate summary</a></li>
+                    <li><a href="#sec-status">Delivery status at a glance</a></li>
+                    <li><a href="#sec-backlog-apr">US-1 … US-17 — full detail</a></li>
+                    <li><a href="#sec-new-backlog">US-18 … US-42 — full detail</a></li>
+                    <li><a href="#sec-consolidated-hours">Hour summary tables (legacy)</a></li>
+                    <li><a href="#sec-deps">Dependency map</a></li>
+                </ol>
+            </div>
+
+            <hr class="divider" id="sec-backlog-apr">
+
+            <h2>Detailed stories — US-1 … US-17</h2>
+            <p class="legend">Narratives below are unchanged from the April&nbsp;2026 consolidated client backlog. Colored bars at the top of each card match the status table.</p>
+
+            <h2>Appointments & CureMD Integration</h2>
+
+            <!-- US-1 -->
+            <div class="story-card" id="us-1-check-in-curemd">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-1: Check-In in CureMD + Blank Note (ERP → CureMD) <span class="module-tag mod-appointments">Appointments</span></h3>
+                <div class="story-meta">As front-desk / clinical staff I want check-in from ERP to drive CureMD, blank note job, and sleep/x-ray orders so that we avoid double entry.</div>
+                <div class="story-desc"><strong>What This Does:</strong> When staff check a patient in through the ERP system, it automatically updates the patient's status in CureMD and creates a blank provider note ready for the doctor to use. No more forgetting to manually create notes in CureMD.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>This is the most important user story in the backlog. Front-desk staff are consistently forgetting to manually create the provider note in CureMD when a patient checks in — resulting in downstream workflow failures where the doctor arrives at the exam room and has no note to document in. The original MVP deferred this functionality entirely due to time pressure. The client has been doing it manually since launch and the error rate has not improved. The proposed flow reverses the current workflow: instead of the user working in CureMD to check in the patient and then separately creating the note, the user checks the patient in from the ERP platform, which triggers a chain — (1) the ERP syncs the check-in status to CureMD via API, (2) a blank provider note is auto-created in CureMD as part of that chain, and (3) the ERP handles both check-in and check-out so the user never needs to touch CureMD for this step.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>40</td></tr>
+                        <tr><td>Frontend Development</td><td>6</td></tr>
+                        <tr><td>Automation (blank-note queue)</td><td>8</td></tr>
+                        <tr><td>QA Testing</td><td>6</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>60</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-2-inbound-checkin">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-2: Inbound CureMD Check-In Sync + Poll <span class="module-tag mod-appointments">Appointments</span></h3>
+                <div class="story-meta">As staff using CureMD for check-in I want ERP updated within minutes so that modalities stay aligned.</div>
+                <div class="story-desc"><strong>What This Does:</strong> When operations team checks a patient in at CureMD (their established workflow), the ERP automatically detects the check-in and creates the corresponding order in ClinicSync MD. No more double-entry.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>This is the reverse direction of US-1 — where US-1 flows ERP → CureMD, this story flows CureMD → ERP. The client's operations team currently checks patients in at CureMD (this is their established workflow and they are not going to stop doing it), and what they want is for that check-in event to automatically trigger the creation of the corresponding order in ClinicSync MD. Today, staff must manually create orders in the ERP after checking in at CureMD, which is redundant double-entry. The CureMD API provides live access to the scheduler, meaning the ERP can poll the appointment list and pick up status changes (including check-ins) in near-real-time. This eliminates the old FEDS-style approach where a report had to be exported, downloaded, and parsed — the connection is now live and bidirectional.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>40</td></tr>
+                        <tr><td>Frontend Development</td><td>6</td></tr>
+                        <tr><td>QA Testing</td><td>5</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>51</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-3-sleep-studies-portal">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-3: Signed Sleep Studies in Medical Records Portal + Patient Documents <span class="module-tag mod-medical">Medical Records</span></h3>
+                <div class="story-meta">As a records user I want signed sleep artifacts on the appointment and in a patient document hub so that download is in-context.</div>
+                <div class="story-desc"><strong>What This Does:</strong> The full signed sleep study package (scored report plus doctor's interpretation) will be available for download through the medical records portal, just like provider notes are today.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>The SFPCC medical records portal currently only uploads provider notes — the narrative document the doctor writes. What the client is now requesting is that the full signed sleep study package (the 6-page scored report plus the doctor's interpretation/template) also be made available for download through the same portal. The business driver is that patients and referring physicians need access to the complete clinical documentation, not just the provider note. From the client's perspective, the patient should appear in the portal only once (not duplicated per document type), and when they click download, they get all available documents — provider notes, sleep studies, and eventually x-rays and PFTs. This is a critical forward-looking architectural decision: the medical records module needs to be designed now to accommodate multiple document types per patient record.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>24</td></tr>
+                        <tr><td>Frontend Development</td><td>12</td></tr>
+                        <tr><td>QA Testing</td><td>4</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>40</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-4-diagnosis-cpt">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-4: Diagnosis & CPT at Upload → CureMD <span class="module-tag mod-sleep">Sleep Study</span></h3>
+                <div class="story-meta">As technician I want diagnosis/CPT on upload so that CureMD note fields get filled via bot.</div>
+                <div class="story-desc"><strong>What This Does:</strong> When the technician uploads sleep study results to the ERP, they can now enter the diagnosis code and CPT code. The system automatically inserts those values into the CureMD provider note. No more manual data entry in CureMD.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>This story was originally part of the MVP scope but was cut because the client was pushing hard on delivery. The workflow gap: when the technician scores the sleep study and uploads results to the ERP, there is no mechanism to capture the diagnosis code and CPT code and transport them into the CureMD provider note. Staff must manually enter these codes in CureMD, creating data entry errors and delays. Once captured, data flows through existing queue to the Python Playwright bot that already automates CureMD interactions, inserting values into note fields. Oriana will work with Harshit on detailed field mapping between the ERP upload form and specific CureMD note fields.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>16</td></tr>
+                        <tr><td>Frontend Development</td><td>6</td></tr>
+                        <tr><td>Automation (CureMD bot)</td><td>20</td></tr>
+                        <tr><td>QA Testing</td><td>4</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>46</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-5-merged-pdf">
+                <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 3</span></div>
+                <h3>US-5: Single Merged PDF (Sleep) <span class="module-tag mod-sleep">Sleep Study</span></h3>
+                <div class="story-meta">As operations I want one PDF for CureMD for sleep so that packaging is simple.</div>
+                <div class="story-desc"><strong>What This Does:</strong> When the doctor signs the sleep study interpretation, the system automatically merges the doctor's signed interpretation (on clinic letterhead) with the technician's scored report into a single PDF. One complete document goes to CureMD instead of two separate files.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>Currently, when the sleep study workflow completes, two separate documents exist: the technician's uploaded scored report and the doctor's signed interpretation template. Both are sent to CureMD individually, creating clutter in the patient's chart and confusion for operations. George specifically requested that when the doctor signs the interpretation, the system auto-merges the template as the cover sheet with the scored report into a single PDF — one cohesive document for CureMD. This affects how referring physicians and insurance companies receive and process documentation. The same merge pattern will be replicated for x-ray and other document types in future stories, so the PDF merge utility should be built as a generic, reusable component.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>16</td></tr>
+                        <tr><td>Frontend Development</td><td>0</td></tr>
+                        <tr><td>QA Testing</td><td>2</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>18</strong></td></tr>
+                    </tbody>
+                </table>
+                <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;3 (May&nbsp;5 – May&nbsp;19,&nbsp;2026) · merged sleep PDF package · PRM actuals supersede planning figures</td></tr></tbody></table>
+                <div class="note-box" style="margin-top:12px;"><strong>Follow-on enhancement (delivered):</strong> <a href="#us-5-1-interpretation-first">US-5.1 — Interpretation-first merge order</a> · Sprint&nbsp;4 · <a href="#us-5-2-pft-pst-merged-pdf">US-5.2 — Combined PDF for PFT &amp; PST</a> · Sprint&nbsp;5</div>
+
+                <div id="us-5-1-interpretation-first" style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);">
+                    <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 4</span> · enhancement · US-5</div>
+                    <div class="badge badge-enhancement">US-5.1 · Enhancement · US-5</div>
+                    <h4 style="margin:12px 0 8px;font-size:1.05rem;color:var(--primary);">US-5.1: Interpretation-First Merge Order</h4>
+                    <div class="story-desc"><strong>Client request:</strong> The team combines the reading (interpretation) and study (scored report) into one sleep PDF, but the reading was appearing on the <strong>last page</strong>. They need the reading on the <strong>first page</strong>.</div>
+                    <div class="context-block">
+                        <div class="context-label">What changed</div>
+                        <p>Switch the merge order so the doctor’s signed <strong>interpretation</strong> appears at the <strong>beginning</strong> of the combined PDF and the technician’s <strong>scored study report</strong> follows — not at the end.</p>
+                    </div>
+                    <table class="hours-table">
+                        <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                        <tbody>
+                            <tr><td>Backend Development</td><td>4</td></tr>
+                            <tr><td>Frontend Development</td><td>0</td></tr>
+                            <tr><td>QA Testing</td><td>0</td></tr>
+                            <tr><td><strong>Total</strong></td><td><strong>4</strong></td></tr>
+                        </tbody>
+                    </table>
+                    <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;4 (May&nbsp;19 – Jun&nbsp;1,&nbsp;2026) · billable per SFPCARE tracker · PRM actuals supersede planning figures</td></tr></tbody></table>
+                </div>
+
+                <div id="us-5-2-pft-pst-merged-pdf" style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);">
+                    <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 5</span> · enhancement · US-5</div>
+                    <div class="badge badge-enhancement">US-5.2 · Enhancement · US-5</div>
+                    <h4 style="margin:12px 0 8px;font-size:1.05rem;color:var(--primary);">US-5.2: Combined Report PDF for PFT and PST</h4>
+                    <div class="story-meta">As SFPCC clinical operations I want PFT and PST orders to upload to CureMD as one combined PDF (interpretation first, then signed report) — the same pattern as US-5 / US-5.1 for Sleep Study.</div>
+                    <div class="story-desc"><strong>What this does:</strong> Extend merged-PDF behaviour to <strong>PFT</strong> and <strong>PST</strong>: CureMD bot merges interpretation + signed report before upload; queue column order aligned; Medical Records delivery per SME policy. See <a href="SFPCC-US5-2-PFT-PST-Merged-PDF-Plain.html">SFPCC-US5-2-PFT-PST-Merged-PDF-Plain.html</a>.</div>
+                    <table class="hours-table">
+                        <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                        <tbody>
+                            <tr><td>Backend Development</td><td>12</td></tr>
+                            <tr><td>Frontend Development</td><td>0</td></tr>
+                            <tr><td>QA Testing</td><td>2</td></tr>
+                            <tr><td><strong>Total</strong></td><td><strong>14</strong></td></tr>
+                        </tbody>
+                    </table>
+                    <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;5 (Jun&nbsp;1 – Jun&nbsp;15,&nbsp;2026) · Harshit quoted 10 h · client quoted 14 h · dev team 5 h · <a href="https://b24.prmbilling.com/workgroups/group/961/tasks/task/view/8647580/" target="_blank" rel="noopener">Bitrix task #8647580</a></td></tr></tbody></table>
+                </div>
+            </div><div class="story-card" id="us-6-status-cards">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-6: Clickable Status Cards <span class="module-tag mod-sleep">Sleep Study</span></h3>
+                <div class="story-meta">As coordinator I want chips to filter the list so that drill-down is one click.</div>
+                <div class="story-desc"><strong>What This Does:</strong> The status cards at the top of the sleep study dashboard (showing counts like "42 pending", "17 in progress") will become clickable. Click a card and the patient list automatically filters to show only that status.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>On the sleep study dashboard's top-right area, four status cards display real-time counts (e.g., 42 pending, 17 in progress, 29 completed). Coordinators currently use search/filter controls manually to see patients by status — a multi-step process that slows triage. The request: clicking a status card auto-populates the search box and filters the list. Some cards already have this behavior (partially implemented); others were missed. Quick UX fix — no backend work, just wiring remaining cards to existing filter infrastructure.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>0</td></tr>
+                        <tr><td>Frontend Development</td><td>2</td></tr>
+                        <tr><td>QA Testing</td><td>1</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>3</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-7-ai-prefill">
+                <div class="status-strip completed">✓ Completed</div>
+                <h3>US-7: AI Pre-Fill from Scored PDF <span class="module-tag mod-sleep">Sleep Study</span></h3>
+                <div class="story-meta">As physician I want draft template fields from the PDF so that typing is reduced.</div>
+                <div class="story-desc"><strong>What This Does:</strong> The doctor uploads the 6-page scored sleep study report PDF. The system uses AI to extract key data points (oxygen levels, AHI index, sleep stages, respiratory events) and automatically fills them into the doctor's interpretation template. The doctor reviews and edits before signing.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>Most technically uncertain story. George currently reads the 6-page scored report, extracts data points (oxygen levels, AHI index, sleep stages, respiratory events, etc.), and types values into his interpretation template. Tedious, error-prone, time-consuming — especially processing multiple studies in a session. The critical open question: is this simple field extraction (find value X, put in field Z) or reasoning-based clinical interpretation (apply medical rules like "if the AHI is above 15 and the oxygen desaturation index exceeds 4%, classify as moderate obstructive sleep apnea")? Either approach requires AI with vision/OCR — the scored PDF is not machine-readable text (formatted report with charts, graphs, scanned elements). We need to confirm with the client: (1) extraction or reasoning? (2) specific field list. Without this input, development cannot be scoped accurately.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>38</td></tr>
+                        <tr><td>Frontend Development</td><td>8</td></tr>
+                        <tr><td>QA Testing</td><td>6</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>52</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-8-mobile-signing">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-8: Mobile-Friendly Sleep Signing <span class="module-tag mod-sleep">Sleep Study</span></h3>
+                <div class="story-meta">As doctor on tablet I want signing to work with touch so that it's reliable.</div>
+                <div class="story-desc"><strong>What This Does:</strong> Redesign the sleep study signing screen so it works properly on tablets with touch input (specifically Microsoft Surface Pro). Larger touch targets, better layout on narrow screens, signature capture that responds to finger/stylus instead of requiring a mouse.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>George uses a Microsoft Surface Pro and frequently signs sleep studies from home or between locations. Current UI was designed for desktop mouse interaction — reported as "clunky" on his touch device: signature capture doesn't respond well to touch, layout elements overlap or require excessive scrolling, experience is unreliable enough that he avoids using it. This is a business problem: the doctor's signing is the bottleneck in the sleep study workflow — every day he delays, patient results are delayed, referring physician doesn't receive the report, and billing cycle doesn't start. Challenge: PRM does not have direct access to the doctor's Surface Pro. Oriana is assigned to contact George, remote into his device via AnyDesk/Zoom, and capture screenshots. At minimum, team needs exact device model and browser version.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>0</td></tr>
+                        <tr><td>Frontend Development</td><td>14</td></tr>
+                        <tr><td>QA Testing</td><td>4</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>18</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-9-xray-legacy">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-9: X-Ray + Legacy (Browser Workflow) <span class="module-tag mod-xray">X-Ray</span></h3>
+                <div class="story-meta">As x-ray user I want ERP and legacy web app usable together so that I don't fight a single cramped panel.</div>
+                <div class="story-desc"><strong>What This Does:</strong> Add a "Launch X-Ray Viewer" button in ClinicSync MD that opens the legacy x-ray viewing system in a separate browser window. The ERP form gets reformatted to work in a narrower layout so both can sit side-by-side on a single monitor.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>SFPCC uses a legacy web-based x-ray viewing system (dated but functional). Doctor needs both the viewer and ClinicSync MD open simultaneously — viewer for the image, ERP for the interpretation form. Staff currently open two tabs and manually arrange them, which is cumbersome on a single monitor. Since the legacy system is web-based, a browser-native approach is feasible — open in a second window/tab, ERP provides a launch button. The ERP form is left-justified and needs reformatting for a narrower viewport when displayed alongside the viewer. Key decision: keep this as a browser workflow (minimal dev) rather than a deep integration with the legacy system.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>0</td></tr>
+                        <tr><td>Frontend Development</td><td>4</td></tr>
+                        <tr><td>QA Testing</td><td>1</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>5</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-10-compliance-prompt">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-10: Weekly Compliance Prompt <span class="module-tag mod-platform">Platform</span></h3>
+                <div class="story-meta">As organization I want a weekly reminder about new doctors so that PRM stays informed.</div>
+                <div class="story-desc"><strong>What This Does:</strong> Once per week, on first login, users see a pop-up reminder: "Have you added any new referring physicians this week? Please notify PRM so we can tag them in the medical records system." User clicks "OK" and the message disappears until next week.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>Addresses a recurring operational breakdown causing significant friction. When the client adds a new referring physician, they are supposed to notify PRM so the doctor gets "tagged" to the practice in the medical records system. If not tagged, records don't flow — and the client reports it as a system bug. PRM investigates, discovers the doctor was never tagged, asks for the info, tags them, and the cycle repeats. Solution: one-time-per-week pop-up on first login reminding users to notify PRM when adding new doctors. Dismisses after acknowledgment, doesn't reappear until next week. George specifically requested approval rights over the message text before deployment.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>0</td></tr>
+                        <tr><td>Frontend Development</td><td>3</td></tr>
+                        <tr><td>QA Testing</td><td>1</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>4</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-11-resource-suggestions">
+                <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 5</span></div>
+                <h3>US-11: Resource Suggestions (Phase A–B MVP) <span class="module-tag mod-resource">Resource Planning</span> <span class="sprint-pill">Sprint 5</span></h3>
+                <div class="story-meta">Delivered Sprint&nbsp;5 (Jun&nbsp;2 – Jun&nbsp;15,&nbsp;2026) · As scheduler I want demand-based suggestions so that staffing hints are visible without auto-assign.</div>
+                <div class="story-desc"><strong>What This Does:</strong> The system analyzes appointment volume at each location and suggests how many doctors and medical assistants should be scheduled for each site. These are suggestions/hints displayed in the scheduling dashboard — not automatic assignments. The scheduler reviews and makes final decisions.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>Significant scope expansion from the original resource planning module. Client originally asked for a scheduler with templates and dynamic staff moves. Now adding a predictive dimension: based on appointment volume at different locations, the system should tell him how many doctors and medical assistants he needs at each site. Fundamentally different from template-based scheduling — requires demand analysis, historical patterns, and staffing heuristics. Lanny acknowledged during the review he doesn't have specific requirements yet. Estimates cover a Phase A–B MVP providing suggestions/hints (not auto-assignment) — deliberately constrained scope to avoid building a full predictive engine before requirements are validated.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>32</td></tr>
+                        <tr><td>Frontend Development</td><td>8</td></tr>
+                        <tr><td>QA Testing</td><td>5</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>45</strong></td></tr>
+                    </tbody>
+                </table>
+                <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;5 (Jun&nbsp;1 – Jun&nbsp;15,&nbsp;2026) · delivered · client approved 45 h</td></tr></tbody></table>
+            </div><div class="story-card" id="us-12-referral">
+                <div class="status-strip backlog">Backlog · new initiative</div>
+                <h3>US-12: Referral Module <span class="module-tag mod-referral">Referral</span> <span class="badge badge-backlog">Backlog — No Estimates</span></h3>
+                <div class="story-meta">As medical records user I want to submit referrals so that patients are directed to specialists.</div>
+                <div class="story-desc"><strong>What This Does:</strong> Brand new module that allows users to create and submit patient referrals to specialists directly from the medical records workflow.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>Identified during the March 20 backlog review meeting. This is a completely new module that does not yet exist in the ERP. The client wants the ability to create and submit patient referrals to specialists directly from the medical records workflow. This needs its own epic/category in the backlog, separate from the existing sleep study, x-ray, and medical records modules. No requirements have been defined yet — this is a placeholder for future discovery and scoping work.</p>
+                </div>
+                <div class="warn-box">
+                    <strong>Status:</strong> Backlog item only. No estimates available. Requires discovery session with client to define requirements, workflow, and integration points before development can be scoped.
+                </div>
+            </div><div class="story-card" id="us-13-admin-login">
+                <div class="status-strip completed">✓ Completed</div>
+                <h3>US-13: Doctor-Approved Admin Login (Firebase / FCM) <span class="module-tag mod-platform">Platform</span></h3>
+                <div class="story-meta">Approver confirms admin sign-in from phone; admin completes session after approve.</div>
+                <div class="story-desc"><strong>What This Does:</strong> When a medical assistant needs to log into a workstation for the doctor, they click "Request Login". A push notification goes to the doctor's phone. Doctor taps the notification → taps "Approve" (two clicks total) → workstation is authenticated. The doctor never needs to enter a password at that workstation.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>George moves between six examination rooms and cannot log in with username/password at every workstation — impractical and breaks clinical flow. Cannot share credentials with medical assistants because they could sign notes under his identity — a compliance and liability issue. Solution: Firebase push notifications — when someone needs to authenticate, they click a login action, a push notification goes to the doctor's phone. Doctor clicks notification → clicks "OK" (two clicks total) → workstation is authenticated. If the doctor isn't present, staff can call and ask him to approve on his phone. Provides frictionless login that preserves identity control. Additional security layer discussed: same-IP/location detection so re-auth isn't needed from the same network. Feature applies only to specific user types (doctors), not all users.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>24</td></tr>
+                        <tr><td>Frontend Development</td><td>8</td></tr>
+                        <tr><td>QA Testing</td><td>3</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>35</strong></td></tr>
+                    </tbody>
+                </table>
+                <div class="note-box" style="margin-top:12px;"><strong>Follow-on enhancements (delivered · Sprint&nbsp;5):</strong> <a href="#us-13-1-pop-up-approval-notification">US-13.1 — Pop-up / browser approval notifications</a> · <a href="#us-13-2-concurrent-ma-approval-queue">US-13.2 — Concurrent MA approval queue</a></div>
+
+                <div id="us-13-1-pop-up-approval-notification" style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);">
+                    <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 5</span> · enhancement · US-13</div>
+                    <div class="badge badge-enhancement">US-13.1 · Enhancement · US-13</div>
+                    <h4 style="margin:12px 0 8px;font-size:1.05rem;color:var(--primary);">US-13.1: Pop-Up Approval Notification</h4>
+                    <div class="story-meta">As a medical assistant I want to request doctor permission when the doctor is offline — and as a doctor I want a browser notification when I am not on my phone — so approval workflows are not blocked.</div>
+                    <div class="story-desc"><strong>What this does:</strong> Extend US-13 so assistants can submit approval requests that persist when the doctor is offline, and the doctor receives a <strong>browser pop-up / web notification</strong> on desktop — in addition to existing mobile push.</div>
+                    <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;5 (Jun&nbsp;1 – Jun&nbsp;15,&nbsp;2026) · client quoted 24 h · team spent 24 h · no Harshit hours</td></tr></tbody></table>
+                </div>
+
+                <div id="us-13-2-concurrent-ma-approval-queue" style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);">
+                    <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 5</span> · enhancement · US-13</div>
+                    <div class="badge badge-enhancement">US-13.2 · Enhancement · US-13</div>
+                    <h4 style="margin:12px 0 8px;font-size:1.05rem;color:var(--primary);">US-13.2: Concurrent MA Approval Queue</h4>
+                    <div class="story-meta">As a medical assistant I want to stay in the doctor approval queue alongside other assistants — without my request being canceled when someone else submits.</div>
+                    <div class="story-desc"><strong>What this does:</strong> Multi-assistant approval queue on US-13 — each request stays active until the doctor approves or dismisses it. Pairs with <a href="#us-13-1-pop-up-approval-notification">US-13.1</a>.</div>
+                    <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;5 (Jun&nbsp;1 – Jun&nbsp;15,&nbsp;2026) · client quoted 3 h · team spent 2 h 15 min · no Harshit hours</td></tr></tbody></table>
+                </div>
+            </div><div class="story-card" id="us-14-same-day-sync">
+                <div class="status-strip completed">✓ Completed</div>
+                <div class="badge badge-bug">US-14 · Bug Fix</div>
+                <h3>Same-Day Patient & Appointment Sync <span class="module-tag mod-integration">Integration</span></h3>
+                <div class="story-meta">Operational impact: assistants cannot work same-day patients until the next overnight sync.</div>
+                <div class="story-desc"><strong>Problem:</strong> New patients and appointments registered in CureMD only appear in ClinicSync the next day. If someone registers after the midnight sync has already run, they won't show up until tomorrow.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>Right now, newly created patients and appointments are only pulled from CureMD once per day during the midnight sync. That means anyone registered after the sync has already run will not appear inside ClinicSync until the following day. Assistants cannot work same-day patients — they have to wait until tomorrow's sync completes.</p>
+                </div>
+                <div class="note-box">
+                    <strong>Our fix:</strong> Add a same-day sync flow so newly created patients and appointments are pulled into ClinicSync during the day instead of waiting for the nightly batch.
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Development</td><td>15</td></tr>
+                        <tr><td>Test & Deployment</td><td>4</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>19</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-15-instant-xray">
+                <div class="status-strip completed">✓ Completed</div>
+                <div class="badge badge-enhancement">US-15 · Enhancement</div>
+                <h3>Instant X-Ray Interpretation Upload <span class="module-tag mod-xray">X-Ray</span></h3>
+                <div class="story-meta">Operational impact: assistants may not see a completed interpretation for up to 30 minutes.</div>
+                <div class="story-desc"><strong>Problem:</strong> After the doctor signs an X-ray interpretation, it takes up to 30 minutes before it appears in CureMD. The interpretation is complete but not visible in the patient folder yet.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>Today, after the doctor signs the X-ray interpretation, the system waits for the scheduled sync process before pushing the document into CureMD. That delay creates confusion for the team because the interpretation is complete, but not yet visible in the patient folder. Assistants waste time checking whether the interpretation is done or still pending.</p>
+                </div>
+                <div class="note-box">
+                    <strong>Our fix:</strong> Build an instant upload flow so that once the doctor signs, the interpretation is pushed to CureMD within seconds instead of waiting for the next sync cycle.
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Development</td><td>12</td></tr>
+                        <tr><td>Test & Deployment</td><td>3</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>15</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-16-sync-messaging">
+                <div class="status-strip completed">✓ Completed</div>
+                <div class="badge badge-enhancement">US-16 · Enhancement</div>
+                <h3>Consistent Sync Status Messaging <span class="module-tag mod-platform">Platform</span></h3>
+                <div class="story-meta">Operational impact: staff lose time checking whether missing data is a bug or just delayed processing.</div>
+                <div class="story-desc"><strong>Problem:</strong> Staff don't know if a missing interpretation means it's still queued for sync, or if something failed. No clear status message on screen.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>This is a visibility problem. Staff do not currently have a clear on-screen message showing whether records are still queued for sync or already uploaded. They waste time investigating whether missing data is a system bug or just waiting for the next sync.</p>
+                </div>
+                <div class="note-box">
+                    <strong>Our fix:</strong> Add consistent status messaging so users can immediately understand whether the interpretation is pending sync or already delivered.
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Development</td><td>1</td></tr>
+                        <tr><td>Test & Deployment</td><td>0.5</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>1.5</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-17-order-validation">
+                <div class="status-strip backlog">Backlog · estimated · optional</div>
+                <div class="badge badge-optional">US-17 · Optional Enhancement</div>
+                <h3>CureMD Order Validation Gate <span class="module-tag mod-platform">Platform</span></h3>
+                <div class="story-meta">Operational impact: doctors may sign an interpretation even when a matching CureMD order does not yet exist.</div>
+                <div class="story-desc"><strong>Problem:</strong> No system check prevents a doctor from signing an X-ray interpretation when no matching order exists in CureMD. Creates workflow inconsistency and potential audit gaps.</div>
+                <div class="context-block">
+                    <div class="context-label">Why This Matters</div>
+                    <p>Currently there is no system check preventing a doctor from signing an X-ray interpretation when no matching order exists in CureMD. This creates workflow inconsistency and potential audit gaps. If the doctor signs before an order is created, the interpretation cannot be properly linked to a CureMD encounter.</p>
+                </div>
+                <div class="note-box">
+                    <strong>Our proposal:</strong> Add a system gate that checks whether a CureMD order exists before allowing a sign. If no order is found, the assistant sees a clear message to create one first. This item requires separate approval.
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Development</td><td>9</td></tr>
+                        <tr><td>Test & Deployment</td><td>2</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>11</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="warn-box">
+                <strong>Note on US-17 (Optional Order Validation Gate):</strong> This is the only item that changes user workflow behavior. It should be discussed briefly before build so we can confirm edge cases, including what should happen if CureMD is temporarily unavailable.
+            </div>
+
+            <hr class="divider" id="sec-new-backlog">
+
+            <h2>Detailed stories — US-18 … US-42 (2026 roadmap)</h2>
+            <div class="info-box">
+                <strong>Planning context:</strong> These items first appeared in the April&nbsp;2026 roadmap discussions (and later specs where noted). Bars at the top of each card mirror the <a href="#sec-status">delivery status table</a>. <strong>Sprint&nbsp;5 (Jun&nbsp;2–15,&nbsp;2026) is closed</strong> — all seven stories delivered: US-13.1 · US-5.2 · US-11 · US-13.2 · US-34 · US-35 · US-38. <strong>US-23</strong> remains Ambient Listening discovery; <strong>US-26</strong> (electronic signature — delivered Sprint&nbsp;4) auto-applies the client-approved doctor signature block for <strong>Dr.&nbsp;JSM Sanchez-Masiques</strong>; <strong>US-38</strong> extended that to remaining physicians (Sprint&nbsp;5); <strong>US-28</strong>, <strong>US-29</strong>, and <strong>US-42</strong> extend Sleep Module / technician workflows — <strong>US-42</strong> adds three sleep-lab electronic packages (demographics · notes · orders · prior studies · templated forms · tablet e-sign · CureMD submit); <strong>US-30</strong> addresses session timeout causing lost in-progress orders; <strong>US-27</strong> and <strong>US-41</strong> split PCP portal self-service for <strong>Medical Records</strong> and <strong>Orders</strong> — US-27 future appointments · US-41 referrals <strong>request template</strong>; <strong>US-33</strong> is the SyncMD-native ambient-notes module scoped via May&nbsp;2026 business-case intake (see <a href="SyncMD_AI_Ambient_Notes_Interview_Summary.pdf">interview summary PDF</a>); <strong>US-25</strong> is the bulk-demographics epic (see linked BRD). Detailed hour splits for ERP waves US‑18&nbsp;…&nbsp;US‑22 are published in <a href="SFPCC-US18-22-ERP-Estimates-APR27.html"><strong>SFPCC-US18-22-ERP-Estimates-APR27.html</strong></a> (v1.0 · Apr&nbsp;27,&nbsp;2026); <strong>that pack numbers stories differently on sleep vs pulmonary</strong> — see the crosswalk under <a href="#sec-consolidated-hours">Consolidated Hour Estimate Breakdown</a>.
+            </div>
+
+            <h3>X-Ray Module</h3>
+
+            <div class="story-card" id="us-18-apr17">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-18: X-Ray Interpretation into Provider Note <span class="module-tag mod-xray">X-Ray</span></h3>
+                <div class="story-meta">As a physician I want the x-ray interpretation to flow into the CureMD provider note so that clinical documentation is complete without manual re-entry.</div>
+                <div class="story-desc"><strong>What this does:</strong> After the doctor completes the x-ray interpretation in ClinicSync MD, the interpretation flows into the corresponding CureMD provider note (pattern similar to sleep study CPT/diagnosis flow via US-4).</div>
+                <div class="context-block">
+                    <div class="context-label">Why this matters</div>
+                    <p>Interpretations currently live in ClinicSync MD without automatic CureMD population; staff manually re-enter, creating duplicate work and error risk. A PRD must define field mapping and whether automation mirrors the bot path used elsewhere.</p>
+                </div>
+                <div class="note-box" style="margin-top:12px;"><strong>APR&nbsp;27 estimate pack (maps to US‑18 there):</strong> <strong>45.6&nbsp;h</strong> total — Backend&nbsp;28 · Frontend&nbsp;10 · Automation&nbsp;0 · QA&nbsp;7.6 (QA&nbsp;=&nbsp;20% of BE+FE+automation). CureMD UI discovery / selector confirmation (<strong>OQ‑1</strong> in that document) still gates implementation path before bot work. Full narrative: <a href="SFPCC-US18-22-ERP-Estimates-APR27.html">estimate pack →</a></div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend (queue + worker + API/bot + error handling + logging)</td><td>28</td></tr>
+                        <tr><td>Frontend (status UI + retry controls + CureMD sync indicator)</td><td>10</td></tr>
+                        <tr><td>Automation (Playwright — if API route not available)</td><td>0</td></tr>
+                        <tr><td>QA (20% of dev work)</td><td>7.6</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>45.6</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-19-apr17">
+                <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span></div>
+                <h3>US-19: Send X-Ray Reports to Referring Physicians <span class="module-tag mod-medical">Medical Records</span></h3>
+                <div class="story-meta">As a medical records user I want x-ray reports sent to referring physicians through the medical records portal so that referring doctors receive complete diagnostic documentation.</div>
+                <div class="story-desc"><strong>What this does:</strong> Extend the outbound medical records portal (today provider-notes-oriented) so x-ray interpretation reports ride along in the referral-facing document package.</div>
+                <div class="context-block">
+                    <div class="context-label">Why this matters</div>
+                    <p>The portal must grow into a multi-type document hub: one patient appearance, unified download for notes, imaging, PFT/PST/studies.</p>
+                </div>
+                <div class="note-box" style="margin-top:12px;"><strong>APR&nbsp;27 estimate pack (US‑19 there — multi‑document portal scaffold):</strong> <strong>16.8&nbsp;h</strong> · Backend&nbsp;6 · Frontend&nbsp;8 · QA&nbsp;2.8. See <a href="SFPCC-US18-22-ERP-Estimates-APR27.html">full breakdown →</a>.</div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend (migration + document_type enum + API updates)</td><td>6</td></tr>
+                        <tr><td>Frontend (document type filter + UI for x-ray entries + icons)</td><td>8</td></tr>
+                        <tr><td>Automation</td><td>0</td></tr>
+                        <tr><td>QA (20% of dev work)</td><td>2.8</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>16.8</strong></td></tr>
+                    </tbody>
+                </table>
+                <table class="hours-table"><tbody><tr><td><strong>Dependencies</strong></td><td>US‑3 portal baseline · APR&nbsp;27 positions this wave before sleep/PST/PFT portal rows · consolidated US‑20–US‑22 pulmonary/sleep attachments</td></tr></tbody></table>
+            </div><div class="story-card" id="us-20-apr17">
+                <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span></div>
+                <h3>US-20: Send PFT Reports to Referring Physicians <span class="module-tag mod-medical">Medical Records</span></h3>
+                <div class="story-meta">As a medical records user I want PFT reports sent to referring physicians via the portal so pulmonary diagnostics are accessible.</div>
+                <div class="story-desc"><strong>What this does:</strong> Adds PFT as another document family on the outbound portal once multi-document scaffolding exists. The April&nbsp;2026 estimate pack sizes the <strong>full PFT ERP module</strong> (workflow + CureMD + portal) — see crosswalk note below.</div>
+                <div class="note-box" style="margin-top:12px;"><strong>APR&nbsp;27 crosswalk:</strong> That document labels the full PFT module as <strong>US‑22</strong> (<strong>31.2&nbsp;h</strong>: BE&nbsp;14 · FE&nbsp;12 · QA&nbsp;5.2). This consolidated roadmap keeps PFT under <strong>US‑20</strong>, so the <strong>31.2&nbsp;h</strong> figure appears on US‑20 in the hour table below. <a href="SFPCC-US18-22-ERP-Estimates-APR27.html">Estimate pack →</a></div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend (2 migrations + controller + service + routes + PDF gen)</td><td>14</td></tr>
+                        <tr><td>Frontend (types + API + store + 5 pages + form + filters)</td><td>12</td></tr>
+                        <tr><td>Automation</td><td>0</td></tr>
+                        <tr><td>QA (20% of dev work)</td><td>5.2</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>31.2</strong></td></tr>
+                    </tbody>
+                </table>
+                <table class="hours-table"><tbody><tr><td><strong>Dependencies</strong></td><td>US‑19 multi‑document portal · APR&nbsp;27: confirm Chest Bellows Reversibility (OQ‑1) before PFT migrations</td></tr></tbody></table>
+            </div><div class="story-card" id="us-21-apr17">
+                <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span></div>
+                <h3>US-21: Send PST Reports to Referring Physicians <span class="module-tag mod-medical">Medical Records</span></h3>
+                <div class="story-meta">As a medical records user I want PST reports sent to referring physicians via the portal so testing documentation stays complete.</div>
+                <div class="story-desc"><strong>What this does:</strong> Same multi-document rollout pattern focused on pulmonary stress reports. The estimate pack scopes PST as a <strong>full new module</strong> (ERP workflow + CureMD + portal), not portal-only attachment.</div>
+                <div class="note-box" style="margin-top:12px;"><strong>APR&nbsp;27 estimate pack (US‑21 PST module there):</strong> <strong>31.2&nbsp;h</strong> · BE&nbsp;14 · FE&nbsp;12 · QA&nbsp;5.2. <a href="SFPCC-US18-22-ERP-Estimates-APR27.html">Estimate pack →</a></div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend (2 migrations + controller + service + routes + PDF gen)</td><td>14</td></tr>
+                        <tr><td>Frontend (types + API + store + 5 pages + form + filters)</td><td>12</td></tr>
+                        <tr><td>Automation</td><td>0</td></tr>
+                        <tr><td>QA (20% of dev work)</td><td>5.2</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>31.2</strong></td></tr>
+                    </tbody>
+                </table>
+                <table class="hours-table"><tbody><tr><td><strong>Dependencies</strong></td><td>US‑19 portal document-type infrastructure · can parallelize with PFT per APR&nbsp;27 sequencing notes</td></tr></tbody></table>
+            </div><div class="story-card" id="us-22-apr17">
+                <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span></div>
+                <h3>US-22: Send Sleep Study Reports to Referring Physicians <span class="module-tag mod-medical">Medical Records</span></h3>
+                <div class="story-meta">As a medical records user I want signed sleep study packets sent outbound so referring clinicians see results without calling SFPCC.</div>
+                <div class="story-desc"><strong>What this does:</strong> Push the merged signed sleep study package via the outbound portal (distinct from downloadable artifacts inside US-3’s hub).</div>
+                <div class="note-box" style="margin-top:12px;"><strong>APR&nbsp;27 crosswalk:</strong> Sleep study portal increment is <strong>US‑20</strong> in that pack (<strong>6&nbsp;h</strong>: BE&nbsp;3 · FE&nbsp;2 · QA&nbsp;1). Here it stays under consolidated <strong>US‑22</strong>; the <strong>6&nbsp;h</strong> figure appears on US‑22 in the consolidated hour table. <a href="SFPCC-US18-22-ERP-Estimates-APR27.html">Estimate pack →</a></div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend (enum update + portal insert on sign event)</td><td>3</td></tr>
+                        <tr><td>Frontend (already built in US‑19 — minimal incremental)</td><td>2</td></tr>
+                        <tr><td>Automation</td><td>0</td></tr>
+                        <tr><td>QA (20% of dev work)</td><td>1</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>6</strong></td></tr>
+                    </tbody>
+                </table>
+                <table class="hours-table"><tbody><tr><td><strong>Dependencies</strong></td><td>US‑3 + US‑5 merged PDF artifact · US‑19 multi‑document FE</td></tr></tbody></table>
+            </div><div class="story-card" id="us-23-apr17">
+                <div class="status-strip backlog">Backlog · new initiative</div>
+                <h3>US-23: Ambient Listening for Clinical Notes <span class="module-tag mod-note">Note Module</span></h3>
+                <div class="story-meta">As a physician I want ambient listening capturing encounters so drafts auto-generate and I edit/sign rather than dictate from scratch.</div>
+                <div class="story-desc"><strong>What this does:</strong> Introduce a net-new Note Module (AI listening + CureMD-aligned templates) analogous to ambient-scribe products.</div>
+                <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>Discovery + compliance + vendor selection before PRD</td></tr></tbody></table>
+            </div><div class="story-card" id="us-24-apr17">
+                <div class="status-strip backlog">Backlog · new initiative</div>
+                <h3>US-24: Order Management Module <span class="module-tag mod-order">Order Management</span></h3>
+                <div class="story-meta">As clinical staff I want CT/MRI and other diagnostics tracked centrally so modality orders stop living in spreadsheets.</div>
+                <div class="story-desc"><strong>What this does:</strong> Seeds a generalized order backbone inside ClinicSync MD so future diagnostics expand beyond legacy sleep/x-ray flows.</div>
+                <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>Discovery for lifecycle states + CureMD alignment</td></tr></tbody></table>
+            </div><div class="story-card" id="us-25-bulk-demographics">
+                <div class="status-strip backlog">Backlog · estimated · BRD</div>
+                <h3>US-25: Bulk Patient Demographics Upload with Auto-Match &amp; Calendar Assignment <span class="module-tag mod-patients">Patients</span> <span class="module-tag mod-scheduler">Scheduler</span> <span class="module-tag mod-ai-tag">AI extraction</span></h3>
+                <div class="story-meta">As an SFP operations user (scheduler / front-desk) I want to upload a CSV, Excel, or PDF of patient demographics from a medical center, so records are created or updated and routed to the correct medical-center calendar for that NP visit day — eliminating manual entry.</div>
+                <div class="story-desc"><strong>What this does:</strong> Pick target calendar (center + visit date), ingest list, AI/parse demographics, bucket rows as New / Update (name+DOB match with diffs) / Needs Review, then confirm before commit. Includes master NP calendar (month/week/day), upload log, and patient master registry. <strong>BRD &amp; sizing:</strong> <a href="SFPCC-US25-BULK-DEMOGRAPHICS-Estimates.html">SFPCC-US25-BULK-DEMOGRAPHICS-Estimates.html</a> — <strong>Interactive prototype:</strong> <a href="SFPCC-US25-Bulk-Demographics-Prototype.html">SFPCC-US25-Bulk-Demographics-Prototype.html</a> — distinct from <a href="#us-23-apr17">US-23 Ambient Listening</a>.</div>
+                <div class="context-block">
+                    <div class="context-label">Sizing (May 2026 BRD)</div>
+                    <p><strong>76 h</strong> combined — 63 engineering (BE 29 · FE 27 · AI/PDF extraction 7) + <strong>13 QA</strong> (approximately 20% of engineering time). SFPCC decisions on source-of-truth, retention, and large PDF rosters gated before build — see linked BRD.</p>
+                    <p style="margin-top:10px;"><a href="SFPCC-US25-BULK-DEMOGRAPHICS-Estimates.html"><strong>Open full BRD &amp; estimate →</strong></a>
+                    · <a href="SFPCC-US25-Bulk-Demographics-Prototype.html"><strong>Open interactive prototype →</strong></a></p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend (staging, parsing, matching, commit, audit)</td><td>29</td></tr>
+                        <tr><td>Frontend (wizard, review buckets, calendars, patient master, upload log)</td><td>27</td></tr>
+                        <tr><td>AI — PDF extraction / vision</td><td>7</td></tr>
+                        <tr><td>QA (~20% of engineering)</td><td>13</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>76</strong></td></tr>
+                    </tbody>
+                </table>
+            </div><div class="story-card" id="us-26-electronic-signature">
+                <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 4</span></div>
+                <h3>US-26: Electronic Signature <span class="module-tag mod-platform">Platform</span></h3>
+                <div class="story-meta">As a physician I want my approved signature block (name + NPI) applied automatically on every note and report I sign in SyncMD, so I never paste it manually and output matches the client-approved layout.</div>
+                <div class="story-desc"><strong>What this does:</strong> In a call with the client, they agreed that the doctor’s signature should match the block shared by <strong>Jessica</strong> — including the doctor’s <strong>name</strong> and <strong>NPI</strong>. The signature is stored as a PNG asset and rendered with the <strong>Poppins</strong> Google Font (per client mockup). When the doctor signs any note or report in the platform, the signature block is <strong>added automatically</strong> — no manual paste step. <strong>First physician live:</strong> Dr.&nbsp;JSM Sanchez-Masiques.</div>
+                <div class="context-block">
+                    <div class="context-label">Layout &amp; sizing (client spec)</div>
+                    <table class="hours-table" style="margin-top:10px;">
+                        <thead><tr><th>Surface</th><th>Dimensions</th></tr></thead>
+                        <tbody>
+                            <tr><td>Signed report / note PDF</td><td><strong>260&nbsp;px × 170&nbsp;px</strong></td></tr>
+                            <tr><td>Interpretation view (in-app)</td><td><strong>110&nbsp;px × 65&nbsp;px</strong></td></tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top:10px;">Typography: <strong>Poppins</strong> (Google Font) — same as client mockup.</p>
+                </div>
+                <div class="note-box" style="margin-top:12px;">
+                    <strong>Reference assets:</strong> Client supplied a layout mockup and doctor signature PNG (Jessica). Files live at <a href="assets/us-26/doctor-signature-jessica.png"><code>assets/us-26/doctor-signature-jessica.png</code></a> and <a href="assets/us-26/signature-layout-reference.png"><code>assets/us-26/signature-layout-reference.png</code></a> when published to this site.
+                </div>
+                <div class="signature-asset">
+                    <img src="assets/us-26/signature-layout-reference.png" alt="US-26 signature layout reference — 260×170 report and 110×65 interpretation sizes" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <p class="cap" style="display:none;">Layout reference image not yet uploaded — add <code>assets/us-26/signature-layout-reference.png</code> to the repo.</p>
+                    <p class="cap">Signature block reference (report + interpretation sizing).</p>
+                </div>
+                <div class="signature-asset">
+                    <img src="assets/us-26/doctor-signature-jessica.png" alt="Jessica-approved doctor signature PNG for US-26" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <p class="cap" style="display:none;">Signature PNG not yet uploaded — add <code>assets/us-26/doctor-signature-jessica.png</code> to the repo.</p>
+                    <p class="cap">Doctor signature PNG (name + NPI) — auto-applied on sign.</p>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development</td><td>5</td></tr>
+                        <tr><td>Frontend Development</td><td>2</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>7</strong></td></tr>
+                    </tbody>
+                </table>
+                <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;4 (May&nbsp;19 – Jun&nbsp;1,&nbsp;2026) · billable per SFPCARE tracker · PRM actuals supersede planning figures</td></tr></tbody></table>
+                <div class="note-box" style="margin-top:12px;"><strong>Follow-on (delivered · Sprint&nbsp;5):</strong> <a href="#us-38-remaining-doctor-signatures">US-38 — Electronic signatures for remaining doctors</a></div>
+
+                <div id="us-38-remaining-doctor-signatures" style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);">
+                    <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 5</span> · enhancement · US-26</div>
+                    <div class="badge badge-enhancement">US-38 · Enhancement · US-26</div>
+                    <h4 style="margin:12px 0 8px;font-size:1.05rem;color:var(--primary);">US-38: Electronic Signatures for Remaining Doctors</h4>
+                    <div class="story-meta">As each remaining SFPCC physician I want my approved signature block applied automatically on every note and report I sign — the same way it works for Dr.&nbsp;JSM Sanchez-Masiques.</div>
+                    <div class="story-desc"><strong>What this does:</strong> Roll out US-26 signature assets to all other doctors — client PNG (name + NPI) per physician, mapped to user profile, smoke verify on sign. Same layout as US-26 (260×170 report · 110×65 interpretation · Poppins).</div>
+                    <div class="context-block">
+                        <div class="context-label">Delivery</div>
+                        <p>Delivered Sprint&nbsp;5 — per-doctor signature PNG + NPI onboarding for remaining physicians.</p>
+                    </div>
+                    <table class="hours-table">
+                        <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                        <tbody>
+                            <tr><td>Backend Development</td><td>0</td></tr>
+                            <tr><td>QA Testing</td><td>0</td></tr>
+                            <tr><td><strong>Total</strong></td><td><strong>0</strong> <small style="color:var(--text-light);">non-billable — platform in US-26</small></td></tr>
+                        </tbody>
+                    </table>
+                    <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;5 (Jun&nbsp;1 – Jun&nbsp;15,&nbsp;2026) · delivered</td></tr></tbody></table>
+                </div>
+            </div><div class="story-card" id="us-27-pcp-medical-records-appointments">
+                <div class="status-strip backlog">Backlog · estimated · BRD ready</div>
+                <h3>US-27: Medical Records — Future Appointments + CureMD Prescriptions <span class="module-tag mod-medical">Medical Records</span> <span class="module-tag mod-order">Scheduler</span></h3>
+                <div class="story-meta">As a ClinicSync user viewing a patient's medical records in the Scheduler / Documents workflow I want to see that patient's upcoming appointments and all prescriptions from CureMD's Copies of Prescriptions folder so that I have CureMD parity when preparing for visits and reviewing medication history without leaving ClinicSyncERP.</div>
+                <div class="story-desc"><strong>What this does:</strong> Two change requests — <strong>CR-A:</strong> Upcoming appointments panel in existing Medical Records (Scheduler) patient view · <strong>CR-B:</strong> Ingest + list + preview prescription PDFs from CureMD (<code>document_type = prescription</code>). Research spike determines API vs Playwright automation path. <strong>Interactive prototype:</strong> <a href="us27-medical-records-prototype.html">US-27 Medical Records Prototype</a>.</div>
+                <div class="context-block">
+                    <div class="context-label">Scope</div>
+                    <p><strong>Surface:</strong> Enhance <code>SchedulerPage</code> / Documents preview — not external MR portal. <strong>Reference patient (UAT):</strong> GOMEZ, FELIPE — account 129968.</p>
+                </div>
+                <div class="context-block">
+                    <div class="context-label">Estimated hours — 30 h (API) / 37 h (automation) · QA = 20% of dev</div>
+                    <table class="hours-table" style="margin-top:6px;">
+                        <thead><tr><th>CR</th><th>BE</th><th>FE</th><th>Research</th><th>QA</th><th>Total</th></tr></thead>
+                        <tbody>
+                            <tr><td>CR-A: Future appointments</td><td>5</td><td>5</td><td>—</td><td>2</td><td><strong>12 h</strong></td></tr>
+                            <tr><td>CR-B: Prescriptions (API path)</td><td>7</td><td>4</td><td>3</td><td>4</td><td><strong>18 h</strong></td></tr>
+                            <tr><td>CR-B: Prescriptions (automation)</td><td>13</td><td>5</td><td>3</td><td>4</td><td><strong>25 h</strong></td></tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top:8px;"><strong>Grand total:</strong> <strong>30 h</strong> (API) / <strong>37 h</strong> (automation) = CR-A (12) + CR-B (18 or 25)</p>
+                    <p style="margin-top:6px;"><strong>Docs:</strong> <a href="SFPCC-US27-MEDICAL-RECORDS-FUTURE-APPTS-PRESCRIPTIONS-BRD.html">BRD</a> · <a href="US-27-MEDICAL-RECORDS-FUTURE-APPTS-PRESCRIPTIONS-USER-STORY.md">User Story</a> · <a href="us27-medical-records-prototype.html">Prototype</a></p>
+                </div>
+                <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>Backlog · estimated — <strong>30–37 h</strong> (12 BE · 9–10 FE · 3 Research · 6 QA) · BRD + prototype ready</td></tr></tbody></table>
+            </div><div class="story-card" id="us-28-manual-patient-creation">
+                <div class="status-strip backlog">Backlog · new initiative</div>
+                <h3>US-28: Manual Patient Creation in the Platform <span class="module-tag mod-patients">Patients</span> <span class="module-tag mod-sleep">Sleep Study</span></h3>
+                <div class="story-meta">As a technician I want to manually create a patient in the platform when they do not appear in my list — with CureMD verification — so the team can run the full workflow in SyncMD only and stop relying on the old parallel process.</div>
+                <div class="story-desc"><strong>What this does:</strong> When a patient is missing from the technician’s view, provide a manual create flow in the platform. On save, look up the patient in CureMD using an alternate reference or ID (not only today’s appointment sync) — orders are sometimes created for patients who have no CureMD appointment yet.</div>
+                <div class="context-block">
+                    <div class="context-label">Problem today</div>
+                    <p>Some patients are not showing up for technicians. The team still uses both the legacy process and the platform, which blocks the goal of a <strong>platform-only</strong> workflow.</p>
+                </div>
+                <div class="context-block">
+                    <div class="context-label">CureMD confirmation rules</div>
+                    <ul style="margin:6px 0 0 1.1rem;line-height:1.6;">
+                        <li>If the patient exists in CureMD, confirm demographics and fully create the record in the platform.</li>
+                        <li>If no match is found, block completion and show an alert such as <em>“Patient’s information not available in Curemd.”</em></li>
+                    </ul>
+                </div>
+                <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>Backlog — CureMD lookup API + manual-create UI; hours TBD · unblocks platform-only technician workflow</td></tr></tbody></table>
+            </div><div class="story-card" id="us-29-facility-dropdown">
+                <div class="status-strip backlog">Backlog · estimated</div>
+                <h3>US-29: Facility / Location Dropdown on Sleep Orders <span class="module-tag mod-sleep">Sleep Study</span></h3>
+                <div class="story-meta">As a technician creating a sleep order I want to select which facility (location) the patient belongs to from a dropdown — similar to Rendering Physician — so operations and accounting can track which office is handling each process.</div>
+                <div class="story-desc"><strong>What this does:</strong> Add a location/facility selector when the technician creates an order. This is for operational and accounting tracking across SFPCC offices, not necessarily for the clinical report content itself.</div>
+                <div class="context-block">
+                    <div class="context-label">Client request</div>
+                    <p>Dropdown list of locations at order creation, patterned after the existing Rendering Physician selector.</p>
+                </div>
+                <table class="hours-table"><tbody><tr><td><strong>Estimated hours</strong></td><td><strong>4 h</strong> — facility master list + dropdown on order-creation UI</td></tr></tbody></table>
+            </div><div class="story-card" id="us-30-login-session-time">
+                <div class="status-strip backlog">Backlog · platform stabilization</div>
+                <h3>US-30: Login Session Time <span class="module-tag mod-platform">Platform</span></h3>
+                <div class="story-meta">As staff I want my login session to stay active long enough to finish multi-step work — especially order creation — so in-progress work is still there when I return, instead of being lost to an automatic logout.</div>
+                <div class="story-desc"><strong>What this does:</strong> Extend or reconfigure session timeout policy so technicians and front-desk users can create an order, step away, and come back without finding the session expired and the order gone.</div>
+                <div class="context-block">
+                    <div class="context-label">Problem today</div>
+                    <p>The session expires too quickly. Staff creates an order, navigates away to handle another task, and when they return the session has logged them out automatically — the order is no longer visible and work must be redone.</p>
+                </div>
+                <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>Backlog — session policy + optional idle warning; hours TBD · related to US-13 auth posture (not a US-13 sub-story)</td></tr></tbody></table>
+            </div><div class="story-card" id="us-33-syncmd-ambient-notes">
+                <div class="status-strip backlog">In progress · <span class="sprint-pill">Sprint 6</span> · <span class="sprint-pill">Sprint 7</span> · BC ready</div>
+                <h3>US-33: SyncMD AI Ambient Notes Module <span class="module-tag mod-note">Note Module</span> <span class="module-tag mod-ai-tag">AI ambient scribe</span></h3>
+                <div class="story-meta">As a physician I want an AI ambient scribe embedded in the SyncMD dashboard (no separate vendor login) so encounter drafts are generated same-day with V28/HCC compliance flags and denial validation — and I edit/sign rather than dictate from scratch or rely on MA overtime for note support.</div>
+                <div class="story-desc"><strong>What this does:</strong> Integrate a third-party AI ambient scribe as a native SyncMD module: real-time encounter capture, CureMD-aligned draft notes, structured documentation for sleep-study and pulmonary workflows, a QC dashboard for clinical leads, and phased rollout across five clinic sites plus off-site PCP. Distinct from generic <a href="#us-23-apr17">US-23 Ambient Listening</a> discovery — US-33 is the BC-backed SyncMD integration path. <strong>Interactive prototype:</strong> <a href="SFPCC-US33-Ambient-Notes-Prototype.html">SFPCC-US33-Ambient-Notes-Prototype.html</a> — dashboard-embedded ambient scribe (office visit flow, consent, live capture, draft note, QC flags).</div>
+                <div class="context-block">
+                    <div class="context-label">Problem (May 25, 2026 intake — Jorge Sanchez Jr.)</div>
+                    <p>Note delays and QC gaps at scale; revenue and throughput impact from incomplete same-day documentation; V28/HCC capture compliance risk; MA overtime for note support (e.g. one clinic running ~$3K/month); sleep-study denials when documentation is unstructured. Conservative ROI floor modeled at <strong>~$158K/yr</strong>.</p>
+                </div>
+                <div class="context-block">
+                    <div class="context-label">Business case &amp; timeline</div>
+                    <p><strong>Sponsor / owner:</strong> Jorge Sanchez Jr. · <strong>Approvers:</strong> JSM + Jorge · <strong>BC completeness:</strong> 12–13/13 — BC can be generated · <strong>Priority rubric:</strong> 2/6 DELEGATE (author notes strategic importance exceeds rubric score).</p>
+                    <p style="margin-top:10px;"><strong>Budget:</strong> ~$5K one-time capex + vendor licensing TBD · <strong>Target start:</strong> ~Jun&nbsp;8,&nbsp;2026 · <strong>Full rollout:</strong> ~Aug&nbsp;8,&nbsp;2026 · Phased pilot across five clinics + off-site PCP.</p>
+                    <p style="margin-top:10px;"><a href="SyncMD_AI_Ambient_Notes_Interview_Summary.pdf"><strong>Open interview summary (PDF) →</strong></a> · <a href="SFPCC-US33-Ambient-Notes-Prototype.html"><strong>Open interactive prototype (US-33 v2) →</strong></a></p>
+                </div>
+                <div class="context-block">
+                    <div class="context-label">Estimated hours — ~140 h (AI-assisted · QA = 20% of dev)</div>
+                    <p><strong>Development:</strong> 117 h (BE 45 · FE 49 · AI/Spike 23) · <strong>QA:</strong> 23 h (20% of dev)</p>
+                    <p style="margin-top:8px;"><strong>Delivery phases:</strong></p>
+                    <table class="hours-table" style="margin-top:6px;">
+                        <thead><tr><th>Phase</th><th>Scope</th><th>Hours</th><th>Ship independently?</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>0</strong></td><td>Spike (CureMD note API) + CR-C platform</td><td class="num">31</td><td>Platform only</td></tr>
+                            <tr><td><strong>1</strong></td><td>CR-A — PFT/PST ambient (MVP)</td><td class="num">37</td><td>Yes — MVP ~68 h with Phase 0</td></tr>
+                            <tr><td><strong>2</strong></td><td>US-36 appointment sync (parallel)</td><td class="num">12</td><td>Parallel with Phase 1</td></tr>
+                            <tr><td><strong>3</strong></td><td>CR-B — Office Visit module</td><td class="num">37</td><td>Requires Phase 0 + 2</td></tr>
+                            <tr><td><strong>4</strong></td><td>QA (20% of dev)</td><td class="num">23</td><td>—</td></tr>
+                            <tr style="font-weight:700;"><td></td><td>Total</td><td class="num">~140</td><td></td></tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top:8px;"><strong>Change requests:</strong> Spike 4 h · CR-C 27 h · CR-A 37 h · CR-B 37 h · US-36 12 h · QA 23 h</p>
+                    <p style="margin-top:6px;"><strong>AI providers:</strong> Whisper (OpenAI) for audio STT · Claude (Anthropic) for SOAP, HCC, interpretation</p>
+                    <p style="margin-top:6px;"><strong>Docs:</strong> <a href="US-33-PRD-SYNCMD-AMBIENT-NOTES.md">PRD</a> · <a href="US-33-AI-ARCHITECTURE-AMBIENT-NOTES.md">AI Architecture</a> · <a href="US-33-SYNCMD-AMBIENT-NOTES-USER-STORY.md">User Story</a></p>
+                </div>
+                <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>In progress · <strong>Sprint 6</strong> (Jun&nbsp;15–29) &amp; <strong>Sprint 7</strong> (Jun&nbsp;30 – Jul&nbsp;13) — same user story · <strong>~140 h</strong> total (45 BE · 49 FE · 23 AI · 23 QA) · PRD + AI architecture + prototype ready</td></tr></tbody></table>
+            </div><div class="story-card" id="us-34-csv-report-export">
+                <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 5</span></div>
+                <h3>US-34: CSV Report Export across All Modules <span class="module-tag mod-xray">X-Ray</span> <span class="module-tag mod-sleep">Sleep Study</span> <span class="module-tag mod-medical">PFT · PST</span></h3>
+                <div class="story-meta">As operations or clinical leadership I want to export a CSV report from each modality module so I can review all orders and all statuses without manual copy-paste from the UI.</div>
+                <div class="story-desc"><strong>What this does:</strong> Add an <strong>Export CSV</strong> button on each of the four module list/report pages — <strong>X-Ray</strong>, <strong>Sleep Study</strong>, <strong>PFT</strong>, and <strong>PST</strong>. Each export includes <strong>all orders</strong> and <strong>all statuses</strong> for that module (not just the current filter view unless product decides otherwise — default is full module dataset). <strong>BRD &amp; sizing:</strong> <a href="SFPCC-US34-CSV-Export-Estimates.html">SFPCC-US34-CSV-Export-Estimates.html</a> · methodology companion: <a href="SFPCC-USER-STORIES-FE-BE-ESTIMATES-2026-03-27.md">SFPCC-USER-STORIES-FE-BE-ESTIMATES-2026-03-27.md</a> (Mar&nbsp;2026 incremental floor · v4.3).</div>
+                <div class="context-block">
+                    <div class="context-label">Sizing (Mar 2026 BRD)</div>
+                    <p><strong>8 h</strong> — BE 4 · FE 3 · QA 1 (one module full QA · smoke on other three).</p>
+                    <p style="margin-top:10px;"><a href="SFPCC-US34-CSV-Export-Estimates.html"><strong>Open full BRD &amp; estimate →</strong></a></p>
+                </div>
+                <div class="context-block">
+                    <div class="context-label">Scope</div>
+                    <ul style="margin:6px 0 0 1.1rem;line-height:1.6;">
+                        <li>Shared backend CSV helper + one export route per module (four routes, common column/format rules where possible).</li>
+                        <li>Shared frontend export button pattern on all four pages (consistent label, loading state, file download).</li>
+                        <li>QA: full pass on one module · smoke check on the other three.</li>
+                    </ul>
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development <small style="color:var(--text-light);">shared CSV helper + export route per module</small></td><td>4</td></tr>
+                        <tr><td>Frontend Development <small style="color:var(--text-light);">shared button on four pages</small></td><td>3</td></tr>
+                        <tr><td>QA Testing <small style="color:var(--text-light);">one module full · quick check on other three</small></td><td>1</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>8</strong></td></tr>
+                    </tbody>
+                </table>
+                <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;5 (Jun&nbsp;1 – Jun&nbsp;15,&nbsp;2026) · delivered</td></tr></tbody></table>
+            </div><div class="story-card" id="us-35-dashboard-pft-pst-status">
+                <div class="status-strip completed">✓ Completed · <span class="delivered-pill">delivered</span> · <span class="sprint-pill">Sprint 5</span></div>
+                <h3>US-35: Dashboard Status Overview for PFT and PST <span class="module-tag mod-medical">PFT · PST</span> <span class="module-tag mod-platform">Dashboard</span></h3>
+                <div class="story-meta">As a ClinicSync user on the home dashboard I want PFT and PST status overview sections like X-Ray and Sleep Study so I can see order counts by stage at a glance and open the filtered orders list with one click.</div>
+                <div class="story-desc"><strong>What this does:</strong> Add <strong>PFT – Status Overview</strong> and <strong>PST – Status Overview</strong> panels on the main ClinicSync dashboard — new row <strong>below</strong> the existing X-Ray and Sleep Study status row. Each panel shows <strong>five clickable metric cards</strong> wired to existing stats APIs (<code>GET /api/pft/orders/stats</code> · <code>GET /api/pst/orders/stats</code>). Activity Overview and Document Status charts stay unchanged.</div>
+                <div class="context-block">
+                    <div class="context-label">Five cards per module (click → filtered orders list)</div>
+                    <table class="hours-table" style="margin-top:10px;">
+                        <thead><tr><th>Card</th><th>Counts</th><th>Filter</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Total Orders</strong></td><td>All active (non-archived) orders</td><td>Full module list</td></tr>
+                            <tr><td><strong>Pending</strong></td><td>Awaiting report upload</td><td><code>pending_for_upload</code></td></tr>
+                            <tr><td><strong>In Progress</strong></td><td>Ready for review only</td><td><code>ready_for_review</code></td></tr>
+                            <tr><td><strong>Signed</strong></td><td>Signed, not yet fully uploaded</td><td><code>signed</code></td></tr>
+                            <tr><td><strong>Uploaded to CureMD</strong></td><td>Completed in CureMD</td><td><code>uploaded_to_curemd</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="context-block">
+                    <div class="context-label">Engineering notes</div>
+                    <ul style="margin:6px 0 0 1.1rem;line-height:1.6;">
+                        <li>Copy X-Ray / Sleep pattern in dashboard page · use <code>getOrderStats</code> / <code>getPstOrderStats</code>.</li>
+                        <li>Add PST deep-link support for <code>?status=</code> on orders page (PFT already supports).</li>
+                        <li>Hide panel when user lacks PFT/PST clinical read (<code>pftAccess</code> / <code>pstAccess</code>).</li>
+                        <li>Counts scoped to rendering physician when doctor acts on behalf of another (same as X-Ray / Sleep).</li>
+                    </ul>
+                </div>
+                <div class="note-box" style="margin-top:12px;">
+                    <strong>Reference spec:</strong> <a href="SFPCC-US35-Dashboard-PFT-PST-Status-Overview.html">SFPCC-US35-Dashboard-PFT-PST-Status-Overview.html</a> — acceptance criteria, assumptions C1–C6, layout (two columns desktop · stacked mobile).
+                </div>
+                <table class="hours-table">
+                    <thead><tr><th>Area</th><th>Hours</th></tr></thead>
+                    <tbody>
+                        <tr><td>Backend Development <small style="color:var(--text-light);">stats APIs exist · no new routes</small></td><td>0</td></tr>
+                        <tr><td>Frontend Development <small style="color:var(--text-light);">PFT + PST panels · permissions · navigation</small></td><td>5</td></tr>
+                        <tr><td>QA Testing <small style="color:var(--text-light);">both modules · access rules · deep links · post-deploy</small></td><td>2</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>7</strong></td></tr>
+                    </tbody>
+                </table>
+                <table class="hours-table"><tbody><tr><td><strong>Delivery</strong></td><td>Sprint&nbsp;5 (Jun&nbsp;1 – Jun&nbsp;15,&nbsp;2026) · delivered</td></tr></tbody></table>
+            </div><div class="story-card" id="us-41-pcp-orders-appointments">
+                <div class="status-strip backlog">Backlog · new initiative · feasibility</div>
+                <h3>US-41: PCP Portal — Medical Records, Orders — Request Template <span class="module-tag mod-medical">Medical Records</span> <span class="module-tag mod-order">Orders</span> <span class="module-tag mod-platform">PCP Portal</span></h3>
+                <div class="story-meta">As a referring PCP I want a structured referrals request template in the PCP portal across Medical Records and Orders so I can coordinate with the referrals team without calling the office.</div>
+                <div class="story-desc"><strong>What this does:</strong> Add a structured <strong>request template</strong> in the PCP portal for <strong>Medical Records</strong> and <strong>Orders</strong> — referrals-team coordination form aligned with portal scaffold from <a href="#us-19-apr17">US-19</a>–<a href="#us-22-apr17">US-22</a>.</div>
+                <div class="context-block">
+                    <div class="context-label">Related PCP portal story</div>
+                    <p>Future appointments scope: <a href="#us-27-pcp-medical-records-appointments">US-27</a>.</p>
+                </div>
+                <div class="context-block">
+                    <div class="context-label">Done criteria (before build)</div>
+                    <ul style="margin:6px 0 0 1.1rem;line-height:1.6;">
+                        <li>Feasibility and estimates defined</li>
+                        <li>Proposal sent to the client</li>
+                    </ul>
+                </div>
+                <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>Backlog — feasibility + client proposal pending; engineering hours TBD after approval</td></tr></tbody></table>
+            </div><div class="story-card" id="us-42-three-sleep-labs-tech-package">
+                <div class="status-strip backlog">Backlog · new initiative · discovery</div>
+                <h3>US-42: Three Sleep Labs — Electronic Technician Package <span class="module-tag mod-sleep">Sleep Study</span> <span class="module-tag mod-integration">CureMD</span></h3>
+                <div class="story-meta">As a sleep lab technician I want a tablet-ready package for each of the three sleep labs — with everything I need for the study and electronic templates — so I can capture patient consent, complete documentation in the system, submit once, and send it all to CureMD with no physical paperwork.</div>
+                <div class="story-desc"><strong>What this does:</strong> Extend the <strong>Sleep Module</strong> with <strong>three sleep labs</strong>. Within each lab, the technician opens a single package that contains:</div>
+                <ul style="margin:10px 0 10px 1.25rem;line-height:1.6;color:var(--text);">
+                    <li><strong>Patient demographics</strong></li>
+                    <li><strong>Notes</strong></li>
+                    <li><strong>Orders</strong></li>
+                    <li><strong>Previous studies</strong> (when applicable)</li>
+                </ul>
+                <div class="story-desc" style="margin-top:10px;"><strong>Templates included in the package:</strong></div>
+                <ul style="margin:10px 0 10px 1.25rem;line-height:1.6;color:var(--text);">
+                    <li>Tech reports</li>
+                    <li>Patient consents</li>
+                    <li>Incident reports</li>
+                    <li>Early study termination reports</li>
+                    <li>Any other required forms</li>
+                </ul>
+                <div class="context-block">
+                    <div class="context-label">Tablet workflow</div>
+                    <p>On a <strong>tablet</strong>, the patient signs consent forms <strong>electronically</strong>. The technician completes tech-report templates and any additional required documentation directly in the system. When finished, they <strong>upload / submit</strong> once — everything flows to <strong>CureMD automatically</strong>. The goal is a <strong>fully electronic</strong> sleep-lab process with no physical paperwork.</p>
+                </div>
+                <div class="context-block">
+                    <div class="context-label">Discovery · SME</div>
+                    <p>Workflow detail to be confirmed with Oriana (client SME). A call can be scheduled for a full walkthrough of the envisioned lab workflow before estimates and build.</p>
+                </div>
+                <div class="context-block">
+                    <div class="context-label">Related sleep-module work</div>
+                    <p>Pairs with <a href="#us-28-manual-patient-creation">US-28</a> (manual patient create / CureMD lookup) · <a href="#us-29-facility-dropdown">US-29</a> (facility on orders) · mobile signing patterns · existing CureMD upload services.</p>
+                </div>
+                <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>Backlog — discovery + feasibility; engineering hours TBD after Oriana workflow review</td></tr></tbody></table>
+            </div>
+
+            <hr class="divider" id="sec-consolidated-hours">
+
+            <h2>Consolidated Hour Estimate Breakdown</h2>
+            <p class="legend" style="margin-bottom: 14px;">Rows mirror story-card workbook totals plus roadmap sizing where published. <strong>Delivery status</strong> follows “Delivery status at a glance.” The APR16-era rollup (<strong>412.5&nbsp;h</strong>) still excludes the supplemental ERP/planning figures shown for consolidated US‑19 · US‑20 · US‑22 below so totals stay comparable with the legacy workbook.</p>
+            <p class="legend" style="margin-bottom: 14px;"><strong>APR&nbsp;27 ERP estimate pack</strong> — <a href="SFPCC-US18-22-ERP-Estimates-APR27.html"><em>SFPCC-US18-22-ERP-Estimates-APR27.html</em></a> (v1.0 · Apr&nbsp;27,&nbsp;2026). Its story IDs differ from this consolidated sheet on sleep vs pulmonary modules. <strong>Crosswalk (consolidated → APR&nbsp;27):</strong> US‑18→US‑18 (<strong>45.6&nbsp;h</strong>); US‑19→US‑19 portal scaffold (<strong>16.8&nbsp;h</strong>); US‑20 (PFT here)→APR&nbsp;27 US‑22 full PFT module (<strong>31.2&nbsp;h</strong>); US‑21 (PST)→APR&nbsp;27 US‑21 PST module (<strong>31.2&nbsp;h</strong>); US‑22 (sleep portal here)→APR&nbsp;27 US‑20 sleep‑study portal increment (<strong>6&nbsp;h</strong>). QA in that pack is 20% of (BE&nbsp;+&nbsp;FE&nbsp;+&nbsp;automation). Full five‑story total when all lines are built: <strong>130.8&nbsp;h</strong>. PRM invoicing supersedes planning numbers.</p>
+            <p class="legend" style="margin-bottom: 14px;"><strong>Completed stories with workbook hours on this sheet:</strong> US-5&nbsp;(<strong>18</strong> · Sprint&nbsp;3), US-5.1&nbsp;(<strong>4</strong> · Sprint&nbsp;4), US-5.2&nbsp;(<strong>14</strong> · Sprint&nbsp;5), US-7&nbsp;(<strong>52</strong>), US-11&nbsp;(<strong>45</strong> · Sprint&nbsp;5), US-13&nbsp;(<strong>35</strong>), US-13.1&nbsp;(<strong>24</strong> · Sprint&nbsp;5), US-13.2&nbsp;(<strong>3</strong> · Sprint&nbsp;5), US-14&nbsp;(<strong>19</strong>), US-15&nbsp;(<strong>15</strong>), US-16&nbsp;(<strong>1.5</strong>), US-26&nbsp;(<strong>7</strong>), US-38&nbsp;(<strong>0</strong> · Sprint&nbsp;5 · non-billable), US-34&nbsp;(<strong>8</strong> · Sprint&nbsp;5), US-35&nbsp;(<strong>7</strong> · Sprint&nbsp;5) ⇒ <strong>252 h</strong> workbook · plus APR&nbsp;27 portal lines US-19–22 ⇒ <strong>337.7 h</strong> completed planning total. See <a href="#sec-estimate-summary">Estimate summary</a> above for totals by bucket.</p>
+            <div class="hours-sort-bar">
+                <label for="consolidated-hours-sort">Sort rows</label>
+                <select id="consolidated-hours-sort" aria-label="Sort consolidated hour estimate rows">
+                    <option value="story">Story ID (US-1 → US-42)</option>
+                    <option value="status">Delivery status — completed first</option>
+                    <option value="status-desc">Delivery status — backlog first</option>
+                </select>
+            </div>
+            <table class="consolidated-hours status-table" id="consolidated-hours-table">
+                <thead>
+                    <tr>
+                        <th>Story</th>
+                        <th>Scope</th>
+                        <th>Module</th>
+                        <th>Estimate (hours)</th>
+                        <th>Delivery status</th>
+                    </tr>
+                </thead>
+                <tbody id="consolidated-hours-body">
+                    <tr>
+                        <td><a class="story-id-link" href="#us-1-check-in-curemd"><strong>US-1</strong></a></td>
+                        <td>Check-In in CureMD + Blank Note (ERP → CureMD)</td>
+                        <td>Appointments</td>
+                        <td class="num">60</td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-2-inbound-checkin"><strong>US-2</strong></a></td>
+                        <td>Inbound CureMD Check-In Sync + Poll</td>
+                        <td>Appointments</td>
+                        <td class="num">51</td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-3-sleep-studies-portal"><strong>US-3</strong></a></td>
+                        <td>Signed Sleep Studies in Medical Records Portal</td>
+                        <td>Medical Records</td>
+                        <td class="num">40</td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-4-diagnosis-cpt"><strong>US-4</strong></a></td>
+                        <td>Diagnosis &amp; CPT at Upload → CureMD</td>
+                        <td>Sleep Study</td>
+                        <td class="num">46</td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-5-merged-pdf"><strong>US-5</strong></a> · <a class="story-id-link" href="#us-5-1-interpretation-first"><strong>US-5.1</strong></a></td>
+                        <td>Single Merged PDF (Sleep) · US-5.1 interpretation-first order</td>
+                        <td>Sleep Study</td>
+                        <td class="num">22 <small style="font-weight:600;color:var(--text-light);">US-5 18 · US-5.1 4</small></td>
+                        <td class="cell-done">✓ Completed · Sprint&nbsp;3 + US-5.1 Sprint&nbsp;4</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-5-2-pft-pst-merged-pdf"><strong>US-5.2</strong></a></td>
+                        <td>Combined PDF for PFT &amp; PST — interpretation + report → one CureMD upload (US-5 parity)</td>
+                        <td>PFT · PST / CureMD</td>
+                        <td class="num">14 <small style="font-weight:600;color:var(--text-light);">12 BE · 0 FE · 2 QA</small></td>
+                        <td class="cell-done">✓ Completed · Sprint&nbsp;5</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-6-status-cards"><strong>US-6</strong></a></td>
+                        <td>Clickable Status Cards</td>
+                        <td>Sleep Study</td>
+                        <td class="num">3</td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-7-ai-prefill"><strong>US-7</strong></a></td>
+                        <td>AI Pre-Fill from Scored PDF</td>
+                        <td>Sleep Study</td>
+                        <td class="num">52</td>
+                        <td class="cell-done">✓ Completed</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-8-mobile-signing"><strong>US-8</strong></a></td>
+                        <td>Mobile-Friendly Sleep Signing</td>
+                        <td>Sleep Study</td>
+                        <td class="num">18</td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-9-xray-legacy"><strong>US-9</strong></a></td>
+                        <td>X-Ray + Legacy (Browser Workflow)</td>
+                        <td>X-Ray</td>
+                        <td class="num">5</td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-10-compliance-prompt"><strong>US-10</strong></a></td>
+                        <td>Weekly Compliance Prompt</td>
+                        <td>Platform</td>
+                        <td class="num">4</td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-11-resource-suggestions"><strong>US-11</strong></a></td>
+                        <td>Resource Suggestions (Phase A–B MVP) <em>(Sprint&nbsp;5 · Jun&nbsp;2–15)</em></td>
+                        <td>Resource Planning</td>
+                        <td class="num">45 <small style="font-weight:600;color:var(--text-light);">32 BE · 8 FE · 5 QA</small></td>
+                        <td class="cell-done">✓ Completed · Sprint&nbsp;5</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-12-referral"><strong>US-12</strong></a></td>
+                        <td>Referral Module</td>
+                        <td>Referral</td>
+                        <td><em>No estimate yet</em></td>
+                        <td class="cell-back">Backlog</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-13-admin-login"><strong>US-13</strong></a></td>
+                        <td>Doctor-Approved Admin Login (Firebase / FCM)</td>
+                        <td>Platform</td>
+                        <td class="num">35</td>
+                        <td class="cell-done">✓ Completed</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-13-1-pop-up-approval-notification"><strong>US-13.1</strong></a></td>
+                        <td>Pop-up / browser approval notifications · offline MA requests</td>
+                        <td>Platform</td>
+                        <td class="num">24</td>
+                        <td class="cell-done">✓ Completed · Sprint&nbsp;5</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-13-2-concurrent-ma-approval-queue"><strong>US-13.2</strong></a></td>
+                        <td>Concurrent MA approval queue (multiple assistants without mutual cancel)</td>
+                        <td>Platform</td>
+                        <td class="num">3</td>
+                        <td class="cell-done">✓ Completed · Sprint&nbsp;5</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-14-same-day-sync"><strong>US-14</strong></a></td>
+                        <td>Same-Day Patient &amp; Appointment Sync</td>
+                        <td>Integration</td>
+                        <td class="num">19</td>
+                        <td class="cell-done">✓ Completed</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-15-instant-xray"><strong>US-15</strong></a></td>
+                        <td>Instant X-Ray Interpretation Upload</td>
+                        <td>X-Ray</td>
+                        <td class="num">15</td>
+                        <td class="cell-done">✓ Completed</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-16-sync-messaging"><strong>US-16</strong></a></td>
+                        <td>Consistent Sync Status Messaging</td>
+                        <td>Platform</td>
+                        <td class="num">1.5</td>
+                        <td class="cell-done">✓ Completed</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-17-order-validation"><strong>US-17</strong></a></td>
+                        <td>CureMD Order Validation Gate <em>(Optional)</em></td>
+                        <td>Platform</td>
+                        <td class="num">11</td>
+                        <td class="cell-est">Optional · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-18-apr17"><strong>US-18</strong></a></td>
+                        <td>X-ray interpretation → CureMD provider note <em>(APR&nbsp;27 US‑18 · OQ‑1 discovery gates bot/API path)</em></td>
+                        <td>X-Ray</td>
+                        <td class="num"><strong>45.6</strong><span class="hours-prm">APR&nbsp;27 pack · QA inclusive · reconcile vs PRM actuals</span></td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-19-apr17"><strong>US-19</strong></a></td>
+                        <td>Outbound portal: referring physicians · x-rays <em>(APR17 backlog)</em></td>
+                        <td>Medical Records</td>
+                        <td class="num"><strong>16.8</strong><span class="hours-prm">APR&nbsp;27 supplemental estimate · QA inclusive · reconcile vs PRM actuals</span></td>
+                        <td class="cell-done">✓ Completed</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-20-apr17"><strong>US-20</strong></a></td>
+                        <td>PFT module — ERP workflow + CureMD + outbound portal <em>(APR&nbsp;27 labels full scope as US‑22)</em></td>
+                        <td>PFT / Medical Records</td>
+                        <td class="num"><strong>31.2</strong><span class="hours-prm">APR&nbsp;27 US‑22 module estimate · QA inclusive · reconcile vs PRM actuals</span></td>
+                        <td class="cell-done">✓ Completed</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-21-apr17"><strong>US-21</strong></a></td>
+                        <td>PST module — ERP workflow + CureMD + outbound portal <em>(APR&nbsp;27 US‑21)</em></td>
+                        <td>PST / Medical Records</td>
+                        <td class="num"><strong>31.2</strong><span class="hours-prm">APR&nbsp;27 pack · QA inclusive · reconcile vs PRM actuals</span></td>
+                        <td class="cell-done">✓ Completed</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-22-apr17"><strong>US-22</strong></a></td>
+                        <td>Outbound portal: referring physicians · sleep studies <em>(APR17 backlog)</em></td>
+                        <td>Medical Records</td>
+                        <td class="num"><strong>6</strong><span class="hours-prm">APR&nbsp;27 labels this increment as US‑20 sleep‑study portal (<strong>6&nbsp;h</strong>) · mapped here · reconcile vs PRM actuals</span></td>
+                        <td class="cell-done">✓ Completed</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-23-apr17"><strong>US-23</strong></a></td>
+                        <td>Ambient listening note drafting <em>(APR17 backlog / new module)</em></td>
+                        <td>Note Module</td>
+                        <td><em>Discovery — un-sized</em></td>
+                        <td class="cell-back">Discovery · backlog</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-24-apr17"><strong>US-24</strong></a></td>
+                        <td>Order management backbone <em>(APR17 backlog / new module)</em></td>
+                        <td>Order Management</td>
+                        <td><em>Discovery — un-sized</em></td>
+                        <td class="cell-back">Discovery · backlog</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="SFPCC-US25-BULK-DEMOGRAPHICS-Estimates.html"><strong>US-25</strong></a></td>
+                        <td>Bulk patient demographics upload, auto-match, NP calendars</td>
+                        <td>Patients / Scheduler / AI</td>
+                        <td class="num">76 <small style="font-weight:600;color:var(--text-light);">63 eng · 13 QA</small></td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-26-electronic-signature"><strong>US-26</strong></a></td>
+                        <td>Electronic signature — Dr.&nbsp;JSM Sanchez-Masiques · auto-applied on signed notes &amp; reports</td>
+                        <td>Platform</td>
+                        <td class="num">7 <small style="font-weight:600;color:var(--text-light);">5 BE · 2 FE</small></td>
+                        <td class="cell-done">✓ Completed · Sprint&nbsp;4</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-38-remaining-doctor-signatures"><strong>US-38</strong></a></td>
+                        <td>Electronic signatures for remaining doctors (US-26 follow-on · Dr.&nbsp;Sanchez-Masiques pattern)</td>
+                        <td>Platform</td>
+                        <td class="num">0 <small style="font-weight:600;color:var(--text-light);">non-billable · platform in US-26</small></td>
+                        <td class="cell-done">✓ Completed · Sprint&nbsp;5</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-27-pcp-medical-records-appointments"><strong>US-27</strong></a></td>
+                        <td>Medical Records — Future Appointments + CureMD Prescriptions</td>
+                        <td>Medical Records / Scheduler</td>
+                        <td class="num">30 <small style="font-weight:600;color:var(--text-light);">12 BE · 9 FE · 3 Res · 6 QA</small></td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-28-manual-patient-creation"><strong>US-28</strong></a></td>
+                        <td>Manual patient creation + CureMD lookup (non-appointment patients)</td>
+                        <td>Patients / Sleep Study</td>
+                        <td><em>Discovery — un-sized</em></td>
+                        <td class="cell-back">Backlog</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-29-facility-dropdown"><strong>US-29</strong></a></td>
+                        <td>Facility / location dropdown on sleep order creation</td>
+                        <td>Sleep Study</td>
+                        <td class="num">4 h</td>
+                        <td class="cell-est">Backlog · estimated</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-30-login-session-time"><strong>US-30</strong></a></td>
+                        <td>Extend login session timeout (in-progress orders lost on auto-logout)</td>
+                        <td>Platform</td>
+                        <td><em>Stabilization — un-sized</em></td>
+                        <td class="cell-back">Backlog</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-33-syncmd-ambient-notes"><strong>US-33</strong></a></td>
+                        <td>SyncMD AI Ambient Notes Module <em>(May&nbsp;2026 BC intake)</em></td>
+                        <td>Note Module / AI</td>
+                        <td class="num">140 <small style="font-weight:600;color:var(--text-light);">45 BE · 49 FE · 23 AI · 23 QA</small></td>
+                        <td class="cell-est">In progress · Sprint&nbsp;6–7</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="SFPCC-US34-CSV-Export-Estimates.html"><strong>US-34</strong></a></td>
+                        <td>CSV report export — all orders &amp; statuses (X-Ray, Sleep Study, PFT, PST)</td>
+                        <td>Reporting / Multi-module</td>
+                        <td class="num">8 <small style="font-weight:600;color:var(--text-light);">4 BE · 3 FE · 1 QA</small></td>
+                        <td class="cell-done">✓ Completed · Sprint&nbsp;5</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-35-dashboard-pft-pst-status"><strong>US-35</strong></a></td>
+                        <td>Dashboard status overview — PFT &amp; PST five-count panels</td>
+                        <td>PFT · PST / Dashboard</td>
+                        <td class="num">7 <small style="font-weight:600;color:var(--text-light);">0 BE · 5 FE · 2 QA</small></td>
+                        <td class="cell-done">✓ Completed · Sprint&nbsp;5</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-41-pcp-orders-appointments"><strong>US-41</strong></a></td>
+                        <td>PCP portal — Medical Records, Orders · request template</td>
+                        <td>Medical Records · Orders / PCP Portal</td>
+                        <td><em>Feasibility — un-sized</em></td>
+                        <td class="cell-back">Backlog · proposal pending</td>
+                    </tr>
+                    <tr>
+                        <td><a class="story-id-link" href="#us-42-three-sleep-labs-tech-package"><strong>US-42</strong></a></td>
+                        <td>Three sleep labs — electronic technician package (tablet · templates · CureMD submit)</td>
+                        <td>Sleep Study / CureMD</td>
+                        <td><em>Discovery — un-sized</em></td>
+                        <td class="cell-back">Backlog · new initiative</td>
+                    </tr></tbody>
+            </table>
+
+            <hr class="divider" id="sec-deps">
+
+            <h2>Dependencies Map</h2>
+            <table>
+                <thead><tr><th>Story</th><th>Depends On</th><th>Enables</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>US-1</strong></td><td>CureMD API access (confirmed)</td><td>US-2 (reuses API client), US-4 (note exists for field insertion)</td></tr>
+                    <tr><td><strong>US-2</strong></td><td>US-1 (API client + appointment model)</td><td>—</td></tr>
+                    <tr><td><strong>US-3</strong></td><td>US-5 (merged PDF is the document to upload)</td><td>Future x-ray/PFT document types</td></tr>
+                    <tr><td><strong>US-4</strong></td><td>US-1 (blank note must exist), Oriana field mapping</td><td>—</td></tr>
+                    <tr><td><strong>US-5</strong></td><td>— (standalone merge utility)</td><td>US-3 (merged document upload)</td></tr>
+                    <tr><td><strong>US-5.1</strong></td><td>US-5 merge utility · client merge-order spec</td><td>Interpretation-first combined sleep PDF (Sprint&nbsp;4)</td></tr>
+                    <tr><td><strong>US-5.2</strong></td><td><a href="#us-5-merged-pdf">US-5</a> merged PDF · US-5.1 interpretation-first order · PFT/PST sign + queue services</td><td>Single combined PFT/PST upload to CureMD · aligned MR merged delivery</td></tr>
+                    <tr><td><strong>US-6</strong></td><td>— (standalone, quick fix)</td><td>—</td></tr>
+                    <tr><td><strong>US-7</strong></td><td>Client confirmation on extraction vs. reasoning</td><td>—</td></tr>
+                    <tr><td><strong>US-8</strong></td><td>Doctor device screenshots or specs</td><td>—</td></tr>
+                    <tr><td><strong>US-9</strong></td><td>— (standalone, browser-native)</td><td>—</td></tr>
+                    <tr><td><strong>US-10</strong></td><td>Client approval on message text</td><td>—</td></tr>
+                    <tr><td><strong>US-11</strong></td><td>— (builds on existing RP module)</td><td>—</td></tr>
+                    <tr><td><strong>US-12</strong></td><td>Client requirements discovery</td><td>—</td></tr>
+                    <tr><td><strong>US-13</strong></td><td>— (Firebase / FCM doctor-approved login — <span class="delivered-label">delivered</span>)</td><td>US-13.1 (offline/browser approvals) · US-13.2 (concurrent MA queue)</td></tr>
+                    <tr><td><strong>US-13.1</strong></td><td>US-13 Firebase/FCM foundation · web push subscription · persisted approval queue when doctor offline</td><td>MA approval requests without doctor online · desktop alerts when doctor not on phone</td></tr>
+                    <tr><td><strong>US-13.2</strong></td><td>US-13 request model · per-MA queue state (no auto-cancel on new request) · doctor multi-request review UI</td><td>Parallel MA workflows across exam rooms · pairs with US-13.1 notification queue</td></tr>
+                    <tr><td><strong>US-14</strong></td><td>—</td><td>US-16 (sync status messaging depends on sync flow)</td></tr>
+                    <tr><td><strong>US-15</strong></td><td>—</td><td>US-16 (status messaging applies to upload flow)</td></tr>
+                    <tr><td><strong>US-16</strong></td><td>US-14, US-15 (sync and upload flows)</td><td>—</td></tr>
+                    <tr><td><strong>US-17</strong></td><td>Client confirmation on edge cases</td><td>—</td></tr>
+                    <tr><td><strong>US-18</strong></td><td>CureMD UI discovery (<strong>OQ‑1</strong> in APR&nbsp;27 pack) · API vs bot · parallels US‑4 integration posture</td><td>CureMD chart completeness for referring physicians</td></tr>
+                    <tr><td><strong>US-19–22</strong></td><td>US‑3 / US‑5 portal artifacts · APR&nbsp;27 sequencing (US‑19 scaffold → sleep portal increment · PST/PFT modules)</td><td>Outbound referring‑physician portal + pulmonary workflows</td></tr>
+                    <tr><td><strong>US-23</strong></td><td>Vendor + compliance posture</td><td>Ambient documentation stream</td></tr>
+                    <tr><td><strong>US-24</strong></td><td>CureMD orders truth source</td><td>Cross-modality orchestration roadmap</td></tr>
+                    <tr><td><strong>US-25</strong></td><td>Medical-center calendars + NP visit model in ClinicSync; SFPCC decisions on patient master rules + sample roster files for UAT</td><td>NP-day prep · patient master · reduced manual scheduler entry</td></tr>
+                    <tr><td><strong>US-26</strong></td><td>Client-approved signature PNG (Jessica) · doctor name + NPI · Poppins typography · report/interpretation size spec</td><td>Automatic signature on every signed note/report · consistent PDF (260×170) and interpretation (110×65) rendering · first live: Dr.&nbsp;Sanchez-Masiques</td></tr>
+                    <tr><td><strong>US-38</strong></td><td><a href="#us-26-electronic-signature">US-26</a> signature platform · per-doctor PNG + NPI from client</td><td>Remaining physicians auto-signed on notes/reports · delivered Sprint&nbsp;5</td></tr>
+                    <tr><td><strong>US-27</strong></td><td><a href="#us-19-apr17">US-19</a>–<a href="#us-22-apr17">US-22</a> portal scaffold · PCP portal requirements · CureMD appointment data</td><td>PCP portal · Medical Records + Orders · future appointments view</td></tr>
+                    <tr><td><strong>US-28</strong></td><td>CureMD patient lookup by alternate ID (not appointment-only) · US-14 sync posture · manual-create UX for technicians</td><td>Platform-only workflow · eliminates parallel legacy process · supports US-42 lab packages</td></tr>
+                    <tr><td><strong>US-29</strong></td><td>Facility/location master list · order-creation UI (Rendering Physician pattern)</td><td>Per-office operational + accounting tracking on sleep orders · lab/facility context for US-42</td></tr>
+                    <tr><td><strong>US-30</strong></td><td>Auth/session configuration · optional idle-timeout warning · aligns with US-13 login model</td><td>Reliable multi-step order creation · supports US-28/US-29/US-42 technician workflows</td></tr>
+                    <tr><td><strong>US-33</strong></td><td>US-36 (appointment sync) · CureMD provider note API spike · PFT/PST review patterns</td><td>SyncMD ambient documentation module — ~140 h (5 phases)</td></tr>
+                    <tr><td><strong>US-34</strong></td><td>Existing module list APIs / query patterns for X-Ray · Sleep · PFT · PST</td><td>Operations CSV exports · cross-status reporting per modality</td></tr>
+                    <tr><td><strong>US-35</strong></td><td>Existing PFT/PST stats APIs · X-Ray/Sleep dashboard panel pattern · <code>pftAccess</code> / <code>pstAccess</code></td><td>At-a-glance PFT/PST pipeline on home dashboard · filtered order drill-down</td></tr>
+                    <tr><td><strong>US-41</strong></td><td><a href="#us-19-apr17">US-19</a>–<a href="#us-22-apr17">US-22</a> portal scaffold · referrals team request-template rules · PCP requirements</td><td>PCP portal · Medical Records + Orders · referrals request template</td></tr>
+                    <tr><td><strong>US-42</strong></td><td><a href="#us-28-manual-patient-creation">US-28</a> patient create · <a href="#us-29-facility-dropdown">US-29</a> facility context · CureMD upload · e-sign / tablet UX · template library from client</td><td>Paperless three-lab technician workflow · single submit to CureMD</td></tr></tbody>
+            </table>
+
+            <div class="footer-note">
+                Living backlog page for SFPCC — narratives trace to the consolidated April&nbsp;2026 ERP user-story pack.<br>
+                Confidential — SFPCC &amp; PRM Billing.<br>
+                Questions? Contact Himani Juneja, Chief of Staff — PRM Billing.
+            </div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            var updatedEl = document.getElementById('doc-last-updated');
+            if (!updatedEl) return;
+
+            function formatUpdated(date) {
+                if (!date || isNaN(date.getTime())) return '';
+                var pad = function (n) { return n < 10 ? '0' + n : String(n); };
+                return pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + '-' + date.getFullYear();
+            }
+
+            function setDate(date) {
+                if (date && !isNaN(date.getTime())) {
+                    updatedEl.textContent = formatUpdated(date);
+                }
+            }
+
+            var meta = document.querySelector('meta[name="doc-last-updated"]');
+            if (meta && meta.content) {
+                setDate(new Date(meta.content + 'T12:00:00'));
+            }
+
+            /* Local python http.server sends Last-Modified; Netlify CDN usually does not. */
+            var resource = window.location.pathname.split('#')[0] +
+                (window.location.search ? window.location.search.split('#')[0] : '');
+
+            fetch(resource, { method: 'HEAD', cache: 'no-store' })
+                .then(function (response) {
+                    var lastModified = response.headers.get('Last-Modified');
+                    if (lastModified) {
+                        setDate(new Date(lastModified));
+                    } else if (!meta || !meta.content) {
+                        updatedEl.textContent = 'Unavailable';
+                    }
+                })
+                .catch(function () {
+                    if (!meta || !meta.content) {
+                        updatedEl.textContent = 'Unavailable';
+                    }
+                });
+        })();
+    </script>
+    <script>
+        (function () {
+            var tbody = document.getElementById('consolidated-hours-body');
+            var select = document.getElementById('consolidated-hours-sort');
+            if (!tbody || !select) return;
+
+            var rows = Array.from(tbody.querySelectorAll('tr'));
+
+            function storyNum(row) {
+                var match = row.cells[0].textContent.match(/US-(\d+(?:\.\d+)?)/);
+                return match ? parseFloat(match[1]) : 0;
+            }
+
+            function statusRank(row) {
+                var statusCell = row.cells[4];
+                if (statusCell.classList.contains('cell-done')) return 0;
+                if (/optional/i.test(statusCell.textContent)) return 2;
+                var estimateCell = row.cells[3];
+                if (estimateCell.querySelector('em') || !estimateCell.classList.contains('num')) return 3;
+                return 1;
+            }
+
+            rows.forEach(function (row) {
+                row.dataset.story = String(storyNum(row));
+                row.dataset.statusRank = String(statusRank(row));
+            });
+
+            function sortRows(mode) {
+                rows.slice().sort(function (a, b) {
+                    if (mode === 'status') {
+                        var byStatus = (+a.dataset.statusRank) - (+b.dataset.statusRank);
+                        if (byStatus !== 0) return byStatus;
+                    } else if (mode === 'status-desc') {
+                        var byStatusDesc = (+b.dataset.statusRank) - (+a.dataset.statusRank);
+                        if (byStatusDesc !== 0) return byStatusDesc;
+                    }
+                    return (+a.dataset.story) - (+b.dataset.story);
+                }).forEach(function (row) {
+                    tbody.appendChild(row);
+                });
+            }
+
+            select.addEventListener('change', function () {
+                sortRows(select.value);
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            var tbody = document.getElementById('delivery-status-body');
+            var tabs = document.querySelectorAll('.status-tab');
+            if (!tbody || !tabs.length) return;
+
+            var rows = Array.from(tbody.querySelectorAll('tr'));
+
+            function filterByTab(category) {
+                rows.forEach(function (row) {
+                    if (row.dataset.category === category) {
+                        row.classList.remove('tab-hidden');
+                    } else {
+                        row.classList.add('tab-hidden');
+                    }
+                });
+            }
+
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    tabs.forEach(function (t) { t.classList.remove('active'); });
+                    tab.classList.add('active');
+                    filterByTab(tab.dataset.tab);
+                });
+            });
+
+            filterByTab('completed');
+        })();
+    </script>
+<script src="prm-date-format.js?v=20260622m"></script>
+<script src="prm-doc-meta.js?v=20260622m"></script>
+</body>
+</html>

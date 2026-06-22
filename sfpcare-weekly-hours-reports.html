@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="doc-last-updated" content="2026-06-21" />
+  <title>SFPCARE - Weekly Hours Reports | PRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --card: #fff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --plan: #2563eb;
+      --act: #059669;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    .page { max-width: 1180px; margin: 0 auto; padding: 36px 24px 64px; }
+    .breadcrumb { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .breadcrumb a { color: var(--plan); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 15px; margin-bottom: 4px; }
+    .mono { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+
+    .hero-card h3.chart-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      color: var(--text);
+      border: none;
+      padding: 0;
+    }
+
+    .weekly-intro {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      max-width: 52rem;
+      line-height: 1.55;
+    }
+
+    table.hours-table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-bottom: 20px;
+      background: var(--card);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    table.hours-table th {
+      text-align: left;
+      padding: 11px 12px;
+      background: #1e3a5f;
+      color: #fff;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    table.hours-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    table.hours-table tbody tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+    /* Δ = billable plan − actual: green when positive (profit vs plan); amber when negative (loss vs plan) */
+    table.hours-table tbody tr:nth-child(even) td.delta-over-plan,
+    table.hours-table tbody tr:nth-child(odd) td.delta-over-plan {
+      font-weight: 700;
+      color: #b45309;
+      background: #fffbeb !important;
+    }
+    table.hours-table tbody tr:nth-child(even) td.delta-under-plan,
+    table.hours-table tbody tr:nth-child(odd) td.delta-under-plan {
+      font-weight: 700;
+      color: #047857;
+      background: #ecfdf5 !important;
+    }
+    table.hours-table td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    table.hours-table td.delta-over-plan {
+      font-weight: 700;
+      color: #b45309;
+      background: #fffbeb !important;
+    }
+    table.hours-table td.delta-under-plan {
+      font-weight: 700;
+      color: #047857;
+      background: #ecfdf5 !important;
+    }
+    table.hours-table tbody tr.row-planned td {
+      color: var(--muted);
+      background: #f8fafc !important;
+    }
+    table.hours-table tbody tr.row-planned td.num strong {
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    .table-scroll .hours-table {
+      margin-bottom: 0;
+      box-shadow: none;
+    }
+
+    .subsection-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    .chart-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -4px 4px;
+      padding: 4px 4px 8px;
+    }
+    .chart-scroll .chart-svg {
+      display: block;
+      max-width: none;
+    }
+
+    .story-recon-section {
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+    }
+
+    .story-recon-section h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 10px;
+    }
+
+    .story-recon-intro {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      max-width: 52rem;
+      line-height: 1.55;
+    }
+
+    table.hours-table td.story-id {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    table.hours-table td.story-title {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 240px;
+    }
+
+    .pill.active {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .rollup-box {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #eff6ff;
+      padding: 14px 16px;
+      margin-bottom: 22px;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .rollup-box strong.title {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .rollup-box .big {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    hr.chart-sep {
+      margin: 22px 0;
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .chart-explainer {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      max-width: 52rem;
+      line-height: 1.5;
+    }
+
+    .hero-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 16px rgba(15,23,42,0.05);
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 8px; }
+    .legend i {
+      width: 22px; height: 4px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .legend .plan-i { background: var(--plan); }
+    .legend .act-i { background: var(--act); }
+
+    svg.chart-svg { width: 100%; max-width: 900px; height: auto; font-family: inherit; min-height: 280px; }
+    .svg-grid line { stroke: #e8edf3; stroke-width: 1; }
+    .svg-axis { fill: var(--muted); font-size: 11px; }
+    .curve-plan { fill: none; stroke: var(--plan); stroke-width: 2.75; stroke-linecap: round; stroke-linejoin: round; }
+    .curve-act { fill: none; stroke: var(--act); stroke-width: 2.75; stroke-linecap: round; stroke-linejoin: round; }
+    .dot { stroke: #fff; stroke-width: 2; }
+
+    .kpi-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .kpi {
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      font-size: 12px;
+      line-height: 1.55;
+      min-height: 0;
+    }
+    .kpi.ok { border-left: 4px solid var(--act); }
+    .kpi.warn { border-left: 4px solid #d97706; }
+    .kpi .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+    .kpi .val { color: #334155; }
+
+    h2 {
+      font-size: 17px;
+      font-weight: 700;
+      margin: 36px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--plan);
+    }
+
+    .billing-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-top: 28px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    }
+    .billing-section h2 {
+      margin: 0 0 8px;
+      padding: 0;
+      border: none;
+    }
+    .billing-intro {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 18px;
+      max-width: 52rem;
+      line-height: 1.55;
+    }
+
+    .sprint-grid {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+    }
+    .sprint-grid > #sprint-cards {
+      display: flex;
+      flex-direction: column;
+    }
+    .sprint-list-header {
+      display: grid;
+      grid-template-columns: 40px minmax(160px, 1fr) minmax(140px, 1fr) minmax(0, 2fr);
+      gap: 6px 16px;
+      padding: 10px 18px;
+      background: #1e3a5f;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: 12px 12px 0 0;
+    }
+    .sprint-list-header span:last-child {
+      text-align: right;
+    }
+    .sprint-card {
+      display: grid;
+      grid-template-columns: 40px minmax(160px, 1fr) minmax(140px, 1fr) minmax(0, 2fr);
+      grid-template-rows: auto auto;
+      grid-template-areas:
+        "seq title stories trail"
+        "seq blurb blurb blurb";
+      gap: 6px 16px;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.15s ease;
+    }
+    .sprint-card:last-child {
+      border-bottom: none;
+      border-radius: 0 0 12px 12px;
+    }
+    .sprint-card:hover {
+      background: #f8fafc;
+    }
+    .sprint-card:nth-child(even) {
+      background: #fafbfc;
+    }
+    .sprint-card:nth-child(even):hover {
+      background: #f1f5f9;
+    }
+    .sprint-card .seq {
+      grid-area: seq;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      color: #1e40af;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-variant-numeric: tabular-nums;
+      align-self: start;
+      margin-top: 2px;
+    }
+    .sprint-card .card-title {
+      grid-area: title;
+      min-width: 0;
+    }
+    .sprint-card .card-title .name {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .sprint-card .card-title .dates {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .sprint-card .card-stories {
+      grid-area: stories;
+      min-width: 0;
+    }
+    .sprint-card .card-stories .lbl {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .sprint-card .card-stories .codes {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+    .sprint-card .card-hours {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .sprint-card .hours-chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      color: #334155;
+      flex-shrink: 0;
+    }
+    .sprint-card .hours-chip.plan {
+      background: #eff6ff;
+      border-color: #dbeafe;
+      color: #1e40af;
+    }
+    .sprint-card .hours-chip.delta-pos {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #047857;
+    }
+    .sprint-card .hours-chip.delta-neg {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #b45309;
+    }
+    .sprint-card .hours-chip.muted {
+      color: var(--muted);
+      background: #f8fafc;
+    }
+    .sprint-card .card-trail {
+      grid-area: trail;
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      min-width: 0;
+    }
+    .sprint-card .card-trail-inner {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .sprint-card .card-trail .pill {
+      flex-shrink: 0;
+    }
+    .sprint-card .blurb {
+      grid-area: blurb;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.45;
+      min-width: 0;
+    }
+    .sprint-card .blurb:empty {
+      display: none;
+    }
+    .sprint-card:has(.blurb:empty) {
+      grid-template-rows: auto;
+      grid-template-areas: "seq title stories trail";
+    }
+    .sprint-card .card-actions {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .sprint-card .card-actions a {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--plan);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .sprint-card .card-actions a:hover {
+      text-decoration: underline;
+    }
+    .sprint-card .card-actions a.primary {
+      padding: 5px 10px;
+      border-radius: 6px;
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+    }
+    .sprint-card .card-actions a.primary:hover {
+      background: #dbeafe;
+      text-decoration: none;
+    }
+
+    .pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .pill.closed { background: #d1fae5; color: #065f46; }
+    .pill.active { background: #dbeafe; color: #1e40af; }
+    .pill.planned { background: #f1f5f9; color: #475569; }
+
+    @media (max-width: 1100px) {
+      .sprint-list-header {
+        display: none;
+      }
+      .sprint-card {
+        grid-template-columns: 40px 1fr;
+        grid-template-areas:
+          "seq title"
+          "seq stories"
+          "seq trail"
+          "seq blurb";
+        gap: 8px 12px;
+        padding: 14px 14px;
+      }
+      .sprint-card:has(.blurb:empty) {
+        grid-template-areas:
+          "seq title"
+          "seq stories"
+          "seq trail";
+      }
+      .sprint-card .card-trail {
+        justify-content: flex-start;
+      }
+      .sprint-card .card-trail-inner {
+        flex-wrap: wrap;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="breadcrumb"><a href="index.html">PRM Documents</a> · Executive</p>
+    <h1 id="prog-title">SFPCARE - Weekly Hours Reports</h1>
+    <p class="subtitle" id="prog-subtitle">—</p>
+    <p class="mono" id="prog-updated">—</p>
+
+    <section class="hero-card">
+      <div class="kpi-row" id="kpi-row"></div>
+
+      <h3 class="chart-section-title">By sprint — billable plan vs actual spent</h3>
+      <p class="weekly-intro">
+        Matches the SFPCARE tracker: first hours column is the <strong>billable plan</strong> for the sprint; second column is <strong>actual hours spent</strong>.
+        <strong>Δ</strong> = plan − actual (same idea as the sheet&apos;s Margin row).
+        <strong style="color:#047857">Green</strong> when Δ is <strong>positive</strong> — we spent less than we priced (profit vs plan).
+        <strong style="color:#b45309">Amber</strong> when Δ is <strong>negative</strong> — actual work exceeded what we priced (loss vs plan).
+      </p>
+      <div id="sprint-all-table-wrap"></div>
+      <div id="overall-hours-rollup"></div>
+
+      <hr class="chart-sep" />
+
+      <h3 class="chart-section-title">Graph — closed sprints (billable plan vs actual spent)</h3>
+      <p class="chart-explainer">
+        Bars are <strong>hours per closed sprint</strong>: blue = billable plan, green = actual spent. Planned sprints (6–7) are listed in the table above, not in this chart.
+      </p>
+      <div class="legend">
+        <span><i class="plan-i"></i> Billable plan (h)</span>
+        <span><i class="act-i"></i> Actual spent (h)</span>
+      </div>
+      <div class="chart-scroll"><div id="chart-wrap"></div></div>
+    </section>
+
+    <section class="billing-section">
+      <h2>Sprint billing &amp; reconciliation</h2>
+      <p class="billing-intro">
+        Each row is one sprint in order. <strong>Hours reconciliation</strong> opens the profit/loss story table; <strong>Client billing</strong> opens the invoice summary. Use <strong>Download CSV</strong> and <strong>Print → Save as PDF</strong> on those pages for invoice packages.
+      </p>
+      <div class="sprint-grid">
+        <div class="sprint-list-header" aria-hidden="true">
+          <span>#</span>
+          <span>Sprint</span>
+          <span>User stories</span>
+          <span>Hours · status · billing</span>
+        </div>
+        <div id="sprint-cards"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="ceo-program-progress-data.js?v=20260528"></script>
+  <script>
+    (function () {
+      var D = window.PRM_CEO_PROGRAM_PROGRESS;
+      if (!D) return;
+
+      document.getElementById("prog-title").textContent = D.meta.title || "SFPCARE - Weekly Hours Reports";
+      (function () {
+        var subEl = document.getElementById("prog-subtitle");
+        var sub = D.meta && typeof D.meta.subtitle === "string" ? D.meta.subtitle.trim() : "";
+        subEl.textContent = sub;
+        subEl.style.display = sub ? "" : "none";
+      })();
+      document.getElementById("prog-updated").textContent =
+        "Last updated: " + (D.meta.lastUpdated || "—");
+
+      function escapeHtml(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      function escapeSvgText(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function fmtHours(n) {
+        if (typeof n !== "number" || isNaN(n)) return "—";
+        return (Math.round(n * 10) / 10).toFixed(1);
+      }
+
+      function fmtDeltaSigned(h) {
+        if (typeof h !== "number" || isNaN(h)) return "—";
+        var rounded = Math.round(h * 10) / 10;
+        var sign = rounded > 0 ? "+" : "";
+        return sign + rounded.toFixed(1) + " h";
+      }
+
+      /** Δ = billable plan − actual spent (tracker Margin convention). */
+      function deltaPlanMinusActual(r) {
+        if (
+          typeof r !== "object" ||
+          typeof r.billedHours !== "number" ||
+          typeof r.estimatedHours !== "number" ||
+          isNaN(r.billedHours) ||
+          isNaN(r.estimatedHours)
+        )
+          return NaN;
+        return r.estimatedHours - r.billedHours;
+      }
+
+      function deltaCellClass(d) {
+        if (typeof d !== "number" || isNaN(d)) return "delta-zero";
+        if (d > 0.05) return "delta-under-plan";
+        if (d < -0.05) return "delta-over-plan";
+        return "delta-zero";
+      }
+
+      function sprintStatusByName(sprints) {
+        var map = {};
+        (sprints || []).forEach(function (s) {
+          if (s && s.name) map[s.name] = String(s.status || "");
+        });
+        return map;
+      }
+
+      function isClosedSprintRow(r, statusMap) {
+        var st = statusMap[r.sprint];
+        return st && st.toLowerCase() === "closed";
+      }
+
+      function isPlannedSprintRow(r, statusMap) {
+        return !isClosedSprintRow(r, statusMap);
+      }
+
+      function renderSprintTable(rows, wrapId, sectionLabel) {
+        var wrap = document.getElementById(wrapId);
+        if (!wrap) return;
+        if (!rows.length) {
+          wrap.innerHTML = "";
+          return;
+        }
+        var statusMap = sprintStatusByName(D.sprints || []);
+        var thead =
+          "<thead><tr><th>Sprint</th><th>Dates</th><th class='num'>Billable plan (h)</th><th class='num'>Actual spent (h)</th><th class='num'>Δ (plan − actual)</th></tr></thead>";
+        var body = rows
+          .map(function (r) {
+            var dh = deltaPlanMinusActual(r);
+            var planned = isPlannedSprintRow(r, statusMap);
+            var rowClass = planned ? " class='row-planned'" : "";
+            var actualCell =
+              planned && r.billedHours === 0
+                ? "<span style='color:var(--muted)'>—</span>"
+                : escapeHtml(fmtHours(r.billedHours));
+            var deltaCell =
+              planned && r.billedHours === 0
+                ? "<span style='color:var(--muted)'>Planned</span>"
+                : escapeHtml(fmtDeltaSigned(dh));
+            var deltaClass = planned && r.billedHours === 0 ? "delta-zero" : deltaCellClass(dh);
+            return (
+              "<tr" +
+              rowClass +
+              "><td><strong>" +
+              escapeHtml(r.sprint || "") +
+              "</strong></td><td>" +
+              escapeHtml(r.dates || "") +
+              "</td><td class='num'>" +
+              escapeHtml(fmtHours(r.estimatedHours)) +
+              "</td><td class='num'>" +
+              actualCell +
+              "</td><td class='num " +
+              deltaClass +
+              "'>" +
+              deltaCell +
+              "</td></tr>"
+            );
+          })
+          .join("");
+        var label = sectionLabel
+          ? "<p class='subsection-label'>" + escapeHtml(sectionLabel) + "</p>"
+          : "";
+        wrap.innerHTML =
+          label +
+          "<div class='table-scroll'><table class='hours-table'>" +
+          thead +
+          "<tbody>" +
+          body +
+          "</tbody></table></div>";
+      }
+
+      function renderRollup(r) {
+        var el = document.getElementById("overall-hours-rollup");
+        if (!el) return;
+        if (!r || typeof r.baselinePlanHours !== "number" || typeof r.billedHours !== "number") {
+          el.innerHTML = "";
+          return;
+        }
+        /* Tracker-style: planned billable − actual spent */
+        var v = r.baselinePlanHours - r.billedHours;
+        var color =
+          typeof v === "number" && !isNaN(v)
+            ? v > 0.05
+              ? "#047857"
+              : v < -0.05
+              ? "#b45309"
+              : "var(--muted)"
+            : "var(--muted)";
+        el.innerHTML =
+          "<div class='rollup-box'>" +
+          "<strong class='title'>Overall — closed Sprints 1–4</strong>" +
+          "<div class='big'>Client quoted: <strong>" +
+          escapeHtml(fmtHours(r.baselinePlanHours)) +
+          " h</strong> · Team spent: <strong>" +
+          escapeHtml(fmtHours(r.billedHours)) +
+          " h</strong></div>" +
+          "<div style='margin-top:10px'>Margin (quoted − spent): <span style='font-weight:700;color:" +
+          color +
+          "'>" +
+          escapeHtml(fmtDeltaSigned(v)) +
+          "</span></div></div>";
+      }
+
+      var allRows = D.sprintHourTable || [];
+      var closedSeries = (D.sprintBarSeries || []).filter(function (s) {
+        return /^Sprint [1-5]$/.test(String(s.shortLabel || ""));
+      });
+
+      renderSprintTable(allRows, "sprint-all-table-wrap", "Sprints 1–7 (chronological)");
+      renderRollup(D.hoursRollupClosed);
+      renderSprintBarChart(closedSeries);
+      renderKpis(D.programKpis || []);
+      renderSprintCards(
+        (D.sprints || []).slice().sort(function (a, b) {
+          return (a.id || 0) - (b.id || 0);
+        })
+      );
+
+      function renderKpis(rows) {
+        document.getElementById("kpi-row").innerHTML = rows.map(function (k) {
+          return (
+            '<div class="kpi ' + escapeHtml(k.tone || "") + '">' +
+            '<div class="lbl">' + escapeHtml(k.label) + '</div>' +
+            '<div class="val">' + escapeHtml(k.value) + '</div></div>'
+          );
+        }).join("") || "";
+      }
+
+      function renderSprintBarChart(series) {
+        var wrap = document.getElementById("chart-wrap");
+        if (!wrap || !series || !series.length) {
+          if (wrap) wrap.innerHTML = "<p style='font-size:13px;color:var(--muted)'>No closed sprint data for chart.</p>";
+          return;
+        }
+        var n = series.length;
+        var groupMin = 92;
+        var W = Math.max(640, 56 + n * groupMin);
+        var H = 280;
+        var pad = { left: 44, right: 16, top: 14, bottom: 62 };
+        var innerW = W - pad.left - pad.right;
+        var innerH = H - pad.top - pad.bottom;
+        var maxVal = 0;
+        series.forEach(function (s) {
+          maxVal = Math.max(maxVal, Number(s.estimatedHours) || 0, Number(s.billedHours) || 0);
+        });
+        maxVal = Math.max(80, Math.ceil(maxVal / 10) * 10 + 10);
+
+        var n = series.length;
+        var groupW = innerW / n;
+        var barW = Math.min(28, Math.max(14, groupW * 0.2));
+
+        var svg =
+          '<svg class="chart-svg" viewBox="0 0 ' +
+          W +
+          " " +
+          H +
+          '" role="img" aria-label="Billable plan versus actual spent hours per sprint">';
+        svg +=
+          '<line x1="' +
+          pad.left +
+          '" y1="' +
+          (pad.top + innerH) +
+          '" x2="' +
+          (W - pad.right) +
+          '" y2="' +
+          (pad.top + innerH) +
+          '" stroke="#cbd5e1" stroke-width="2" />';
+
+        var steps = 4;
+        for (var t = 0; t <= steps; t++) {
+          var val = (maxVal * t) / steps;
+          var y = pad.top + innerH - (innerH * val) / maxVal;
+          svg +=
+            '<line class="svg-grid" x1="' +
+            pad.left +
+            '" y1="' +
+            y +
+            '" x2="' +
+            (W - pad.right) +
+            '" y2="' +
+            y +
+            '" stroke="#f1f5f9" stroke-width="1" />';
+          svg +=
+            '<text class="svg-axis" x="' +
+            (pad.left - 6) +
+            '" y="' +
+            (y + 4) +
+            '" text-anchor="end">' +
+            escapeSvgText(String(Math.round(val))) +
+            "</text>";
+        }
+
+        series.forEach(function (s, i) {
+          var cx = pad.left + groupW * (i + 0.5);
+          var estH = Number(s.estimatedHours) || 0;
+          var billH = Number(s.billedHours) || 0;
+          var hEst = (innerH * estH) / maxVal;
+          var hBill = (innerH * billH) / maxVal;
+          var xEst = cx - barW - 5;
+          var xBill = cx + 5;
+          var yBase = pad.top + innerH;
+          svg +=
+            '<rect x="' +
+            xEst +
+            '" y="' +
+            (yBase - hEst) +
+            '" width="' +
+            barW +
+            '" height="' +
+            hEst +
+            '" fill="var(--plan)" rx="3" />';
+          svg +=
+            '<rect x="' +
+            xBill +
+            '" y="' +
+            (yBase - hBill) +
+            '" width="' +
+            barW +
+            '" height="' +
+            hBill +
+            '" fill="var(--act)" rx="3" />';
+          svg +=
+            '<text class="svg-axis" x="' +
+            cx +
+            '" y="' +
+            (pad.top + innerH + 34) +
+            '" text-anchor="middle" font-weight="700" fill="#0f172a">' +
+            escapeSvgText(s.shortLabel || "") +
+            "</text>";
+          svg +=
+            '<text class="svg-axis" x="' +
+            cx +
+            '" y="' +
+            (pad.top + innerH + 50) +
+            '" text-anchor="middle" font-size="10">' +
+            escapeSvgText(s.dates || "") +
+            "</text>";
+        });
+
+        svg += "</svg>";
+        wrap.innerHTML = svg;
+      }
+
+      function renderSprintCards(sprints) {
+        document.getElementById("sprint-cards").innerHTML = sprints
+          .map(function (s) {
+            var slug = "?sprint=" + encodeURIComponent(s.id);
+            var pillClass =
+              String(s.status).toLowerCase() === "closed"
+                ? "closed"
+                : String(s.status).toLowerCase() === "active" ||
+                  String(s.status).toLowerCase() === "in progress"
+                ? "active"
+                : "planned";
+            var codes =
+              Array.isArray(s.storyCodes) && s.storyCodes.length
+                ? s.storyCodes
+                : (s.stories || [])
+                    .map(function (row) {
+                      return row && row[0];
+                    })
+                    .filter(Boolean);
+            var blurb = s.headline ? escapeHtml(s.headline) : "";
+            var snap = s.effortSnapshot || {};
+            var isPlanned =
+              String(s.status).toLowerCase() !== "closed" &&
+              (!snap.actualH || snap.actualH === 0);
+            var hoursInner = "";
+            if (typeof snap.estimatedH === "number") {
+              var marginH =
+                typeof snap.actualH === "number"
+                  ? Math.round((snap.estimatedH - snap.actualH) * 10) / 10
+                  : typeof snap.marginH === "number"
+                  ? snap.marginH
+                  : NaN;
+              var deltaClass =
+                typeof marginH === "number"
+                  ? marginH > 0.05
+                    ? "delta-pos"
+                    : marginH < -0.05
+                    ? "delta-neg"
+                    : "muted"
+                  : "muted";
+              hoursInner =
+                '<span class="hours-chip plan">' +
+                escapeHtml(fmtHours(snap.estimatedH)) +
+                " h quoted</span>" +
+                (isPlanned
+                  ? '<span class="hours-chip muted">— spent</span><span class="hours-chip muted">Planned</span>'
+                  : '<span class="hours-chip">' +
+                    escapeHtml(fmtHours(snap.actualH)) +
+                    " h spent</span>" +
+                    '<span class="hours-chip ' +
+                    deltaClass +
+                    '">Δ ' +
+                    escapeHtml(fmtDeltaSigned(marginH)) +
+                    "</span>");
+            }
+            var hasRecon =
+              Array.isArray(s.storyHoursReconciliation) && s.storyHoursReconciliation.length;
+            var reconHref = "sfpcare-sprint-hours-reconciliation.html?sprint=" + encodeURIComponent(String(s.id));
+            var billingHref = "sfpcare-sprint-billing.html" + slug;
+            var actionsHtml = "";
+            if (hasRecon) {
+              actionsHtml =
+                '<a class="primary" href="' +
+                reconHref +
+                '">Hours reconciliation →</a>' +
+                '<a href="' +
+                billingHref +
+                '">Client billing →</a>';
+            } else {
+              actionsHtml =
+                '<a class="primary" href="' +
+                billingHref +
+                '">Billing summary (client) →</a>';
+            }
+            var trailHtml =
+              '<div class="card-trail"><div class="card-trail-inner">' +
+              (hoursInner ? '<div class="card-hours">' + hoursInner + "</div>" : "") +
+              '<span class="pill ' +
+              pillClass +
+              '">' +
+              escapeHtml(s.status || "—") +
+              "</span>" +
+              '<div class="card-actions">' +
+              actionsHtml +
+              "</div></div></div>";
+            return (
+              '<article class="sprint-card">' +
+              '<div class="seq">' +
+              escapeHtml(String(s.id || "")) +
+              "</div>" +
+              '<div class="card-title"><span class="name">' +
+              escapeHtml(s.name) +
+              '</span><span class="dates">' +
+              escapeHtml(s.dates) +
+              "</span></div>" +
+              '<div class="card-stories"><span class="codes">' +
+              escapeHtml(codes.join(", ") || "—") +
+              "</span></div>" +
+              trailHtml +
+              (blurb ? '<div class="blurb">' + blurb + "</div>" : '<div class="blurb"></div>') +
+              "</article>"
+            );
+          })
+          .join("");
+      }
+    })();
+  </script>
+<script src="prm-date-format.js?v=20260622m"></script>
+<script src="prm-doc-meta.js?v=20260622m"></script>
+</body>
+</html>

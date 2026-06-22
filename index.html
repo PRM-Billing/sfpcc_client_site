@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="doc-last-updated" content="2026-06-21" />
+    <meta name="description" content="SFPCC delivery status and planning documents · shared workspace">
+    <title>SFPCC · Shared documents</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ocean: #0a2540;
+            --ocean-mid: #123a5c;
+            --aqua: #00b4d8;
+            --aqua-soft: rgba(0, 180, 216, 0.12);
+            --paper: #f8fafc;
+            --elev: #ffffff;
+            --mist: rgba(248, 250, 252, 0.72);
+            --ink: #0f172a;
+            --ink-soft: #334155;
+            --muted: #64748b;
+            --line: rgba(10, 37, 64, 0.08);
+            --line-strong: rgba(10, 37, 64, 0.14);
+            --shadow-sm: 0 1px 2px rgba(10, 37, 64, 0.04);
+            --shadow-md: 0 12px 40px rgba(10, 37, 64, 0.08), 0 4px 12px rgba(10, 37, 64, 0.04);
+            --shadow-float: 0 24px 48px rgba(10, 37, 64, 0.12), 0 8px 16px rgba(10, 37, 64, 0.06);
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --font: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+            --font-serif: "Source Serif 4", Georgia, serif;
+        }
+
+        *,
+        *::before,
+        *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            color: var(--ink);
+            min-height: 100vh;
+            line-height: 1.55;
+            background-color: var(--paper);
+            background-image:
+                radial-gradient(ellipse 120% 80% at 0% -40%, rgba(0, 180, 216, 0.2), transparent 50%),
+                radial-gradient(ellipse 90% 60% at 100% -10%, rgba(10, 37, 64, 0.08), transparent 45%),
+                linear-gradient(180deg, #eef6f9 0%, var(--paper) 38%);
+        }
+
+        .page {
+            position: relative;
+            min-height: 100vh;
+            padding: clamp(1.75rem, 4vw, 3rem);
+            padding-bottom: 3rem;
+        }
+
+        /* Ambient ornament */
+        .page::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 82% 75%, rgba(0, 180, 216, 0.06) 0%, transparent 42%),
+                radial-gradient(circle at 14% 90%, rgba(10, 37, 64, 0.04) 0%, transparent 38%);
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        /* Masthead */
+        .masthead {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem 1.25rem;
+            margin-bottom: clamp(2rem, 6vw, 3.25rem);
+        }
+
+        .brand-cluster {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .mark {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, var(--ocean) 0%, var(--ocean-mid) 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                var(--shadow-sm);
+            display: grid;
+            place-items: center;
+            color: #fff;
+        }
+
+        .mark svg { width: 26px; height: 26px; }
+
+        .brand-text .eyebrow {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--aqua);
+        }
+
+        .brand-text .org {
+            font-family: var(--font-serif);
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--ocean);
+            letter-spacing: -0.02em;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.95rem;
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--ocean-mid);
+            background: var(--mist);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            backdrop-filter: blur(8px);
+        }
+
+        .status-pill::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+            flex-shrink: 0;
+        }
+
+        /* Hero */
+        .hero {
+            margin-bottom: clamp(2rem, 5vw, 2.75rem);
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(1.85rem, 4.8vw, 2.45rem);
+            font-weight: 600;
+            color: var(--ocean);
+            letter-spacing: -0.03em;
+            line-height: 1.12;
+            max-width: 16ch;
+        }
+
+        .hero .lede {
+            margin-top: 1rem;
+            font-size: 1.0625rem;
+            color: var(--ink-soft);
+            max-width: 46ch;
+        }
+
+        /* Document grid */
+        .doc-grid {
+            display: grid;
+            gap: clamp(1rem, 3vw, 1.35rem);
+        }
+
+        @media (min-width: 620px) {
+            .doc-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .doc-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: clamp(1.35rem, 3.5vw, 1.75rem);
+            text-decoration: none;
+            color: inherit;
+            background: var(--elev);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            transition:
+                transform 0.38s var(--ease),
+                box-shadow 0.38s var(--ease),
+                border-color 0.38s var(--ease);
+            overflow: hidden;
+        }
+
+        .doc-card::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--aqua), var(--ocean-mid));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.45s var(--ease);
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .doc-card,
+            .doc-card::after {
+                transition: none;
+            }
+        }
+
+        .doc-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-float);
+            border-color: var(--line-strong);
+        }
+
+        .doc-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .doc-card:focus-visible {
+            outline: 3px solid var(--aqua);
+            outline-offset: 3px;
+        }
+
+        .doc-card:active {
+            transform: translateY(-2px);
+        }
+
+        .doc-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-lg);
+            background: var(--aqua-soft);
+            color: var(--ocean-mid);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(0, 180, 216, 0.18);
+        }
+
+        .icon-wrap svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .doc-card--accent .icon-wrap {
+            background: rgba(18, 58, 92, 0.08);
+            border-color: rgba(18, 58, 92, 0.12);
+            color: var(--ocean);
+        }
+
+        .chev {
+            color: var(--muted);
+            flex-shrink: 0;
+            margin-top: 0.35rem;
+            transition: transform 0.38s var(--ease), color 0.38s var(--ease);
+        }
+
+        .doc-card:hover .chev {
+            transform: translateX(4px);
+            color: var(--aqua);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .doc-card:hover .chev { transform: none; }
+        }
+
+        .pill {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.28rem 0.62rem;
+            border-radius: 6px;
+            background: rgba(10, 37, 64, 0.06);
+            color: var(--ocean-mid);
+            margin-bottom: 0.6rem;
+        }
+
+        .doc-card h2 {
+            font-family: var(--font);
+            font-size: 1.13rem;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            margin-bottom: 0.45rem;
+        }
+
+        .doc-card p.desc {
+            font-size: 0.895rem;
+            color: var(--muted);
+            line-height: 1.55;
+            flex-grow: 1;
+            margin-bottom: 1.1rem;
+        }
+
+        .doc-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem 1rem;
+            padding-top: 0.95rem;
+            border-top: 1px dashed var(--line);
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--ocean-mid);
+        }
+
+        .doc-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .doc-meta span svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.7;
+        }
+
+        .doc-meta .doc-updated {
+            flex: 1 1 100%;
+            color: var(--ink-soft);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .doc-meta .doc-updated svg {
+            opacity: 0.85;
+        }
+
+        /* Footer */
+        .footnote {
+            margin-top: clamp(2.25rem, 5vw, 3rem);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(10px);
+        }
+
+        .footnote p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .footnote strong {
+            color: var(--ink-soft);
+        }
+    </style>
+</head>
+<body class="page">
+    <div class="container">
+        <header class="masthead">
+            <div class="brand-cluster">
+                <div class="mark" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21a9 9 0 100-18 9 9 0 000 18z"/>
+                        <path d="M8 13h8M11 17h2M11 10c0-.5.38-2 2-2s2 .5 2 2"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <div class="eyebrow">ClinicSync · SFPCC</div>
+                    <div class="org">Shared workspace</div>
+                </div>
+            </div>
+            <div class="status-pill">Documents current</div>
+        </header>
+
+        <main>
+            <div class="hero">
+                <h1>Planning &amp; delivery materials</h1>
+                <p class="lede">Open the backlog overview (including <strong>US‑33 SyncMD AI Ambient Notes</strong>), the APR&nbsp;2026 US‑18&nbsp;…&nbsp;US‑22 estimate pack, the <strong>US‑25</strong> or <strong>US‑33</strong> interactive prototypes, or the bulk-demographics BRD and sizing.</p>
+            </div>
+
+            <nav class="doc-grid" aria-label="Available documents">
+                <a class="doc-card doc-card--accent" href="SFPCC-Business-Case-Intake.html">
+                    <div class="doc-card-top">
+                        <span class="icon-wrap" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                        </span>
+                        <span class="chev" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 18l6-6-6-6"/></svg>
+                        </span>
+                    </div>
+                    <span class="pill">Intake · New initiative</span>
+                    <h2>Business case intake form</h2>
+                    <p class="desc">Submit a new ERP request with the detail PRM needs to scope, estimate, and plan — problem, success metrics, owners, and boundaries.</p>
+                    <div class="doc-meta" role="presentation">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+                            Required fields for scoping
+                        </span>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                            Submit to PRM
+                        </span>
+                    </div>
+                </a>
+
+                <a class="doc-card" href="sfpcc-consolidated-user-stories.html">
+                    <div class="doc-card-top">
+                        <span class="icon-wrap" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                            </svg>
+                        </span>
+                        <span class="chev" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 18l6-6-6-6"/></svg>
+                        </span>
+                    </div>
+                    <span class="pill">Overview</span>
+                    <h2>Delivery status &amp; backlog</h2>
+                    <p class="desc">Unified user stories, completed vs backlog, and roadmap initiatives including US-25 and US-33 — updated as priorities shift.</p>
+                    <div class="doc-meta" role="presentation">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            Living document
+                        </span>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-2 8-2 8 2 8 2M12 17v4M12 11V3"/></svg>
+                            ERP scope
+                        </span>
+                    </div>
+                </a>
+
+                <a class="doc-card doc-card--accent" href="SFPCC-US18-22-ERP-Estimates-APR27.html">
+                    <div class="doc-card-top">
+                        <span class="icon-wrap" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 20V10"/>
+                                <path d="M18 20V4"/>
+                                <path d="M6 20v-4"/>
+                            </svg>
+                        </span>
+                        <span class="chev" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 18l6-6-6-6"/></svg>
+                        </span>
+                    </div>
+                    <span class="pill">US-18 … US-22 · Apr 2026</span>
+                    <h2>ERP wave estimates</h2>
+                    <p class="desc">Detailed breakdown for CureMD x-ray note, portal scaffold, sleep portal increment, PST module, and PFT module — <strong>130.8&nbsp;h</strong> combined (QA rule documented).</p>
+                    <div class="doc-meta" role="presentation">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+                            v1.0 · Apr 27
+                        </span>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            Crosswalk in backlog doc
+                        </span>
+                    </div>
+                </a>
+
+                <a class="doc-card" href="SFPCC-US25-Bulk-Demographics-Prototype.html">
+                    <div class="doc-card-top">
+                        <span class="icon-wrap" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <path d="M3 9h18M9 21V9"/>
+                            </svg>
+                        </span>
+                        <span class="chev" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 18l6-6-6-6"/></svg>
+                        </span>
+                    </div>
+                    <span class="pill">US-25 · Prototype</span>
+                    <h2>Bulk demographics walkthrough</h2>
+                    <p class="desc">Clickable demo — master calendar (month/week/day), upload wizard, three-bucket review, patient master, upload log.</p>
+                    <div class="doc-meta" role="presentation">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                            UX review
+                        </span>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-2 8-2 8 2 8 2M12 17v4"/></svg>
+                            Matches BRD flows
+                        </span>
+                    </div>
+                </a>
+
+                <a class="doc-card doc-card--accent" href="SFPCC-US33-Ambient-Notes-Prototype.html">
+                    <div class="doc-card-top">
+                        <span class="icon-wrap" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+                                <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                        </span>
+                        <span class="chev" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 18l6-6-6-6"/></svg>
+                        </span>
+                    </div>
+                    <span class="pill">US-33 · Prototype</span>
+                    <h2>Ambient notes walkthrough</h2>
+                    <p class="desc">ClinicSync MD v2 — login, patient context, consent, live ambient capture, AI-generated draft note, compliance flags, physician review &amp; sign.</p>
+                    <div class="doc-meta" role="presentation">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                            UX review
+                        </span>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-2 8-2 8 2 8 2M12 17v4"/></svg>
+                            BC-backed US-33
+                        </span>
+                    </div>
+                </a>
+
+                <a class="doc-card doc-card--accent" href="SFPCC-US25-BULK-DEMOGRAPHICS-Estimates.html">
+                    <div class="doc-card-top">
+                        <span class="icon-wrap" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <path d="M12 11v5M12 9h.01"/>
+                            </svg>
+                        </span>
+                        <span class="chev" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 18l6-6-6-6"/></svg>
+                        </span>
+                    </div>
+                    <span class="pill">US-25 · BRD</span>
+                    <h2>Bulk demographics upload</h2>
+                    <p class="desc">Business requirements for roster ingestion, matching, calendars, QA — inclusive of <strong>76&nbsp;h</strong> sizing (engineering + QA).</p>
+                    <div class="doc-meta" role="presentation">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+                            Acceptance criteria
+                        </span>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 13.71L4 18l8-1 18-17-7 7"/><path d="M13 6l5 5"/></svg>
+                            Estimates
+                        </span>
+                    </div>
+                </a>
+            </nav>
+        </main>
+
+        <footer class="footnote">
+            <p><strong>Confidential</strong> — SFPCC &amp; PRM Billing. For authorized recipients only.</p>
+        </footer>
+    </div>
+    <script>
+        (function () {
+            var calIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
+
+            function formatUpdated(date) {
+                return date.toLocaleDateString(undefined, {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+
+            document.querySelectorAll('a.doc-card[href]').forEach(function (card) {
+                var meta = card.querySelector('.doc-meta');
+                if (!meta) return;
+
+                var updated = document.createElement('span');
+                updated.className = 'doc-updated';
+                updated.innerHTML = calIcon + 'Last updated · loading…';
+                meta.insertBefore(updated, meta.firstChild);
+
+                fetch(card.getAttribute('href'), { method: 'HEAD', cache: 'no-store' })
+                    .then(function (response) {
+                        var lastModified = response.headers.get('Last-Modified');
+                        if (!lastModified) {
+                            updated.innerHTML = calIcon + 'Last updated · unavailable';
+                            return;
+                        }
+                        updated.innerHTML = calIcon + 'Last updated · ' + formatUpdated(new Date(lastModified));
+                    })
+                    .catch(function () {
+                        updated.innerHTML = calIcon + 'Last updated · unavailable';
+                    });
+            });
+        })();
+    </script>
+<script src="prm-date-format.js?v=20260622m"></script>
+<script src="prm-doc-meta.js?v=20260622m"></script>
+</body>
+</html>
