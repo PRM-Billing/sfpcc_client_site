@@ -681,7 +681,7 @@
                 <div class="dash-card back">
                     <div class="lbl">Backlog · estimated</div>
                     <div class="val">14 stories</div>
-                    <div class="legend" style="margin-top:8px;"><strong>599 h</strong> incl. optional US-17 + US-33 + US-27 + US-29 · <strong>588 h</strong> excl. US-17</div>
+                    <div class="legend" style="margin-top:8px;"><strong>606 h</strong> incl. optional US-17 + US-33 + US-27 + US-29 · <strong>595 h</strong> excl. US-17</div>
                 </div>
                 <div class="dash-card pending">
                     <div class="lbl">Backlog · pending BRD / estimate</div>
@@ -713,7 +713,7 @@
                     <tr>
                         <td><strong>Backlog · estimated</strong></td>
                         <td class="num">14</td>
-                        <td class="num"><strong>599</strong></td>
+                        <td class="num"><strong>606</strong></td>
                         <td class="story-ids"><strong>US-1</strong> · <strong>US-2</strong> · <strong>US-3</strong> · <strong>US-4</strong> · <strong>US-6</strong> · <strong>US-8</strong> · <strong>US-9</strong> · <strong>US-10</strong> · <strong>US-17</strong> <em>(optional, 11 h)</em> · <strong>US-18</strong> · <strong>US-25</strong> · <strong>US-27</strong> · <strong>US-29</strong> · <strong>US-33</strong></td>
                     </tr>
                     <tr>
@@ -725,7 +725,7 @@
 
                 </tbody>
             </table>
-            <p class="legend" style="margin-top:14px;">Hours come from story-card workbooks and published BRD / APR estimate packs. <strong>588 h</strong> backlog estimated total excludes optional US-17; includes US-33 (~140 h) + US-27 (~30 h) + US-29 (4 h). PRM invoiced actuals supersede planning figures for delivered work. Line-by-line detail is in <a href="#sec-consolidated-hours">Consolidated Hour Estimate Breakdown</a> below.</p>
+            <p class="legend" style="margin-top:14px;">Hours come from story-card workbooks and published BRD / APR estimate packs. <strong>595 h</strong> backlog estimated total excludes optional US-17; includes US-33 (~140 h) + US-27 (~30 h) + US-29 (11 h). PRM invoiced actuals supersede planning figures for delivered work. Line-by-line detail is in <a href="#sec-consolidated-hours">Consolidated Hour Estimate Breakdown</a> below.</p>
 
             <hr class="divider" id="sec-status">
 
@@ -776,7 +776,7 @@
                     <tr data-category="estimated"><td><a class="story-id-link" href="#us-18-apr17"><strong>US-18</strong></a></td><td>X-ray interpretation → CureMD provider note</td><td class="cell-est">Backlog · estimated</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <a href="SFPCC-US18-22-ERP-Estimates-APR27.html">APR&nbsp;27 estimate</a></td></tr>
                     <tr data-category="estimated"><td><a class="story-id-link" href="SFPCC-US25-BULK-DEMOGRAPHICS-Estimates.html"><strong>US-25</strong></a></td><td>Bulk patient demographics upload (CSV/XLSX/PDF) + auto-match + NP calendar</td><td class="cell-est">Backlog · estimated</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <a href="SFPCC-US25-Bulk-Demographics-Prototype.html">prototype</a></td></tr>
                     <tr data-category="estimated"><td><a class="story-id-link" href="#us-27-pcp-medical-records-appointments"><strong>US-27</strong></a></td><td>Medical Records — Future Appointments + CureMD Prescriptions</td><td class="cell-est">Backlog · estimated</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <strong>30–37 h</strong> (API 30 h / automation 37 h) · <a href="SFPCC-US27-MEDICAL-RECORDS-FUTURE-APPTS-PRESCRIPTIONS-BRD.html">BRD</a> · <a href="US-27-MEDICAL-RECORDS-FUTURE-APPTS-PRESCRIPTIONS-USER-STORY.md">user story</a> · <a href="us27-medical-records-prototype.html">prototype</a></td></tr>
-                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-29-facility-dropdown"><strong>US-29</strong></a></td><td>Facility / location dropdown on sleep orders (operational tracking)</td><td class="cell-est">Backlog · estimated</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <strong>4 h</strong></td></tr>
+                    <tr data-category="estimated"><td><a class="story-id-link" href="#us-29-facility-dropdown"><strong>US-29</strong></a></td><td>Order location (facility) dropdown on all Create Order flows (operational tracking)</td><td class="cell-est">Backlog · estimated</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <strong>11 h</strong> · <a href="SFPCC-US29-ORDER-LOCATION-FACILITY-BRD.html">BRD</a></td></tr>
                     <tr data-category="estimated"><td><a class="story-id-link" href="#us-33-syncmd-ambient-notes"><strong>US-33</strong></a></td><td>SyncMD AI Ambient Notes Module (dashboard-embedded ambient scribe)</td><td class="cell-est">In progress · Sprint&nbsp;6–7</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · <span class="sprint-pill">Sprint 6</span> · <span class="sprint-pill">Sprint 7</span> · <strong>~140 h</strong> (45 BE · 49 FE · 23 AI · 23 QA) · BC intake May&nbsp;2026 · <a href="SyncMD_AI_Ambient_Notes_Interview_Summary.pdf">interview summary</a> · <a href="SFPCC-US33-Ambient-Notes-Prototype.html">prototype</a> · <a href="US-33-PRD-SYNCMD-AMBIENT-NOTES.md">PRD</a></td></tr>
 
                     <tr data-category="backlog"><td><a class="story-id-link" href="#us-12-referral"><strong>US-12</strong></a></td><td>Referral module</td><td class="cell-back">Backlog</td><td><span class="new-pill" style="margin-left:0">New initiative</span> · discovery</td></tr>
@@ -1443,15 +1443,31 @@
                 </div>
                 <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>Backlog — CureMD lookup API + manual-create UI; hours TBD · unblocks platform-only technician workflow</td></tr></tbody></table>
             </div><div class="story-card" id="us-29-facility-dropdown">
-                <div class="status-strip backlog">Backlog · estimated</div>
-                <h3>US-29: Facility / Location Dropdown on Sleep Orders <span class="module-tag mod-sleep">Sleep Study</span></h3>
-                <div class="story-meta">As a technician creating a sleep order I want to select which facility (location) the patient belongs to from a dropdown — similar to Rendering Physician — so operations and accounting can track which office is handling each process.</div>
-                <div class="story-desc"><strong>What this does:</strong> Add a location/facility selector when the technician creates an order. This is for operational and accounting tracking across SFPCC offices, not necessarily for the clinical report content itself.</div>
+                <div class="status-strip backlog">Backlog · estimated · BRD ready</div>
+                <h3>US-29: Order Location (Facility) Dropdown <span class="module-tag mod-sleep">Sleep Study</span> <span class="module-tag mod-xray">X-Ray</span> <span class="module-tag mod-medical">PFT · PST</span></h3>
+                <div class="story-meta">As a technician creating a clinical order I want to optionally select which facility (location) the patient belongs to from a dropdown — similar to Rendering Physician — so SFPCC can track which office is handling each process for operational and accounting purposes.</div>
+                <div class="story-desc"><strong>What this does:</strong> On each Create Order form (Sleep Study, X-Ray, PFT, PST), load all locations from Resource Planning and show them in an optional Location dropdown. The selected value is saved on the order for ops/accounting visibility on list and detail — not on interpretation PDFs, CureMD notes, or the Medical Records portal.</div>
                 <div class="context-block">
                     <div class="context-label">Client request</div>
-                    <p>Dropdown list of locations at order creation, patterned after the existing Rendering Physician selector.</p>
+                    <p>Ability to create/select the facility (Location). When the technician creates the order, they should be able to indicate which facility the patient belongs to. This is not necessarily for the report itself, but for operational and accounting purposes, so we can track which of our offices is handling each process.</p>
+                    <p style="margin-top:8px;"><strong>Extra comment:</strong> We need to add a dropdown list with the locations so the technician can select which location the patient belongs to, similar to what we have for the Rendering Physician.</p>
                 </div>
-                <table class="hours-table"><tbody><tr><td><strong>Estimated hours</strong></td><td><strong>4 h</strong> — facility master list + dropdown on order-creation UI</td></tr></tbody></table>
+                <div class="context-block">
+                    <div class="context-label">Estimated hours — 11 h (Jun 2026 BRD)</div>
+                    <table class="hours-table" style="margin-top:6px;">
+                        <thead><tr><th>Work area</th><th>Hours</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td>Database migration</td><td class="num">1</td><td><code>location_id</code> + <code>location_nickname</code> on 4 order tables</td></tr>
+                            <tr><td>Backend — save location on create (×4)</td><td class="num">2</td><td>Accept optional <code>locationId</code>; store nickname snapshot</td></tr>
+                            <tr><td>Frontend — Location dropdown (×4 create pages)</td><td class="num">4</td><td>Load all locations; Autocomplete like Rendering Physician; wire payload</td></tr>
+                            <tr><td>Frontend — show on list/detail (×4)</td><td class="num">2</td><td>Location column + read-only detail field</td></tr>
+                            <tr><td>QA / smoke test</td><td class="num">2</td><td>One location picked per module; blank optional; no PDF change</td></tr>
+                            <tr><td>US-29 total</td><td class="num">11</td><td>Straightforward — no extra location logic</td></tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top:8px;"><a href="SFPCC-US29-ORDER-LOCATION-FACILITY-BRD.html"><strong>Open full BRD &amp; estimate →</strong></a></p>
+                </div>
+                <table class="hours-table"><tbody><tr><td><strong>Status</strong></td><td>Backlog · estimated — <strong>11 h</strong> (1 DB · 2 BE · 6 FE · 2 QA) · BRD ready · all four Create Order modules</td></tr></tbody></table>
             </div><div class="story-card" id="us-30-login-session-time">
                 <div class="status-strip backlog">Backlog · platform stabilization</div>
                 <h3>US-30: Login Session Time <span class="module-tag mod-platform">Platform</span></h3>
@@ -1867,9 +1883,9 @@
                     </tr>
                     <tr>
                         <td><a class="story-id-link" href="#us-29-facility-dropdown"><strong>US-29</strong></a></td>
-                        <td>Facility / location dropdown on sleep order creation</td>
-                        <td>Sleep Study</td>
-                        <td class="num">4 h</td>
+                        <td>Order location (facility) dropdown on all Create Order flows <em>(Jun&nbsp;2026 BRD)</em></td>
+                        <td>Sleep · X-Ray · PFT · PST</td>
+                        <td class="num">11 <small style="font-weight:600;color:var(--text-light);">1 DB · 2 BE · 6 FE · 2 QA</small></td>
                         <td class="cell-est">Backlog · estimated</td>
                     </tr>
                     <tr>
@@ -1952,7 +1968,7 @@
                     <tr><td><strong>US-38</strong></td><td><a href="#us-26-electronic-signature">US-26</a> signature platform · per-doctor PNG + NPI from client</td><td>Remaining physicians auto-signed on notes/reports · delivered Sprint&nbsp;5</td></tr>
                     <tr><td><strong>US-27</strong></td><td><a href="#us-19-apr17">US-19</a>–<a href="#us-22-apr17">US-22</a> portal scaffold · PCP portal requirements · CureMD appointment data</td><td>PCP portal · Medical Records + Orders · future appointments view</td></tr>
                     <tr><td><strong>US-28</strong></td><td>CureMD patient lookup by alternate ID (not appointment-only) · US-14 sync posture · manual-create UX for technicians</td><td>Platform-only workflow · eliminates parallel legacy process · supports US-42 lab packages</td></tr>
-                    <tr><td><strong>US-29</strong></td><td>Facility/location master list · order-creation UI (Rendering Physician pattern)</td><td>Per-office operational + accounting tracking on sleep orders · lab/facility context for US-42</td></tr>
+                    <tr><td><strong>US-29</strong></td><td>Resource Planning location master (<code>rp_locations</code>) · all four Create Order flows · Rendering Physician UI pattern</td><td>Per-office operational + accounting tracking on all modules · lab/facility context for US-42</td></tr>
                     <tr><td><strong>US-30</strong></td><td>Auth/session configuration · optional idle-timeout warning · aligns with US-13 login model</td><td>Reliable multi-step order creation · supports US-28/US-29/US-42 technician workflows</td></tr>
                     <tr><td><strong>US-33</strong></td><td>US-36 (appointment sync) · CureMD provider note API spike</td><td>SyncMD ambient documentation module — ~140 h (5 phases)</td></tr>
                     <tr><td><strong>US-34</strong></td><td>Existing module list APIs / query patterns for X-Ray · Sleep · PFT · PST</td><td>Operations CSV exports · cross-status reporting per modality</td></tr>

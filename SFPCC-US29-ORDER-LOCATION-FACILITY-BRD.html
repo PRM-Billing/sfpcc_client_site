@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SFPCC ERP — US-29 Order Location (Facility) Dropdown — BRD &amp; Estimate</title>
+  <style>
+    :root {
+      --primary: #1a365d;
+      --primary-light: #2c5282;
+      --accent: #3182ce;
+      --success: #38a169;
+      --warning: #d69e2e;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --muted: #718096;
+      --border: #e2e8f0;
+      --purple: #6b46c1;
+      --purple-bg: #f3e8ff;
+      --orange: #c05621;
+      --orange-bg: #fffaf0;
+      --blue-bg: #ebf8ff;
+      --green-bg: #f0fff4;
+      --teal: #319795;
+      --teal-bg: #e6fffa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      padding: 40px 20px;
+    }
+    .container { max-width: 1080px; margin: 0 auto; }
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      border-radius: 14px 14px 0 0;
+      padding: 36px 44px;
+    }
+    .header h1 { font-size: 1.45rem; line-height: 1.3; margin-bottom: 12px; }
+    .header-meta { font-size: 0.88rem; opacity: 0.92; line-height: 1.8; }
+    .header-meta strong { font-weight: 600; }
+    .content {
+      background: var(--card);
+      padding: 42px 44px;
+      border-radius: 0 0 14px 14px;
+      box-shadow: 0 4px 8px rgba(15, 23, 42, 0.06);
+    }
+    h2 {
+      color: var(--primary);
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 8px;
+      margin: 34px 0 16px;
+      font-size: 1.22rem;
+    }
+    h2:first-child { margin-top: 0; }
+    h3 { color: var(--primary-light); margin: 22px 0 10px; font-size: 1rem; }
+    p { margin-bottom: 12px; }
+    ul, ol { margin: 8px 0 16px 24px; }
+    li { margin-bottom: 6px; }
+    code {
+      background: #edf2f7;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.86em;
+    }
+    .box {
+      border-left: 4px solid var(--accent);
+      background: var(--blue-bg);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0 18px;
+      font-size: 0.92rem;
+    }
+    .success { background: var(--green-bg); border-left-color: var(--success); }
+    .warn { background: #fffbeb; border-left-color: var(--warning); }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin: 18px 0;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+    .module-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin-right: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .mod-sleep { background: #e9d8fd; color: #553c9a; }
+    .mod-xray { background: #dbeafe; color: #1e40af; }
+    .mod-pft { background: #ccfbf1; color: #065f46; }
+    .mod-pst { background: #feebc8; color: #c05621; }
+    .mod-rp { background: var(--teal-bg); color: var(--teal); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 0.84rem;
+    }
+    th {
+      background: var(--primary);
+      color: white;
+      text-align: left;
+      padding: 9px 11px;
+      font-size: 0.76rem;
+      white-space: nowrap;
+    }
+    td {
+      border-bottom: 1px solid var(--border);
+      padding: 9px 11px;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .totals-row td { font-weight: 700; background: #edf2f7 !important; }
+    .hours-table { max-width: 640px; }
+    .grand-total {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      padding: 20px 28px;
+      border-radius: 10px;
+      margin: 20px 0;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 16px;
+      text-align: center;
+    }
+    .grand-total .gt-label {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .grand-total .gt-value { font-size: 1.5rem; font-weight: 700; margin-top: 4px; }
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f8fafc;
+      margin: 14px 0;
+      font-size: 0.84rem;
+    }
+    .flow-step {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-weight: 600;
+    }
+    .arrow { color: var(--muted); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 34px 0; }
+    @media print {
+      body { padding: 0; background: white; }
+      .container { max-width: 100%; }
+      .header { border-radius: 0; }
+      .content { box-shadow: none; border-radius: 0; }
+      .card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>SFPCC ERP — US-29: Order Location (Facility) Dropdown</h1>
+      <div class="header-meta">
+        <strong>Purpose:</strong> Business requirements and effort estimate for optional facility/location selection on all Create Order flows.<br>
+        <strong>Version:</strong> 1.0 · June 2026 &nbsp;|&nbsp; <strong>Story:</strong> US-29 &nbsp;|&nbsp;
+        <strong>Estimate:</strong> ~11 h (simple dropdown + save across 4 create forms)<br>
+        <strong>PRD:</strong> <code>US-29-PRD-ORDER-LOCATION-FACILITY.md</code><br>
+        <strong>Reference UI:</strong> Sleep Study Create Order — <code>/sleep-study/create</code>
+      </div>
+    </header>
+
+    <main class="content">
+      <h2>Executive Summary</h2>
+      <div class="box success">
+        <p><strong>US-29</strong> is a <strong>simple task</strong>: on each Create Order form (Sleep Study, X-Ray, PFT, PST), load <strong>all locations</strong> from Resource Planning and show them <strong>directly in a dropdown</strong> — same idea as Rendering Physician. Technician picks a location (optional); value is saved on the order for ops/accounting.</p>
+        <p>No search, no smart defaults, no appointment-based filtering. Fetch location list → display in dropdown → save <code>locationId</code> on create. Not shown on PDFs or Medical Records portal.</p>
+      </div>
+
+      <h2>Client Request Alignment</h2>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Client request</th><th>Deliverable</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Technician indicates which facility the patient belongs to at order creation</td>
+            <td>Optional Location dropdown on all Create Order forms</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Operational / accounting — not for the report</td>
+            <td>Persisted on order; excluded from PDF, CureMD note, portal</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Similar to Rendering Physician picker</td>
+            <td>MUI Autocomplete, full-width row, same styling pattern</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>All locations from location module</td>
+            <td>Full list loaded once; every location shown directly in dropdown</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>All Create Order flows</td>
+            <td>Sleep Study, X-Ray, PFT, PST</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>User Story</h2>
+      <div class="box">
+        <p><strong>As a</strong> technician creating a clinical order,<br>
+        <strong>I want</strong> to optionally select which <strong>facility (location)</strong> the patient belongs to,<br>
+        <strong>So that</strong> SFPCC can track which office is handling each process for operational and accounting purposes.</p>
+      </div>
+
+      <h2>Business Goals</h2>
+      <ul>
+        <li>Capture facility attribution at order creation without extra data entry tools.</li>
+        <li>Reuse the Resource Planning location master — no duplicate location list.</li>
+        <li>Enable future ops/accounting reporting by office (data captured in v1; reports Wave 2).</li>
+        <li>Keep clinical outputs unchanged — zero impact on physician interpretation workflow.</li>
+      </ul>
+
+      <h2>Solution Flow</h2>
+      <div class="flow">
+        <span class="flow-step">RP Locations</span>
+        <span class="arrow">→</span>
+        <span class="flow-step">Create Order form</span>
+        <span class="arrow">→</span>
+        <span class="flow-step">POST order + locationId</span>
+        <span class="arrow">→</span>
+        <span class="flow-step">Order list / detail</span>
+      </div>
+      <p><code>site_id</code> (tenant entity) remains unchanged. <code>location_id</code> is the SFPCC office from Resource Planning — a separate dimension for ops/accounting.</p>
+
+      <h2>Scope by Module</h2>
+      <table>
+        <thead>
+          <tr><th>Module</th><th>Create route</th><th>Order table</th><th>v1 changes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="module-tag mod-sleep">Sleep</span></td>
+            <td><code>/sleep-study/create</code></td>
+            <td><code>sleep_study_orders</code></td>
+            <td>Dropdown + persist + list/detail column</td>
+          </tr>
+          <tr>
+            <td><span class="module-tag mod-xray">X-Ray</span></td>
+            <td><code>/xray/create</code></td>
+            <td><code>xray_orders</code></td>
+            <td>Dropdown + persist + list/detail column</td>
+          </tr>
+          <tr>
+            <td><span class="module-tag mod-pft">PFT</span></td>
+            <td><code>/pft/create</code></td>
+            <td><code>pft_orders</code></td>
+            <td>Dropdown + persist + list/detail column</td>
+          </tr>
+          <tr>
+            <td><span class="module-tag mod-pst">PST</span></td>
+            <td><code>/pst/create</code></td>
+            <td><code>pst_orders</code></td>
+            <td>Dropdown + persist + list/detail column</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h2>Functional Requirements</h2>
+
+      <div class="card">
+        <h3><span class="module-tag mod-rp">Shared</span> Location data source</h3>
+        <ul>
+          <li>On page load: <code>GET /api/resource-planning/locations</code> → show <strong>all locations</strong> in the dropdown.</li>
+          <li>Reuse <code>useLocationMasterStore</code> — no new APIs, no location CRUD.</li>
+          <li>No search, filter, or auto-select — straight list of location nicknames.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Create Order UI (all four modules)</h3>
+        <ul>
+          <li>Add <strong>Location (facility)</strong> Autocomplete after Rendering Physician row.</li>
+          <li>Field is <strong>optional</strong> (confirmed with SFPCC).</li>
+          <li>Display option label = location <code>nickname</code>.</li>
+          <li>Submit payload includes <code>locationId</code> when selected.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Backend &amp; database</h3>
+        <ul>
+          <li>Single migration: add nullable <code>location_id</code> (FK → <code>rp_locations</code>) and <code>location_nickname</code> to all four order tables.</li>
+          <li>Create-order APIs accept optional <code>locationId</code>; validate active location when provided.</li>
+          <li>Include location in create audit <code>schemaJson</code> where audit exists today.</li>
+          <li>List/detail APIs return location nickname for staff visibility.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Display rules</h3>
+        <ul>
+          <li>Order list: <strong>Location</strong> column — nickname or "—" when blank.</li>
+          <li>Order detail: read-only Location field; not editable after create.</li>
+          <li><strong>Excluded:</strong> interpretation PDF, CureMD note, Medical Records portal.</li>
+        </ul>
+      </div>
+
+      <h2>Client Decisions</h2>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Decision</th><th>Resolution</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>D1</td><td>Required vs optional on create?</td><td><strong>Optional</strong> — same as Rendering Physician on Sleep Study</td></tr>
+          <tr><td>D2</td><td>Show on list/detail in v1?</td><td><strong>Yes</strong></td></tr>
+        </tbody>
+      </table>
+
+      <h2>Acceptance Criteria</h2>
+      <ol>
+        <li>All locations from Resource Planning appear directly in the Location dropdown on all four Create Order pages.</li>
+        <li>Technician can create an order <strong>with</strong> a location selected — value persists and shows on list and detail.</li>
+        <li>Technician can create an order <strong>without</strong> a location — order succeeds; list/detail show "—".</li>
+        <li>Invalid <code>locationId</code> via API returns 400.</li>
+        <li>Signed PDFs and portal views do <strong>not</strong> include Location.</li>
+        <li>Existing required fields and Rendering Physician behavior unchanged per module.</li>
+      </ol>
+
+      <h2>Out of Scope (v1)</h2>
+      <ul>
+        <li>Required Location field</li>
+        <li>Edit location after order creation</li>
+        <li>Filters, exports, or dashboards by location</li>
+        <li>Billing / GL mapping by location</li>
+        <li>Auto-default from appointment or patient record</li>
+        <li>New location management UI (Resource Planning)</li>
+      </ul>
+
+      <hr>
+
+      <h2>Effort Estimate</h2>
+      <div class="box success">
+        <p><strong>Simple scope.</strong> Load all locations → dropdown on 4 create forms → save <code>locationId</code> on order. Copy-paste the Rendering Physician pattern. Locations master already exists.</p>
+      </div>
+
+      <h3>Hours by Work Area</h3>
+      <table class="hours-table">
+        <thead>
+          <tr><th>Work area</th><th>Hours</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Database migration</td>
+            <td>1</td>
+            <td><code>location_id</code> + <code>location_nickname</code> on 4 order tables</td>
+          </tr>
+          <tr>
+            <td>Backend — save location on create (×4)</td>
+            <td>2</td>
+            <td>Accept optional <code>locationId</code>; store nickname snapshot</td>
+          </tr>
+          <tr>
+            <td>Frontend — Location dropdown (×4 create pages)</td>
+            <td>4</td>
+            <td>Load all locations; Autocomplete like Rendering Physician; wire payload</td>
+          </tr>
+          <tr>
+            <td>Frontend — show on list/detail (×4)</td>
+            <td>2</td>
+            <td>Location column + read-only detail field</td>
+          </tr>
+          <tr>
+            <td>QA / smoke test</td>
+            <td>2</td>
+            <td>One location picked per module; blank optional; no PDF change</td>
+          </tr>
+          <tr>
+            <td>US-29 total</td>
+            <td>11 h</td>
+            <td>Straightforward — no extra location logic</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="grand-total">
+        <div>
+          <div class="gt-label">US-29 total</div>
+          <div class="gt-value">11 h</div>
+        </div>
+      </div>
+
+      <h3>Estimate assumptions</h3>
+      <ul>
+        <li>Locations already configured in Resource Planning.</li>
+        <li>Dropdown shows full location list — no filtering or search.</li>
+        <li>Same copy-paste pattern across Sleep Study, X-Ray, PFT, PST.</li>
+      </ul>
+
+      <h3>Test plan (UAT)</h3>
+      <table>
+        <thead>
+          <tr><th>Step</th><th>Action</th><th>Expected</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Add location in RP → Locations</td><td>Appears in all Create Order dropdowns</td></tr>
+          <tr><td>2</td><td>Create order with location (each module)</td><td>List and detail show nickname</td></tr>
+          <tr><td>3</td><td>Create order without location (each module)</td><td>Success; list shows —</td></tr>
+          <tr><td>4</td><td>Open interpretation / PDF</td><td>No location printed</td></tr>
+          <tr><td>5</td><td>POST invalid <code>locationId</code></td><td>400 error</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Dependencies</h2>
+      <ul>
+        <li>Resource Planning location master (<code>rp_locations</code>) configured with SFPCC offices</li>
+        <li>Existing Create Order flows operational on staging (Sleep, X-Ray, PFT, PST)</li>
+      </ul>
+
+      <h2>Sign-Off</h2>
+      <table>
+        <thead>
+          <tr><th>Role</th><th>Name</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SFPCC / Operations</td><td></td><td></td></tr>
+          <tr><td>Product</td><td></td><td></td></tr>
+          <tr><td>Engineering</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </main>
+  </div>
+</body>
+</html>
