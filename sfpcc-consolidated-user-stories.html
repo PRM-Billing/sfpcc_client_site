@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="doc-last-updated" content="2026-06-23" />
+    <meta name="doc-last-updated" content="2026-06-24" />
     <title>SFPCC — ERP Backlog &amp; Delivery Status</title>
     <style>
         :root {
@@ -38,7 +38,11 @@
             background: var(--bg);
             color: var(--text);
             line-height: 1.7;
-            padding: 40px 20px;
+            padding: 0 20px 40px;
+        }
+
+        body.prm-backlog-nav-on .container {
+            margin-top: 16px;
         }
 
         .container {
@@ -48,7 +52,7 @@
 
         .print-btn {
             position: fixed;
-            top: 24px;
+            top: calc(var(--prm-nav-offset, 52px) + 12px);
             right: 24px;
             z-index: 999;
             border: none;
@@ -635,8 +639,9 @@
             .story-card { page-break-inside: avoid; }
         }
     </style>
+    <link rel="stylesheet" href="prm-backlog-nav.css?v=20260624e">
 </head>
-<body>
+<body data-prm-updated-target="#doc-last-updated">
     <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
 
     <div class="container">
@@ -651,27 +656,7 @@
         </div>
 
         <div class="content">
-            <a class="hub-link" href="index.html">← SFPCC shared documents</a>
-            <p class="legend" style="margin-bottom: 18px;">Proposing a <strong>new initiative</strong> not yet on this backlog? Complete the <a href="sfpcc-client-site/SFPCC-Business-Case-Intake.html"><strong>business case intake form</strong></a> so PRM can scope and estimate it.</p>
-
-            <div class="info-box">
-                <strong>How to use this page:</strong> Start with <a href="#sec-estimate-summary">Estimate summary</a> for hours by bucket, then <a href="#sec-status">Delivery status at a glance</a> for the full story list. <strong>Click any story ID</strong> (e.g. US-25) to jump to its detail narrative and hour breakdown — stories with a published BRD open the BRD page directly. Status labels are maintained for the client; if something looks wrong, flag PRM and we will correct the same day.
-            </div>
-
-            <ul class="legend" style="margin:8px 0 0 1.1rem;line-height:1.65;">
-                <li><strong>Completed</strong> — live in production for SFPCC as agreed.</li>
-                <li><strong>Backlog</strong> — scoped or proposed, not yet delivered.</li>
-                <li><strong>Backlog · estimated</strong> — BRD or estimate pack published; click story ID for detail &amp; hours.</li>
-                <li><strong>Enhancement stories</strong> use parent.child IDs (e.g. <strong>US-5.1</strong>, <strong>US-5.2</strong>) nested under the parent story card — not standalone top-level numbers.</li>
-                <li><strong>Enhancement · US-26</strong> — <strong>US-38</strong> delivered Sprint&nbsp;5 (remaining physicians).</li>
-                <li><strong>Enhancement · US-5</strong> — <strong>US-5.1</strong> delivered (interpretation-first merge); <strong>US-5.2</strong> extends merged PDF to PFT &amp; PST.</li>
-                <li><strong>Sprint 5 (Jun&nbsp;2–15,&nbsp;2026)</strong> — <strong>closed</strong> · all seven stories delivered: US-13.1 · US-5.2 · US-11 · US-13.2 · US-34 · US-35 · US-38.</li>
-                <li><strong>Sprint 6 (Jun&nbsp;15–29)</strong> &amp; <strong>Sprint 7 (Jun&nbsp;30 – Jul&nbsp;13)</strong> — <strong>US-33</strong> SyncMD AI Ambient Notes Module (~140&nbsp;h · same story across both sprints).</li>
-            </ul>
-
-            <hr class="divider" id="sec-estimate-summary">
-
-            <h2>Estimate summary</h2>
+            <h2 id="sec-estimate-summary">Estimate summary</h2>
             <div class="dash-grid" aria-label="Estimate summary by delivery status">
                 <div class="dash-card done">
                     <div class="lbl">Completed</div>
@@ -727,11 +712,38 @@
             </table>
             <p class="legend" style="margin-top:14px;">Hours come from story-card workbooks and published BRD / APR estimate packs. <strong>595 h</strong> backlog estimated total excludes optional US-17; includes US-33 (~140 h) + US-27 (~30 h) + US-29 (11 h). PRM invoiced actuals supersede planning figures for delivered work. Line-by-line detail is in <a href="#sec-consolidated-hours">Consolidated Hour Estimate Breakdown</a> below.</p>
 
+            <details class="page-about-collapse">
+                <summary>About this page</summary>
+                <div class="page-about-inner">
+                    <a class="hub-link" href="index.html">← SFPCC shared documents</a>
+                    <p class="legend" style="margin: 14px 0 18px;">Proposing a <strong>new initiative</strong> not yet on this backlog? Use <strong>New initiative intake</strong> in the menu above, or open the <a href="SFPCC-Business-Case-Intake.html"><strong>business case intake form</strong></a> directly.</p>
+                    <div class="info-box">
+                        <strong>How to use this page:</strong> Start with <a href="#sec-estimate-summary">Estimate summary</a> for hours by bucket, then <a href="#sec-status">Delivery status at a glance</a> for the full story list. <strong>Click any story ID</strong> (e.g. US-25) to jump to its detail narrative and hour breakdown — stories with a published BRD open the BRD page directly. Status labels are maintained for the client; if something looks wrong, flag PRM and we will correct the same day.
+                    </div>
+                    <ul class="legend" style="margin:8px 0 0 1.1rem;line-height:1.65;">
+                        <li><strong>Completed</strong> — live in production for SFPCC as agreed.</li>
+                        <li><strong>Backlog</strong> — scoped or proposed, not yet delivered.</li>
+                        <li><strong>Backlog · estimated</strong> — BRD or estimate pack published; click story ID for detail &amp; hours.</li>
+                        <li><strong>Enhancement stories</strong> use parent.child IDs (e.g. <strong>US-5.1</strong>, <strong>US-5.2</strong>) nested under the parent story card — not standalone top-level numbers.</li>
+                        <li><strong>Enhancement · US-26</strong> — <strong>US-38</strong> delivered Sprint&nbsp;5 (remaining physicians).</li>
+                        <li><strong>Enhancement · US-5</strong> — <strong>US-5.1</strong> delivered (interpretation-first merge); <strong>US-5.2</strong> extends merged PDF to PFT &amp; PST.</li>
+                        <li><strong>Sprint 5 (Jun&nbsp;2–15,&nbsp;2026)</strong> — <strong>closed</strong> · all seven stories delivered: US-13.1 · US-5.2 · US-11 · US-13.2 · US-34 · US-35 · US-38.</li>
+                        <li><strong>Sprint 6 (Jun&nbsp;15–29)</strong> &amp; <strong>Sprint 7 (Jun&nbsp;30 – Jul&nbsp;13)</strong> — <strong>US-33</strong> SyncMD AI Ambient Notes Module (~140&nbsp;h · same story across both sprints).</li>
+                    </ul>
+                </div>
+            </details>
+
+            <div id="prm-view-heading" class="prm-view-heading" hidden></div>
+
+            <div id="prm-story-browser" class="prm-story-browser" hidden>
+                <ul id="prm-us-accordion" class="prm-us-accordion" aria-label="User stories"></ul>
+            </div>
+
             <hr class="divider" id="sec-status">
 
-            <h2>Delivery status at a glance</h2>
+            <h2 class="prm-status-section-title">Delivery status at a glance</h2>
 
-            <div class="status-tabs" id="status-tabs">
+            <div class="status-tabs prm-page-global" id="status-tabs" hidden aria-hidden="true">
                 <button class="status-tab active" data-tab="completed">Completed</button>
                 <button class="status-tab" data-tab="estimated">Backlog · Estimated</button>
                 <button class="status-tab" data-tab="backlog">Backlog</button>
@@ -1122,7 +1134,7 @@
             </div><div class="story-card" id="us-14-same-day-sync">
                 <div class="status-strip completed">✓ Completed</div>
                 <div class="badge badge-bug">US-14 · Bug Fix</div>
-                <h3>Same-Day Patient & Appointment Sync <span class="module-tag mod-integration">Integration</span></h3>
+                <h3>US-14: Same-Day Patient & Appointment Sync <span class="module-tag mod-integration">Integration</span></h3>
                 <div class="story-meta">Operational impact: assistants cannot work same-day patients until the next overnight sync.</div>
                 <div class="story-desc"><strong>Problem:</strong> New patients and appointments registered in CureMD only appear in ClinicSync the next day. If someone registers after the midnight sync has already run, they won't show up until tomorrow.</div>
                 <div class="context-block">
@@ -1143,7 +1155,7 @@
             </div><div class="story-card" id="us-15-instant-xray">
                 <div class="status-strip completed">✓ Completed</div>
                 <div class="badge badge-enhancement">US-15 · Enhancement</div>
-                <h3>Instant X-Ray Interpretation Upload <span class="module-tag mod-xray">X-Ray</span></h3>
+                <h3>US-15: Instant X-Ray Interpretation Upload <span class="module-tag mod-xray">X-Ray</span></h3>
                 <div class="story-meta">Operational impact: assistants may not see a completed interpretation for up to 30 minutes.</div>
                 <div class="story-desc"><strong>Problem:</strong> After the doctor signs an X-ray interpretation, it takes up to 30 minutes before it appears in CureMD. The interpretation is complete but not visible in the patient folder yet.</div>
                 <div class="context-block">
@@ -1164,7 +1176,7 @@
             </div><div class="story-card" id="us-16-sync-messaging">
                 <div class="status-strip completed">✓ Completed</div>
                 <div class="badge badge-enhancement">US-16 · Enhancement</div>
-                <h3>Consistent Sync Status Messaging <span class="module-tag mod-platform">Platform</span></h3>
+                <h3>US-16: Consistent Sync Status Messaging <span class="module-tag mod-platform">Platform</span></h3>
                 <div class="story-meta">Operational impact: staff lose time checking whether missing data is a bug or just delayed processing.</div>
                 <div class="story-desc"><strong>Problem:</strong> Staff don't know if a missing interpretation means it's still queued for sync, or if something failed. No clear status message on screen.</div>
                 <div class="context-block">
@@ -1185,7 +1197,7 @@
             </div><div class="story-card" id="us-17-order-validation">
                 <div class="status-strip backlog">Backlog · estimated · optional</div>
                 <div class="badge badge-optional">US-17 · Optional Enhancement</div>
-                <h3>CureMD Order Validation Gate <span class="module-tag mod-platform">Platform</span></h3>
+                <h3>US-17: CureMD Order Validation Gate <span class="module-tag mod-platform">Platform</span></h3>
                 <div class="story-meta">Operational impact: doctors may sign an interpretation even when a matching CureMD order does not yet exist.</div>
                 <div class="story-desc"><strong>Problem:</strong> No system check prevents a doctor from signing an X-ray interpretation when no matching order exists in CureMD. Creates workflow inconsistency and potential audit gaps.</div>
                 <div class="context-block">
@@ -2011,7 +2023,7 @@
             function formatUpdated(date) {
                 if (!date || isNaN(date.getTime())) return '';
                 var pad = function (n) { return n < 10 ? '0' + n : String(n); };
-                return pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + '-' + date.getFullYear();
+                return pad(date.getMonth() + 1) + '/' + pad(date.getDate()) + '/' + date.getFullYear();
             }
 
             function setDate(date) {
@@ -2092,35 +2104,7 @@
             });
         })();
     </script>
-    <script>
-        (function () {
-            var tbody = document.getElementById('delivery-status-body');
-            var tabs = document.querySelectorAll('.status-tab');
-            if (!tbody || !tabs.length) return;
-
-            var rows = Array.from(tbody.querySelectorAll('tr'));
-
-            function filterByTab(category) {
-                rows.forEach(function (row) {
-                    if (row.dataset.category === category) {
-                        row.classList.remove('tab-hidden');
-                    } else {
-                        row.classList.add('tab-hidden');
-                    }
-                });
-            }
-
-            tabs.forEach(function (tab) {
-                tab.addEventListener('click', function () {
-                    tabs.forEach(function (t) { t.classList.remove('active'); });
-                    tab.classList.add('active');
-                    filterByTab(tab.dataset.tab);
-                });
-            });
-
-            filterByTab('completed');
-        })();
-    </script>
+<script src="prm-backlog-nav.js?v=20260624e"></script>
 <script src="prm-date-format.js?v=20260622m"></script>
 <script src="prm-doc-meta.js?v=20260622m"></script>
 </body>

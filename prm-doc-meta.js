@@ -13,13 +13,16 @@
 
   function formatDate(input) {
     if (input == null || input === "") return "";
+    var formatted;
     if (global.PRM_DATE_FORMAT && global.PRM_DATE_FORMAT.format) {
-      return global.PRM_DATE_FORMAT.format(input);
+      formatted = global.PRM_DATE_FORMAT.format(input);
+    } else {
+      var s = String(input).trim();
+      var iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (iso) formatted = iso[2] + "-" + iso[3] + "-" + iso[1];
+      else formatted = s;
     }
-    var s = String(input).trim();
-    var iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (iso) return iso[2] + "-" + iso[3] + "-" + iso[1];
-    return s;
+    return formatted.replace(/^(\d{2})-(\d{2})-(\d{4})$/, "$1/$2/$3");
   }
 
   function getMetaIso() {
@@ -100,7 +103,7 @@
     if (targetSel) {
       var target = document.querySelector(targetSel);
       if (target) {
-        target.textContent = label;
+        target.textContent = formatDate(iso);
         return;
       }
     }

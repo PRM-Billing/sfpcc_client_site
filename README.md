@@ -23,4 +23,22 @@ cd PRM-Web-Deploy
 NETLIFY_TOKEN='nfp_...' NETLIFY_SITE_NAME=sfpcc-documents python3 deploy.py --sfpcc-client
 ```
 
-Set **whole-site Password Protection** (or SSO) **only on that Netlify site**. Keep `prm-documents` URLs internal.
+## New initiative intake — email notifications
+
+When someone submits **SFPCC-Business-Case-Intake.html**, a Netlify serverless function emails the full Q&A to **osanchez@prmbilling.net**.
+
+### One-time Netlify setup
+
+1. In [Resend](https://resend.com), create an API key and verify the sending domain (`prmbilling.net`) if you want mail from your domain.
+2. In the **sfpcc-documents** Netlify site → **Site configuration** → **Environment variables**, add:
+
+| Variable | Example | Required |
+|----------|---------|----------|
+| `RESEND_API_KEY` | `re_...` | Yes |
+| `INTAKE_FROM_EMAIL` | `SFPCC Intake <intake@prmbilling.net>` | Recommended |
+| `INTAKE_NOTIFY_TO` | `osanchez@prmbilling.net` | Optional (this is the default) |
+
+3. Redeploy the site so `netlify/functions/sfpcc-intake-notify.mjs` is published.
+
+Without `RESEND_API_KEY`, the form shows an error on submit. Use **Generate preview** and email the text manually until the key is set.
+

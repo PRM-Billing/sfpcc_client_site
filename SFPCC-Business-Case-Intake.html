@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="doc-last-updated" content="2026-06-21" />
+    <meta name="doc-last-updated" content="2026-06-24" />
     <meta name="description" content="SFPCC initiative intake — capture the detail PRM needs to scope, estimate, and plan ERP work.">
     <title>SFPCC · New initiative intake</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,6 +47,9 @@
         }
 
         .page { padding: clamp(1.5rem, 4vw, 2.5rem); padding-bottom: 3rem; }
+        body.prm-backlog-nav-on .page {
+            padding-top: clamp(1rem, 3vw, 1.25rem);
+        }
         .container { max-width: 820px; margin: 0 auto; }
 
         .masthead { margin-bottom: 2rem; }
@@ -344,8 +347,9 @@
             .check-grid { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="stylesheet" href="prm-backlog-nav.css?v=20260624e">
 </head>
-<body>
+<body data-prm-doc-updated="skip">
     <div class="page">
         <div class="container">
             <header class="masthead">
@@ -737,77 +741,11 @@
         </div>
     </div>
 
+    <script src="prm-intake-submit.js?v=20260623i"></script>
     <script>
-    function val(id) { return (document.getElementById(id) || {}).value || ''; }
-    function radio(name) {
-        var el = document.querySelector('input[name="' + name + '"]:checked');
-        return el ? el.value : 'Not specified';
-    }
-    function checkedValues(name) {
-        return Array.prototype.slice.call(document.querySelectorAll('input[name="' + name + '"]:checked'))
-            .map(function (el) { return el.value; }).join(', ') || 'None selected';
-    }
-
     function generateSummary() {
-        var summary = [
-            '═══════════════════════════════════════════════════',
-            'SFPCC BUSINESS CASE INTAKE',
-            '═══════════════════════════════════════════════════',
-            '',
-            'CONTACT',
-            '  Name: ' + val('f_name'),
-            '  Role: ' + val('f_role'),
-            '  Contact: ' + val('f_contact'),
-            '',
-            'INITIATIVE',
-            '  Title: ' + val('f_title'),
-            '  Type: ' + radio('req_type'),
-            '  ERP areas: ' + checkedValues('erp_area') + (val('f_erp_other') ? ' (' + val('f_erp_other') + ')' : ''),
-            '',
-            '───────────────────────────────────────────────────',
-            'PROBLEM',
-            '  ' + val('f_problem'),
-            '  Who affected: ' + val('f_affected'),
-            '  Example: ' + val('f_example'),
-            val('f_quote') ? '  Quote: ' + val('f_quote') : '',
-            '',
-            'WHY NOW',
-            '  Trigger: ' + val('f_trigger'),
-            '  90-day cost of inaction: ' + val('f_inaction_90'),
-            '  Deadline: ' + val('f_deadline'),
-            '',
-            'IMPACT',
-            '  Operational: ' + val('f_ops_impact'),
-            '',
-            'SOLUTION & SUCCESS',
-            '  Future state: ' + val('f_vision'),
-            '  Deliverables:',
-            val('f_deliverables'),
-            '  Success metric: ' + val('f_metric1_name') + ' | baseline ' + val('f_metric1_base') + ' → target ' + val('f_metric1_target') + ' by ' + val('f_metric1_when'),
-            val('f_previous') ? '  Previous attempts: ' + val('f_previous') : '',
-            val('f_market') ? '  Similar products: ' + val('f_market') : '',
-            '',
-            'SCOPE',
-            '  Out of scope: ' + val('f_out_scope'),
-            '  Rollout: ' + radio('rollout') + (val('f_rollout_detail') ? ' — ' + val('f_rollout_detail') : ''),
-            '',
-            'PEOPLE',
-            '  Accountable owner: ' + val('f_owner'),
-            '  SME: ' + val('f_sme'),
-            '  Approvers: ' + val('f_approvers'),
-            '  Locations: ' + checkedValues('locations'),
-            '',
-            'RISKS',
-            '  Top risk: ' + val('f_risk'),
-            '',
-            'PRIORITY',
-            '  Level: ' + radio('priority'),
-            '  Start timing: ' + radio('start_timing'),
-            val('f_notes') ? '  Notes: ' + val('f_notes') : '',
-            '',
-            '═══════════════════════════════════════════════════'
-        ].filter(Boolean).join('\n');
-
+        var form = document.getElementById('bc-intake-form');
+        var summary = window.PRM_INTAKE_SUBMIT.generateSummaryFromForm(form);
         document.getElementById('previewBox').textContent = summary;
         document.getElementById('previewBox').style.display = 'block';
         document.getElementById('generated_summary').value = summary;
@@ -822,8 +760,7 @@
         status.className = 'form-status';
         status.style.display = 'none';
 
-        var erpChecked = document.querySelectorAll('input[name="erp_area"]:checked').length;
-        if (!erpChecked && !val('f_erp_other')) {
+        if (!window.PRM_INTAKE_SUBMIT.validateErpSelection(form)) {
             status.textContent = 'Please select at least one ERP area, or describe it under "If other."';
             status.classList.add('form-status', 'error');
             status.style.display = 'block';
@@ -839,15 +776,8 @@
         generateSummary();
         btn.disabled = true;
 
-        var pathname = window.location.pathname;
-        if (!pathname || pathname === '/' || pathname === '/index.html') {
-            pathname = '/SFPCC-Business-Case-Intake.html';
-        }
-        var endpoint = window.location.origin + pathname;
-
-        fetch(endpoint, { method: 'POST', body: new FormData(form) })
-            .then(function (res) {
-                if (!res.ok) throw new Error('HTTP ' + res.status);
+        window.PRM_INTAKE_SUBMIT.submitIntake(form)
+            .then(function () {
                 status.textContent = 'Thank you — your intake was received. PRM will confirm within one business day with next steps and any follow-up questions.';
                 status.classList.add('form-status', 'success');
                 status.style.display = 'block';
@@ -857,7 +787,9 @@
                 status.scrollIntoView({ behavior: 'smooth' });
             })
             .catch(function (err) {
-                status.textContent = 'Submission failed (' + (err.message || 'unknown error') + '). Use Generate preview, copy the text, and email your PRM contact — or retry after refreshing.';
+                var message = err && err.message ? err.message : 'unknown error';
+                if (message === 'ERP_AREA_REQUIRED' || message === 'VALIDATION_FAILED') return;
+                status.textContent = 'Submission failed (' + message + '). Use Generate preview, copy the text, and email osanchez@prmbilling.net — or retry after refreshing.';
                 status.classList.add('form-status', 'error');
                 status.style.display = 'block';
                 status.scrollIntoView({ behavior: 'smooth' });
@@ -865,6 +797,7 @@
             .finally(function () { btn.disabled = false; });
     }
     </script>
+<script src="prm-backlog-nav.js?v=20260624e"></script>
 <script src="prm-date-format.js?v=20260622m"></script>
 <script src="prm-doc-meta.js?v=20260622m"></script>
 </body>
