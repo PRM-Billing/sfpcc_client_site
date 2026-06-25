@@ -14,16 +14,33 @@ Runs automatically when deploying with **`python3 deploy.py --sfpcc-client`**:
 
 `index.html` in this folder is hand-maintained — only SFPCC entry points linked.
 
-## Commands
+## Deploy to Netlify (`sfpcc-documents`)
 
-Using a dedicated Netlify site (example name `sfpcc-documents`):
+**Pushing to GitHub does not update the live site by itself.** The Netlify site must be redeployed after each push.
+
+### Option A — GitHub Actions (recommended)
+
+1. In [Netlify](https://app.netlify.com) → **sfpcc-documents** → **Site configuration** → **General** → copy **Site ID**.
+2. Netlify → **User settings** → **Personal access tokens** → create a token.
+3. In GitHub → **PRM-Billing/sfpcc_client_site** → **Settings** → **Secrets and variables** → **Actions**, add:
+   - `NETLIFY_AUTH_TOKEN` — your Netlify token
+   - `NETLIFY_SITE_ID` — site ID from step 1
+4. Push to `main` (or run **Actions** → **Deploy to Netlify** → **Run workflow**).
+
+### Option B — Netlify linked to GitHub
+
+Netlify → **sfpcc-documents** → **Build & deploy** → **Link repository** → `PRM-Billing/sfpcc_client_site`, branch `main`, publish directory `.` → **Trigger deploy**.
+
+### Option C — Legacy `deploy.py` (PRM-Web-Deploy repo)
 
 ```bash
 cd PRM-Web-Deploy
 NETLIFY_TOKEN='nfp_...' NETLIFY_SITE_NAME=sfpcc-documents python3 deploy.py --sfpcc-client
 ```
 
-## New initiative intake — email notifications
+After deploy, hard-refresh the backlog page (`Ctrl+Shift+R`). The landing view opens **Completed** with the sticky nav and accordion browser.
+
+## What gets copied (legacy deploy.py)
 
 When someone submits **SFPCC-Business-Case-Intake.html**, a Netlify serverless function emails the full Q&A to **osanchez@prmbilling.net**.
 

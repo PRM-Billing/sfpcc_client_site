@@ -726,7 +726,10 @@
         var viewId = viewFromHash();
         if (viewId) {
             setView(viewId, options);
+            return;
         }
+
+        setView('completed', options);
     }
 
     function buildNav() {
