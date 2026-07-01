@@ -1,12 +1,19 @@
-/* Sticky backlog shortcuts — shared by consolidated backlog + intake form */
+/* Sticky backlog shortcuts — PRM brand */
 :root {
-    --prm-nav-bg: #1a365d;
-    --prm-nav-accent: #3182ce;
+    --prm-navy: #123a59;
+    --prm-blue: #006ba8;
+    --prm-blue-light: #50afe5;
+    --prm-blue-text: #2d91cc;
+    --prm-gold: #ffc804;
+    --prm-orange: #ec5030;
+    --prm-orange-hover: #fa6c50;
+    --prm-nav-bg: #ffffff;
+    --prm-nav-accent: var(--prm-blue);
     --prm-nav-h: 56px;
 }
 
 body.prm-backlog-nav-on {
-    padding-top: var(--prm-nav-offset, var(--prm-nav-h));
+    padding-top: 0;
 }
 
 #sec-status {
@@ -14,14 +21,17 @@ body.prm-backlog-nav-on {
 }
 
 .prm-backlog-nav {
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     right: 0;
     z-index: 10050;
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 4px;
     background: var(--prm-nav-bg);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.18);
+    border-bottom: 1px solid #e8eef3;
+    box-shadow: 0 4px 16px rgba(18, 58, 89, 0.1);
 }
 
 /* When prm-doc-meta bar is present, sit below it */
@@ -30,15 +40,43 @@ body.prm-doc-bar-on .prm-backlog-nav {
 }
 
 .prm-backlog-nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 10px 20px;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 10px clamp(16px, 3vw, 24px);
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 12px 16px;
+}
+
+.prm-nav-brand {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    line-height: 0;
+    padding: 2px 0;
+}
+
+.prm-nav-brand img,
+.prm-nav-brand svg {
+    display: block;
+    height: 54px;
+    width: auto;
+    max-width: min(360px, 55vw);
+}
+
+.prm-backlog-nav-menu {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
     gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .prm-backlog-nav a {
@@ -46,9 +84,9 @@ body.prm-doc-bar-on .prm-backlog-nav {
     align-items: center;
     justify-content: center;
     min-height: 36px;
-    color: rgba(255, 255, 255, 0.92);
+    color: var(--prm-blue-light);
     text-decoration: none;
-    font-size: 0.84rem;
+    font-size: 0.88rem;
     font-weight: 600;
     line-height: 1.35;
     padding: 8px 16px;
@@ -59,12 +97,32 @@ body.prm-doc-bar-on .prm-backlog-nav {
 }
 
 .prm-backlog-nav a:hover {
-    background: rgba(255, 255, 255, 0.14);
-    color: #fff;
+    background: #f2faff;
+    color: var(--prm-blue);
 }
 
 .prm-backlog-nav a.is-active {
-    background: var(--prm-nav-accent);
+    background: rgba(0, 107, 168, 0.1);
+    color: var(--prm-blue);
+    box-shadow: none;
+}
+
+.prm-backlog-nav a.prm-nav-intake {
+    border: none;
+    background: var(--prm-orange);
+    color: #fff;
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+.prm-backlog-nav a.prm-nav-intake:hover {
+    background: var(--prm-orange-hover);
+    color: #fff;
+}
+
+.prm-backlog-nav a.prm-nav-intake.is-active {
+    background: var(--prm-orange-hover);
     color: #fff;
 }
 
@@ -72,18 +130,9 @@ body.prm-doc-bar-on .prm-backlog-nav {
     width: 1px;
     align-self: stretch;
     min-height: 24px;
-    background: rgba(255, 255, 255, 0.22);
+    background: #d4e1ec;
     margin: 6px 6px;
     flex-shrink: 0;
-}
-
-.prm-backlog-nav a.prm-nav-intake {
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.prm-backlog-nav a.prm-nav-intake.is-active {
-    border-color: transparent;
 }
 
 /* ——— US search (nav) ——— */
@@ -108,10 +157,10 @@ body.prm-doc-bar-on .prm-backlog-nav {
 .prm-us-search-input {
     width: 100%;
     min-height: 36px;
-    border: 1px solid rgba(255, 255, 255, 0.28);
+    border: 1px solid #d4e1ec;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background: #f2faff;
+    color: var(--prm-navy);
     font: inherit;
     font-size: 0.84rem;
     font-weight: 500;
@@ -120,14 +169,14 @@ body.prm-doc-bar-on .prm-backlog-nav {
 }
 
 .prm-us-search-input::placeholder {
-    color: rgba(255, 255, 255, 0.55);
+    color: #8eb3d1;
 }
 
 .prm-us-search-input:hover,
 .prm-us-search-input:focus {
     outline: none;
-    background: rgba(255, 255, 255, 0.16);
-    border-color: rgba(255, 255, 255, 0.45);
+    background: #fff;
+    border-color: var(--prm-blue-light);
 }
 
 .prm-us-search-results {
@@ -445,6 +494,27 @@ body.prm-view-completed .content > hr.divider:first-of-type,
 body.prm-view-estimated .content > hr.divider:first-of-type,
 body.prm-view-backlog .content > hr.divider:first-of-type {
     display: none;
+}
+
+@media (max-width: 720px) {
+    .prm-backlog-nav-inner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .prm-nav-brand {
+        justify-content: center;
+    }
+
+    .prm-nav-brand img,
+    .prm-nav-brand svg {
+        height: 46px;
+        max-width: 100%;
+    }
+
+    .prm-backlog-nav-menu {
+        justify-content: center;
+    }
 }
 
 @media print {

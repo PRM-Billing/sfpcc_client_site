@@ -12,7 +12,7 @@
         { id: 'completed', label: 'Completed', hash: 'prm-nav-completed', tab: 'completed' },
         { id: 'estimated', label: 'Backlog Estimated', hash: 'prm-nav-estimated', tab: 'estimated' },
         { id: 'backlog', label: 'Backlog', hash: 'prm-nav-backlog', tab: 'backlog' },
-        { id: 'intake', label: 'New initiative intake', hash: '', tab: null, href: INTAKE },
+        { id: 'intake', label: 'New initiative', hash: '', tab: null, href: INTAKE },
     ];
 
     var VIEW_META = {
@@ -56,9 +56,12 @@
     }
 
     function setBodyOffset(nav) {
-        if (!nav || !document.body) return;
-        var total = docBarHeight() + (nav.offsetHeight || 56);
-        document.documentElement.style.setProperty('--prm-nav-offset', total + 'px');
+        if (!document.documentElement) return;
+        var banner = document.querySelector('.prm-page-banner');
+        var bannerH = banner ? banner.offsetHeight : 0;
+        var navH = nav ? nav.offsetHeight : 56;
+        document.documentElement.style.setProperty('--prm-banner-offset', bannerH + 'px');
+        document.documentElement.style.setProperty('--prm-nav-offset', navH + 'px');
     }
 
     function categorizeFromStrip(strip) {
@@ -740,12 +743,27 @@
         var inner = document.createElement('div');
         inner.className = 'prm-backlog-nav-inner';
 
+        var brand = document.createElement('span');
+        brand.className = 'prm-nav-brand';
+        brand.setAttribute('aria-label', 'Professional Reimbursement Managers');
+        var logo = document.createElement('img');
+        logo.src = 'assets/prm-logo.png?v=20260625b';
+        logo.alt = 'Professional Reimbursement Managers';
+        logo.width = 280;
+        logo.height = 44;
+        logo.decoding = 'async';
+        brand.appendChild(logo);
+        inner.appendChild(brand);
+
+        var menu = document.createElement('div');
+        menu.className = 'prm-backlog-nav-menu';
+
         NAV_ITEMS.forEach(function (item, index) {
             if (index === 3) {
                 var sep = document.createElement('span');
                 sep.className = 'prm-nav-sep';
                 sep.setAttribute('aria-hidden', 'true');
-                inner.appendChild(sep);
+                menu.appendChild(sep);
             }
 
             var a = document.createElement('a');
@@ -769,32 +787,53 @@
                 a.href = backlogUrl(item.hash);
             }
 
-            inner.appendChild(a);
+            menu.appendChild(a);
         });
 
         if (isBacklogPage()) {
             var searchSep = document.createElement('span');
             searchSep.className = 'prm-nav-sep';
             searchSep.setAttribute('aria-hidden', 'true');
-            inner.appendChild(searchSep);
-            inner.appendChild(buildUsSearch());
+            menu.appendChild(searchSep);
+            menu.appendChild(buildUsSearch());
         } else {
             var intakeSearchSep = document.createElement('span');
             intakeSearchSep.className = 'prm-nav-sep';
             intakeSearchSep.setAttribute('aria-hidden', 'true');
-            inner.appendChild(intakeSearchSep);
-            inner.appendChild(buildUsSearch());
+            menu.appendChild(intakeSearchSep);
+            menu.appendChild(buildUsSearch());
         }
 
+        inner.appendChild(menu);
         nav.appendChild(inner);
         return nav;
+    }
+
+    function mountNavAfterBanner(nav) {
+        var banner = document.querySelector('.prm-page-banner');
+        if (banner && banner.parentNode) {
+            if (banner.nextSibling) {
+                banner.parentNode.insertBefore(nav, banner.nextSibling);
+            } else {
+                banner.parentNode.appendChild(nav);
+            }
+            return;
+        }
+
+        var container = document.querySelector('.container');
+        if (container && container.parentNode) {
+            container.parentNode.insertBefore(nav, container);
+            return;
+        }
+
+        document.body.insertBefore(nav, document.body.firstChild);
     }
 
     function mount() {
         if (!isBacklogPage() && !isIntakePage()) return;
 
         navEl = buildNav();
-        document.body.insertBefore(navEl, document.body.firstChild);
+        mountNavAfterBanner(navEl);
         document.body.classList.add('prm-backlog-nav-on');
 
         function refreshOffset() {

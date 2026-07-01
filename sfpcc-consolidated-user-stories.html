@@ -7,21 +7,22 @@
     <title>SFPCC — ERP Backlog &amp; Delivery Status</title>
     <style>
         :root {
-            --primary: #1a365d;
-            --primary-light: #2c5282;
-            --accent: #3182ce;
+            --primary: #123a59;
+            --primary-light: #1b476b;
+            --accent: #006ba8;
+            --prm-gold: #ffc804;
             --success: #2f855a;
             --success-light: #f0fff4;
             --warning: #d69e2e;
             --warning-light: #fffbeb;
-            --danger: #e53e3e;
+            --danger: #ec5030;
             --danger-light: #fff5f5;
-            --bg: #f7fafc;
+            --bg: #f2faff;
             --card-bg: #ffffff;
-            --text: #2d3748;
-            --text-light: #718096;
-            --border: #e2e8f0;
-            --muted-bg: #f8fafc;
+            --text: #123a59;
+            --text-light: #628eb2;
+            --border: #d4e1ec;
+            --muted-bg: #f2faff;
             --purple: #6b46c1;
             --purple-light: #f3e8ff;
             --teal: #319795;
@@ -38,11 +39,12 @@
             background: var(--bg);
             color: var(--text);
             line-height: 1.7;
-            padding: 0 20px 40px;
+            padding: 0 0 40px;
         }
 
         body.prm-backlog-nav-on .container {
-            margin-top: 16px;
+            margin-top: 0;
+            padding: 0 20px;
         }
 
         .container {
@@ -50,9 +52,69 @@
             margin: 0 auto;
         }
 
+        .prm-page-banner {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: #fff;
+            padding: 28px clamp(20px, 4vw, 44px);
+        }
+
+        .prm-page-banner-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: clamp(20px, 3vw, 32px);
+        }
+
+        .prm-banner-client {
+            flex-shrink: 0;
+            line-height: 0;
+        }
+
+        .prm-banner-client img {
+            display: block;
+            height: clamp(56px, 10vw, 88px);
+            width: auto;
+            max-width: min(280px, 38vw);
+        }
+
+        .prm-banner-divider {
+            width: 1px;
+            align-self: stretch;
+            min-height: 72px;
+            background: rgba(255, 255, 255, 0.42);
+            flex-shrink: 0;
+        }
+
+        .prm-page-banner .header,
+        .prm-banner-content {
+            flex: 1;
+            min-width: 0;
+            max-width: none;
+            margin: 0;
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        @media (max-width: 720px) {
+            .prm-page-banner-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .prm-banner-divider {
+                width: 100%;
+                height: 1px;
+                min-height: 0;
+                align-self: stretch;
+            }
+        }
+
         .print-btn {
             position: fixed;
-            top: calc(var(--prm-nav-offset, 52px) + 12px);
+            top: calc(var(--prm-banner-offset, 0px) + var(--prm-nav-offset, 52px) + 12px);
             right: 24px;
             z-index: 999;
             border: none;
@@ -74,15 +136,21 @@
             border-radius: 14px 14px 0 0;
         }
 
+        body.prm-backlog-nav-on .content {
+            border-radius: 14px;
+            margin-top: 16px;
+        }
+
         .eyebrow {
             display: inline-block;
             font-size: 0.72rem;
             font-weight: 700;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            background: rgba(255,255,255,0.16);
-            color: #fff;
-            padding: 5px 10px;
+            background: rgba(255, 200, 4, 0.18);
+            color: var(--prm-gold);
+            border: 1px solid rgba(255, 200, 4, 0.35);
+            padding: 4px 12px;
             border-radius: 999px;
             margin-bottom: 14px;
         }
@@ -639,22 +707,30 @@
             .story-card { page-break-inside: avoid; }
         }
     </style>
-    <link rel="stylesheet" href="prm-backlog-nav.css?v=20260624f">
+    <link rel="stylesheet" href="prm-backlog-nav.css?v=20260625b">
 </head>
-<body data-prm-updated-target="#doc-last-updated">
+<body class="prm-backlog-main" data-prm-updated-target="#doc-last-updated">
     <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
 
-    <div class="container">
-        <div class="header">
-            <div class="eyebrow">Client view · living backlog</div>
-            <h1>SFPCC — ERP Backlog &amp; Delivery Status</h1>
-            <div class="header-meta">
-                <strong>For:</strong> Jorge &amp; SFPCC leadership — completed vs backlog user stories in one place (no items marked in flight at this snapshot).<br>
-                <strong>Last updated:</strong> <span class="last-updated-date" id="doc-last-updated">…</span><br>
-                <strong>Maintained by:</strong> PRM Billing · Himani Juneja, Chief of Staff
+    <header class="prm-page-banner">
+        <div class="prm-page-banner-inner">
+            <div class="prm-banner-client">
+                <img src="assets/sfpcc-logo-white.png?v=20260625b" alt="South Florida Pulmonary &amp; Critical Care Associates" width="280" height="88" decoding="async">
+            </div>
+            <div class="prm-banner-divider" aria-hidden="true"></div>
+            <div class="header prm-banner-content">
+                <div class="eyebrow">Client view · living backlog</div>
+                <h1>SFPCC — ERP Backlog &amp; Delivery Status</h1>
+                <div class="header-meta">
+                    <strong>For:</strong> Jorge &amp; SFPCC leadership — completed vs backlog user stories in one place (no items marked in flight at this snapshot).<br>
+                    <strong>Last updated:</strong> <span class="last-updated-date" id="doc-last-updated">…</span><br>
+                    <strong>Maintained by:</strong> PRM Billing · Himani Juneja, Chief of Staff
+                </div>
             </div>
         </div>
+    </header>
 
+    <div class="container">
         <div class="content">
             <h2 id="sec-estimate-summary">Estimate summary</h2>
             <div class="dash-grid" aria-label="Estimate summary by delivery status">
@@ -2104,7 +2180,7 @@
             });
         })();
     </script>
-<script src="prm-backlog-nav.js?v=20260624f"></script>
+<script src="prm-backlog-nav.js?v=20260625b"></script>
 <script src="prm-date-format.js?v=20260622m"></script>
 <script src="prm-doc-meta.js?v=20260622m"></script>
 </body>
