@@ -18,15 +18,18 @@
     var VIEW_META = {
         completed: {
             title: 'Completed',
-            subtitle: '18 stories · 337.7 h planning total · live in production for SFPCC as agreed.',
+            badgePrimary: '18 Stories – 337.7 h total spent',
+            badgeSecondary: 'Live in production for SFPCC as agreed',
         },
         estimated: {
             title: 'Backlog Estimated',
-            subtitle: '14 stories · 595–606 h backlog estimated · BRD or estimate pack published.',
+            badgePrimary: '14 Stories – 595–606 h backlog estimated',
+            badgeSecondary: 'BRD or estimate pack published',
         },
         backlog: {
             title: 'Backlog',
-            subtitle: '8 stories · hours pending BRD / estimate · scoped or proposed, not yet delivered.',
+            badgePrimary: '8 Stories – Hours Pending',
+            badgeSecondary: 'Scoped or proposed, not yet delivered',
         },
     };
 
@@ -308,8 +311,14 @@
         if (!heading || !meta) return;
         heading.hidden = false;
         heading.innerHTML =
-            '<h2>' + meta.title + '</h2>' +
-            '<p class="legend">' + meta.subtitle + '</p>';
+            '<div class="prm-view-heading-row">' +
+                '<h2>' + meta.title + '</h2>' +
+                '<div class="prm-view-heading-badge">' +
+                    '<strong>' + meta.badgePrimary + '</strong>' +
+                    '<span>' + meta.badgeSecondary + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="prm-view-heading-rule" aria-hidden="true"></div>';
     }
 
     function cloneStoryContent(entry) {

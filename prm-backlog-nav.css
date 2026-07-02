@@ -465,23 +465,85 @@ body.prm-view-backlog .prm-story-section-heading {
 }
 
 .prm-view-heading {
-    margin: 0 0 20px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--accent, #3182ce);
-}
-
-.prm-view-heading h2 {
-    font-size: 1.35rem;
-    color: var(--primary, #1a365d);
-    margin: 0 0 8px;
+    margin: 0 0 16px;
     padding: 0;
     border: none;
 }
 
-.prm-view-heading .legend {
+.prm-view-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 20px;
+    flex-wrap: wrap;
+}
+
+.prm-view-heading h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--prm-navy, #123a59);
     margin: 0;
+    padding: 0;
+    border: none;
+    line-height: 1.2;
+}
+
+.prm-view-heading-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+    min-width: min(100%, 280px);
+    max-width: 420px;
+    margin-left: auto;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: var(--prm-orange, #ec5030);
+    color: #fff;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.prm-view-heading-badge strong,
+.prm-view-heading-badge span {
+    display: block;
+    width: 100%;
+    letter-spacing: normal;
+    word-spacing: normal;
+    line-height: 1.4;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.prm-view-heading-badge strong {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.prm-view-heading-badge span {
     font-size: 0.88rem;
-    color: var(--text-light, #718096);
+    font-weight: 500;
+    opacity: 0.96;
+}
+
+.prm-view-heading-rule {
+    margin-top: 14px;
+    height: 2px;
+    background: var(--prm-blue-light, #50afe5);
+    border-radius: 1px;
+}
+
+@media (max-width: 640px) {
+    .prm-view-heading-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .prm-view-heading-badge {
+        max-width: none;
+        align-items: flex-end;
+        text-align: right;
+    }
 }
 
 body.prm-view-completed #sec-status,
