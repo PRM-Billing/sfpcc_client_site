@@ -536,6 +536,18 @@
         return navVar ? parseFloat(navVar) || 56 : 56;
     }
 
+    function scrollPageToTop() {
+        function doScroll() {
+            global.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        }
+
+        doScroll();
+        global.requestAnimationFrame(function () {
+            doScroll();
+            global.setTimeout(doScroll, 50);
+        });
+    }
+
     function scrollStoryIntoView(details) {
         if (!details || !details.isConnected) return;
 
@@ -663,12 +675,7 @@
         renderStoryAccordion(viewId);
 
         if (!options.skipScroll) {
-            var heading = document.getElementById('prm-view-heading');
-            if (heading) {
-                heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                global.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+            scrollPageToTop();
         }
 
         if (!options.skipHash) {
